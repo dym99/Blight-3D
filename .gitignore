@@ -1,7 +1,10 @@
 .vs/
-Debug/
-Release/
-x64/
+OpenGL Framework Test1/OpenGL Framework Test1/Debug
+OpenGL Framework Test1/OpenGL Framework Test1/Release
+OpenGL Framework Test1/OpenGL Framework Test1/x64
 *.pdb
 *.ibd
+*.ipdb
+*.obj
+*.iobj
 *.ilk
