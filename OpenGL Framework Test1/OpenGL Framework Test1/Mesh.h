@@ -32,6 +32,7 @@ public:
 	GLuint VAO = 0;
 
 private:
+	bool hasUVs = false;
 	unsigned int m_NumFaces;
 	unsigned int m_NumVertices;
 	Transform transform;

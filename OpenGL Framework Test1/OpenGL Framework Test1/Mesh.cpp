@@ -80,47 +80,51 @@ bool Mesh::LoadFromFile(const std::string & file)
 	while (!input.eof()) {
 		input.getline(inputString, CHAR_BUFFER_SIZE);
 
-		if (std::strstr(inputString, "#") != nullptr) {
+		if (inputString[0] == '#') {
 			//This line is a comment
 			continue;
 		}
-		if (std::strstr(inputString, "mtllib") != nullptr) {
-			//This line is a mtl
-			continue;
-		}
-		if (std::strstr(inputString, "s") != nullptr) {
-			//this line is useless
-			continue;
-		}
-		else if (std::strstr(inputString, "vn") != nullptr) {
-			//This line has normal data in it
-			glm::vec3 temp;
+		else if (inputString[0] == 'v') {
+			if (inputString[1] == 'n') {
+				//This line has normal data in it
+				glm::vec3 temp;
 
-			std::sscanf(inputString, "vn %f %f %f", &temp.x, &temp.y, &temp.z);
-			normalData.push_back(temp);
-		}
-		else if (std::strstr(inputString, "vt") != nullptr) {
-			//This line has texture data in it
-			glm::vec2 temp;
+				std::sscanf(inputString, "vn %f %f %f", &temp.x, &temp.y, &temp.z);
+				normalData.push_back(temp);
+			}
+			else if (inputString[1] == 't') {
+				//This line has texture data in it
+				glm::vec2 temp;
 
-			std::sscanf(inputString, "vt %f %f", &temp.x, &temp.y);
-			textureData.push_back(temp);
+				hasUVs ? true : hasUVs = true;
+
+				std::sscanf(inputString, "vt %f %f", &temp.x, &temp.y);
+				textureData.push_back(temp);
+			}
+			else {
+				//This line has vertex data in it
+				glm::vec3 temp;
+
+				std::sscanf(inputString, "v %f %f %f", &temp.x, &temp.y, &temp.z);
+				vertexData.push_back(temp);
+			}
 		}
-		else if (std::strstr(inputString, "v") != nullptr) {
-			//This line has vertex data in it
-			glm::vec3 temp;
-			
-			std::sscanf(inputString, "v %f %f %f", &temp.x, &temp.y, &temp.z);
-			vertexData.push_back(temp);
-		}
-		else if (std::strstr(inputString, "f") != nullptr) {
+		else if (inputString[0] == 'f') {
 			//This line has face data in it
 			MeshFace temp;
 
-			std::sscanf(inputString, "f %u/%u/%u %u/%u/%u %u/%u/%u",
-				&temp.vertices[0], &temp.textureUVs[0], &temp.normals[0],
-				&temp.vertices[1], &temp.textureUVs[1], &temp.normals[1],
-				&temp.vertices[2], &temp.textureUVs[2], &temp.normals[2]);
+			if (hasUVs) {
+				std::sscanf(inputString, "f %u/%u/%u %u/%u/%u %u/%u/%u",
+					&temp.vertices[0], &temp.textureUVs[0], &temp.normals[0],
+					&temp.vertices[1], &temp.textureUVs[1], &temp.normals[1],
+					&temp.vertices[2], &temp.textureUVs[2], &temp.normals[2]);
+			}
+			else {
+				std::sscanf(inputString, "f %u//%u %u//%u %u//%u",
+					&temp.vertices[0], &temp.normals[0],
+					&temp.vertices[1], &temp.normals[1],
+					&temp.vertices[2], &temp.normals[2]);
+			}
 			faceData.push_back(temp);
 		}
 	}
@@ -136,8 +140,10 @@ bool Mesh::LoadFromFile(const std::string & file)
 			unPackedVertexData.push_back(vertexData[faceData[i].vertices[j] - 1].y);
 			unPackedVertexData.push_back(vertexData[faceData[i].vertices[j] - 1].z);
 
-			unPackedTextureData.push_back(textureData[faceData[i].textureUVs[j] - 1].x);
-			unPackedTextureData.push_back(textureData[faceData[i].textureUVs[j] - 1].y);
+			if (hasUVs) {
+				unPackedTextureData.push_back(textureData[faceData[i].textureUVs[j] - 1].x);
+				unPackedTextureData.push_back(textureData[faceData[i].textureUVs[j] - 1].y);
+			}
 
 			unPackedNormalData.push_back(normalData[faceData[i].normals[j] - 1].x);
 			unPackedNormalData.push_back(normalData[faceData[i].normals[j] - 1].y);
@@ -151,7 +157,9 @@ bool Mesh::LoadFromFile(const std::string & file)
 	//Send the data to OpenGL
 	glGenVertexArrays(1, &VAO);
 	glGenBuffers(1, &VBO_Vertices);
-	glGenBuffers(1, &VBO_UVs);
+	if (hasUVs) {
+		glGenBuffers(1, &VBO_UVs);
+	}
 	glGenBuffers(1, &VBO_Normals);
 
 	glBindVertexArray(VAO);
@@ -165,10 +173,12 @@ bool Mesh::LoadFromFile(const std::string & file)
 	glBufferData(GL_ARRAY_BUFFER, sizeof(float) * unPackedVertexData.size(), &unPackedVertexData[0], GL_STATIC_DRAW);
 	glVertexAttribPointer((GLuint)0, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 3, BUFFER_OFFSET(0));
 
-	//Send the texture data to OpenGL
-	glBindBuffer(GL_ARRAY_BUFFER, VBO_UVs);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(float) * unPackedTextureData.size(), &unPackedTextureData[0], GL_STATIC_DRAW);
-	glVertexAttribPointer((GLuint)1, 2, GL_FLOAT, GL_FALSE, sizeof(float) * 2, BUFFER_OFFSET(0));
+	if (hasUVs) {
+		//Send the texture data to OpenGL
+		glBindBuffer(GL_ARRAY_BUFFER, VBO_UVs);
+		glBufferData(GL_ARRAY_BUFFER, sizeof(float) * unPackedTextureData.size(), &unPackedTextureData[0], GL_STATIC_DRAW);
+		glVertexAttribPointer((GLuint)1, 2, GL_FLOAT, GL_FALSE, sizeof(float) * 2, BUFFER_OFFSET(0));
+	}
 
 	//Send the texture data to OpenGL
 	glBindBuffer(GL_ARRAY_BUFFER, VBO_Normals);
@@ -200,7 +210,9 @@ void Mesh::Draw(Shader * shader)
 void Mesh::Unload()
 {
 	glDeleteBuffers(1, &VBO_Normals);
-	glDeleteBuffers(1, &VBO_UVs);
+	if (hasUVs) {
+		glDeleteBuffers(1, &VBO_UVs);
+	}
 	glDeleteBuffers(1, &VBO_Vertices);
 	glDeleteVertexArrays(1, &VAO);
 
