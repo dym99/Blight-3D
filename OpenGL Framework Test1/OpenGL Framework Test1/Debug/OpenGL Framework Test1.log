@@ -1,0 +1,8 @@
+﻿  Display.cpp
+  Game.cpp
+  main.cpp
+c:\users\100662175\git\blight-3d\opengl framework test1\opengl framework test1\main.cpp(17): warning C4067: unexpected tokens following preprocessor directive - expected a newline
+c:\users\100662175\git\blight-3d\opengl framework test1\opengl framework test1\main.cpp(18): warning C4326: return type of 'main' should be 'int' instead of 'void'
+  Generating Code...
+c:\users\100662175\git\blight-3d\opengl framework test1\opengl framework test1\game.cpp(72): warning C4715: 'Game::initSDL': not all control paths return a value
+  OpenGL Framework Test1.vcxproj -> C:\Users\100662175\git\blight-3d\OpenGL Framework Test1\Debug\OpenGL Framework Test1.exe

@@ -14,8 +14,7 @@ Shader* shaderHook;
 std::vector<Shader*> shaders;
 
 
-#undef main()
-void main() {
+int main(int,char**) {
 	Camera camera(glm::vec3(0, 0, 3), 70.f, (float)display.GetWidth() / (float)display.GetHeight(), 0.001f, 1000.f);
 
 	Shader basicShader("./Resources/basicShader");
@@ -39,6 +38,7 @@ void main() {
 
 		PrepareForNextFrame(&camera);
 	}
+	return 0;
 }
 
 //Prepares everything for the next frame
