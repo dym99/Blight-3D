@@ -15,14 +15,14 @@ std::vector<Shader*> shaders;
 
 
 int main(int,char**) {
-	Camera camera(glm::vec3(0, 0, 3), 70.f, (float)display.GetWidth() / (float)display.GetHeight(), 0.001f, 1000.f);
+	Camera camera(glm::vec3(0, 0, 40), 70.f, (float)display.GetWidth() / (float)display.GetHeight(), 0.001f, 1000.f);
 
 	Shader basicShader("./Resources/Shaders/basicShader");
 	shaders.push_back(&basicShader);
 
 	Mesh box;
 	box.LoadFromFile("./Resources/Objects/Ravager/Ravager.obj");
-
+	box.GetTransform()->getPos() -= glm::vec3(0, 5.f, 20.f);
 
 	if (shaders.size() != 0)
 		shaderHook = shaders.at(Interact::GetShaderIndex());
@@ -32,7 +32,7 @@ int main(int,char**) {
 	while (!display.isClosed()) {
 
 		shaderHook->bind();
-		box.GetTransform()->getRot() += glm::vec3(0.2f, 0.5f, 0.1f) * glm::pi<float>() / (400.f);
+		//box.GetTransform()->getRot().y += glm::pi<float>();
 		shaderHook->update(*box.GetTransform(), camera);
 		box.Draw(shaderHook);
 

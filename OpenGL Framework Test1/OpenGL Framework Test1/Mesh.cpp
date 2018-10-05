@@ -84,6 +84,14 @@ bool Mesh::LoadFromFile(const std::string & file)
 			//This line is a comment
 			continue;
 		}
+		if (std::strstr(inputString, "mtllib") != nullptr) {
+			//This line is a mtl
+			continue;
+		}
+		if (std::strstr(inputString, "s") != nullptr) {
+			//this line is useless
+			continue;
+		}
 		else if (std::strstr(inputString, "vn") != nullptr) {
 			//This line has normal data in it
 			glm::vec3 temp;
