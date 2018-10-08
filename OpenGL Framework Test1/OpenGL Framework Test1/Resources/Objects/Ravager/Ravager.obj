@@ -1,6 +1,6 @@
 # Blender v2.79 (sub 0) OBJ File: 'Ravager 3d Model.blend'
 # www.blender.org
-mtllib Ravager 3d Model.mtl
+mtllib Ravager.mtl
 o Sphere
 v 0.702370 17.880339 1.575972
 v 0.702370 17.964621 1.472851

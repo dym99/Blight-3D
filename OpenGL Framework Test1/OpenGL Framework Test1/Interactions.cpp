@@ -13,7 +13,7 @@ int Interact::modelIndex = 0;
 Transform* Interact::transform = NULL;
 Interact* Interact::instance = NULL;
 std::unordered_map<std::string, const char*> Interact::paths = {
-	{"crysis", "./Resources/Crysis/nanosuit.obj" },
+	{"crysis", "./Resources/Objects/Ravager/Ravager.obj" },
 	{"albeto", "./Resources/Albeto/scene.gltf" },
 	{"lamp", "./Resources/cube.obj"},
 	{"box", "./Resources/Box/box.obj" }

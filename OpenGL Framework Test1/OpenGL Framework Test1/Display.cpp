@@ -50,6 +50,7 @@ Display::Display(int width, int height, const std::string& name) : m_width(width
 	//Enables the depth test
 	
 	glEnable(GL_DEPTH_TEST);
+	glEnable(GL_TEXTURE_2D);
 
 	//If the face is facing away from the camera, we don't draw it;
 	glEnable(GL_CULL_FACE);
