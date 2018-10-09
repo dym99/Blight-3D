@@ -1,9 +1,9 @@
 #ifndef __TRANSFORM_H__
 #define __TRANSFORM_H__
 
-#include <glm\glm.hpp>
 #define GLM_ENABLE_EXPERIMENTAL
 #include <glm\gtx\transform.hpp>
+
 
 //#include
 
@@ -41,9 +41,9 @@ public:
 		inline glm::vec3& getRot() { return m_rotation; }
 		inline glm::vec3& getScale() { return m_scale; }
 
-		inline void setPos(glm::vec3& pos) {m_position = pos;}
-		inline void setRot(glm::vec3& rot) {m_rotation = rot;}
-		inline void setScale(glm::vec3& scale) {m_scale = scale;}
+		inline void setPos(glm::vec3 pos) {m_position = pos;}
+		inline void setRot(glm::vec3 rot) {m_rotation = rot;}
+		inline void setScale(glm::vec3 scale) {m_scale = scale;}
 	//End Getters and Setters
 
 	//Deconstructors

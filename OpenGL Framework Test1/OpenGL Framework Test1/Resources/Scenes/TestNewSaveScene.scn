@@ -1,0 +1,33 @@
+En 2
+Evn 2
+Ln 2
+Epa ./Resources/Objects/Crysis/
+Ena nanosuit
+Epo -0.250000 -0.500000 1.500000
+Ert 0.000000 0.000000 0.000000
+Esc 0.050000 0.050000 0.050000
+Epa ./Resources/Objects/Crysis/
+Ena nanosuit
+Epo 0.250000 -0.500000 1.500000
+Ert 0.000000 0.000000 0.000000
+Esc 0.050000 0.050000 0.050000
+Evpa ./Resources/Objects/Box/
+Evna cube
+Evpo -0.277000 -0.723003 1.413997
+Evrt 0.000000 0.000000 0.000000
+Evsc 0.450000 0.450000 0.450000
+Evpa ./Resources/Objects/Box/
+Evna cube
+Evpo 0.283000 -0.722003 1.434998
+Evrt 0.000000 0.000000 0.000000
+Evsc 0.450000 0.450000 0.450000
+Lpa ./Resources/Objects/Lamp/
+Lna lamp
+Lpo -0.007808 -0.385189 0.953419
+Lrt 0.000000 0.000000 0.000000
+Lsc 0.500000 0.500000 0.500000
+Lpa ./Resources/Objects/Lamp/
+Lna lamp
+Lpo 0.016237 0.094607 0.943449
+Lrt 0.000000 0.000000 0.000000
+Lsc 0.500000 0.500000 0.500000

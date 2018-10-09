@@ -40,7 +40,7 @@ void main()
 {    
 	//Normal stuffs
 	if (hasNormMap == 1) {
-		normals = vec3(texture(material.normalTex, TexCoords));
+		normals = texture(material.normalTex, TexCoords).rgb;
 		normals = normalize(normal0 * 2.0 - 1.0);
 	}
 	else {
