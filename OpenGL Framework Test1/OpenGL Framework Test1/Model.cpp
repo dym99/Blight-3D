@@ -10,6 +10,28 @@ Model::Model()
 {
 }
 
+Model::Model(const Model& copy)
+{
+	for (int i = 0; i < copy.meshes.size(); i++) {
+		this->meshes.push_back(copy.meshes[i]);
+	}
+	this->meshIndex = copy.meshIndex;
+
+	for (int i = 0; i < copy.materials.size(); i++) {
+		this->matNames.push_back(copy.matNames[i]);
+		this->materials.push_back(copy.materials[i]);
+	}
+	this->matIndex = copy.matIndex;
+
+	this->path = copy.path;
+	this->name = copy.name;
+
+	this->firstObj = copy.firstObj;
+	this->hasUVs = copy.hasUVs;
+
+
+}
+
 Model::~Model()
 {
 	for (int i = 0; i < materials.size(); i++) {
@@ -138,6 +160,11 @@ bool Model::LoadFromFile(const std::string & _path, const std::string & _name)
 
 	//Closes the file stream
 	input.close();
+
+	vertexData.clear();
+	textureData.clear();
+	normalData.clear();
+	faceData.clear();
 
 	return true;
 }

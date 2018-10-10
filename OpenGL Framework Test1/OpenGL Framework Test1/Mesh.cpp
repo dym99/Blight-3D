@@ -19,10 +19,6 @@ Mesh::~Mesh()
 
 bool Mesh::ProcessMesh(std::vector<glm::vec3> &vertexData, std::vector<glm::vec2> &textureData, std::vector<glm::vec3> &normalData, std::vector<MeshFace> &faceData)
 {
-	//Data ready for OpenGL
-	std::vector<float> unPackedVertexData;
-	std::vector<float> unPackedTextureData;
-	std::vector<float> unPackedNormalData;
 	{
 		//
 		//while (!input.eof()) {
@@ -104,6 +100,10 @@ bool Mesh::ProcessMesh(std::vector<glm::vec3> &vertexData, std::vector<glm::vec2
 		//input.close();
 	}
 
+	std::vector<float> unPackedVertexData;
+	std::vector<float> unPackedTextureData;
+	std::vector<float> unPackedNormalData;
+
 	//Unpack the data
 	//Face data important here
 	for (unsigned i = 0; i < faceData.size(); i++) {
@@ -156,11 +156,13 @@ bool Mesh::ProcessMesh(std::vector<glm::vec3> &vertexData, std::vector<glm::vec2
 	glBindVertexArray(0);
 
 	faceData.clear();
-	unPackedVertexData.clear();
-	unPackedTextureData.clear();
-	unPackedNormalData.clear();
 
 	return true;
+}
+
+bool Mesh::ProcessMesh(std::vector<float>& unPackedVertexData, std::vector<float>& unPackedTextureData, std::vector<float>& unPackedNormalData)
+{
+	return false;
 }
 
 void Mesh::Draw(Shader * shader)

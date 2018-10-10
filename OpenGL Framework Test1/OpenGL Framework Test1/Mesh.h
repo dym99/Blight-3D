@@ -51,6 +51,9 @@ public:
 						std::vector<glm::vec2> &textureData, 
 							std::vector<glm::vec3> &normalData, 
 								std::vector<MeshFace> &faceData);
+	bool ProcessMesh(std::vector<float> &unPackedVertexData,
+						std::vector<float> &unPackedTextureData,
+							std::vector<float> &unPackedNormalData);
 	void Draw(Shader* shader);
 
 	//Releases all data from openGL (clear allocations)
@@ -70,6 +73,8 @@ public:
 	GLuint VBO_UVs = 0;
 	GLuint VBO_Normals = 0;
 	GLuint VAO = 0;
+
+	//Data ready for OpenGL
 
 private:
 	unsigned int m_NumFaces;

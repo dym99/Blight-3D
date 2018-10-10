@@ -234,22 +234,64 @@ void Scene::Load(Model* player, std::vector<Model*>& enemies, std::vector<Model*
 		player->GetTransform()->setScale(getPlayerScale());
 	}
 	for (int i = 0; i < getEnemyCount(); i++) {
-		enemies.push_back(new Model());
-		enemies.at(i)->LoadFromFile(getEnemyPaths().at(i), getEnemyNames().at(i));
+		if (i > 0) {
+			for (int j = i-1; j >= 0; j--) {
+				if (getEnemyPaths().at(j) == getEnemyPaths().at(i)) {
+					enemies.push_back(new Model(*enemies[j]));
+					break;
+				}
+			}
+			if (enemies.size() < i + 1) {
+				enemies.push_back(new Model());
+				enemies.at(i)->LoadFromFile(getEnemyPaths().at(i), getEnemyNames().at(i));
+			}
+		}
+		else {
+			enemies.push_back(new Model());
+			enemies.at(i)->LoadFromFile(getEnemyPaths().at(i), getEnemyNames().at(i));
+		}
 		enemies.at(i)->GetTransform()->setPos(getEnemyPositions().at(i));
 		enemies.at(i)->GetTransform()->setRot(getEnemyRotations().at(i));
 		enemies.at(i)->GetTransform()->setScale(getEnemyScales().at(i));
 	}
 	for (int i = 0; i < getEnvironmentCount(); i++) {
-		environments.push_back(new Model());
-		environments.at(i)->LoadFromFile(getEnvironmentPaths().at(i), getEnvironmentNames().at(i));
+		if (i > 0) {
+			for (int j = i - 1; j >= 0; j--) {
+				if (getEnvironmentPaths().at(j) == getEnvironmentPaths().at(i)) {
+					environments.push_back(new Model(*environments[j]));
+					break;
+				}
+			}
+			if (environments.size() < i + 1) {
+				environments.push_back(new Model());
+				environments.at(i)->LoadFromFile(getEnvironmentPaths().at(i), getEnvironmentNames().at(i));
+			}
+		}
+		else {
+			environments.push_back(new Model());
+			environments.at(i)->LoadFromFile(getEnvironmentPaths().at(i), getEnvironmentNames().at(i));
+		}
 		environments.at(i)->GetTransform()->setPos(getEnvironmentPositions().at(i));
 		environments.at(i)->GetTransform()->setRot(getEnvironmentRotations().at(i));
 		environments.at(i)->GetTransform()->setScale(getEnvironmentScales().at(i));
 	}
 	for (int i = 0; i < getLightCount(); i++) {
-		lights.push_back(new Model());
-		lights.at(i)->LoadFromFile(getLightPaths().at(i), getLightNames().at(i));
+		if (i > 0) {
+			for (int j = i - 1; j >= 0; j--) {
+				if (getLightPaths().at(j) == getLightPaths().at(i)) {
+					lights.push_back(new Model(*lights[j]));
+					break;
+				}
+			}
+			if (lights.size() < i + 1) {
+				lights.push_back(new Model());
+				lights.at(i)->LoadFromFile(getLightPaths().at(i), getLightNames().at(i));
+			}
+		}
+		else {
+			lights.push_back(new Model());
+			lights.at(i)->LoadFromFile(getLightPaths().at(i), getLightNames().at(i));
+		}
 		lights.at(i)->GetTransform()->setPos(getLightPositions().at(i));
 		lights.at(i)->GetTransform()->setRot(getLightRotations().at(i));
 		lights.at(i)->GetTransform()->setScale(getLightScales().at(i));

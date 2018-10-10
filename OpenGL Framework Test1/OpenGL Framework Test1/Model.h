@@ -5,6 +5,9 @@
 class Model {
 public:
 	Model();
+
+	Model(const Model& copy);
+
 	~Model();
 	
 	bool LoadFromFile(const std::string &_path, const std::string &_name);
