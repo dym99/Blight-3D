@@ -241,6 +241,10 @@ void Scene::Load(Model* player, std::vector<Model*>& enemies, std::vector<Model*
 					break;
 				}
 			}
+			if (enemies.size() < i + 1) {
+				enemies.push_back(new Model());
+				enemies.at(i)->LoadFromFile(getEnemyPaths().at(i), getEnemyNames().at(i));
+			}
 		}
 		else {
 			enemies.push_back(new Model());
@@ -258,6 +262,10 @@ void Scene::Load(Model* player, std::vector<Model*>& enemies, std::vector<Model*
 					break;
 				}
 			}
+			if (environments.size() < i + 1) {
+				environments.push_back(new Model());
+				environments.at(i)->LoadFromFile(getEnvironmentPaths().at(i), getEnvironmentNames().at(i));
+			}
 		}
 		else {
 			environments.push_back(new Model());
@@ -274,6 +282,10 @@ void Scene::Load(Model* player, std::vector<Model*>& enemies, std::vector<Model*
 					lights.push_back(new Model(*lights[j]));
 					break;
 				}
+			}
+			if (lights.size() < i + 1) {
+				lights.push_back(new Model());
+				lights.at(i)->LoadFromFile(getLightPaths().at(i), getLightNames().at(i));
 			}
 		}
 		else {
