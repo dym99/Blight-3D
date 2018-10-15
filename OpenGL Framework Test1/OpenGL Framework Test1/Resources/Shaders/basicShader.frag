@@ -41,7 +41,7 @@ void main()
 	//Normal stuffs
 	if (hasNormMap == 1) {
 		normals = texture(material.normalTex, TexCoords).rgb;
-		normals = normalize(normal0 * 2.0 - 1.0);
+		normals = normalize(normals * 2.0 - 1.0);
 	}
 	else {
 		normals = normal0;
