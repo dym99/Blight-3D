@@ -135,6 +135,9 @@ void Game::keyboardDown()
 			scene->Load(player, enemies, environments, lights);
 		}
 	}
+	if (Input::GetKey(KeyCode::Q)) {
+		exit(0);
+	}
 }
 
 void Game::keyboardPress()
