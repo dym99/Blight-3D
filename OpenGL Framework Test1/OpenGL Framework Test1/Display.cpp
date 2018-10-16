@@ -31,6 +31,12 @@ Display::Display(int width, int height, const std::string& name) : m_width(width
 	//We must use the .c_str() method.
 	m_window = SDL_CreateWindow(name.c_str(), SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, width, height, SDL_WINDOW_OPENGL);
 
+	//Set GL context version (for RenderDoc stuffs)
+	if (m_window != NULL) {
+		SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
+		SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 2);
+	}
+
 	//Creates the context for the window, such that OpenGL can actually draw to the window
 	m_glContext = SDL_GL_CreateContext(m_window);
 
