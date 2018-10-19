@@ -81,10 +81,10 @@ void Game::InitGame(bool* debug)
 	shaders.at(shaders.size() - 1)->setOptionalMessage("You are now viewing Model Specular Maps\n");
 	shaders.push_back(new Shader("./Resources/Shaders/basicShader", "./Resources/Shaders/diffuseMap"));
 	shaders.at(shaders.size() - 1)->setOptionalMessage("You are now viewing Model Diffuse Maps\n");
-	shaders.push_back(new Shader("./Resources/Shaders/basicShader", "./Resources/Shaders/norSpecMap"));
-	shaders.at(shaders.size() - 1)->setOptionalMessage("You are now viewing Model Normal and Specular Maps\n");
-	shaders.push_back(new Shader("./Resources/Shaders/basicShader", "./Resources/Shaders/difNorMap"));
-	shaders.at(shaders.size() - 1)->setOptionalMessage("You are now viewing Model Diffuse and Normal Maps\n");
+	//shaders.push_back(new Shader("./Resources/Shaders/basicShader", "./Resources/Shaders/norSpecMap"));
+	//shaders.at(shaders.size() - 1)->setOptionalMessage("You are now viewing Model Normal and Specular Maps\n");
+	//shaders.push_back(new Shader("./Resources/Shaders/basicShader", "./Resources/Shaders/difNorMap"));
+	//shaders.at(shaders.size() - 1)->setOptionalMessage("You are now viewing Model Diffuse and Normal Maps\n");
 	//shaders.push_back(new Shader("./Resources/Shaders/basicShader"));
 	//{
 	//	shaders.at(shaders.size() - 1)->Bind();
