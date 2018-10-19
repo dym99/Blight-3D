@@ -190,42 +190,74 @@ void CheckShaderError(GLuint shader, GLuint flag, bool isProgram, const std::str
 }
 
 //Set the GPU to a state that makes it use the vertex and fragment shaders defined here
-void Shader::bind()
+void Shader::Bind()
 {
 	glUseProgram(m_program);
 }
 
-void Shader::setVec3(const GLchar* name, const float & x, const float & y, const float & z)
+void Shader::setOptionalMessage(const std::string _optionalMessage)
+{
+	optionalMessage = _optionalMessage;
+}
+
+void Shader::SetVec3(const GLchar* name, const float & x, const float & y, const float & z)
 {
 	GLfloat vec[3] = { x, y, z };
 	GLuint loc = glGetUniformLocation(m_program, name);
 	glUniform3fv(loc, 1, vec);
 }
 
-void Shader::setFloat(const GLchar * name, const float & f)
+void Shader::SetVec3(const GLchar * name, const glm::vec3 & vec3)
 {
-	GLfloat fl = f;
+	GLfloat vec[3] = { vec3.x, vec3.y, vec3.z };
+	GLuint loc = glGetUniformLocation(m_program, name);
+	glUniform3fv(loc, 1, vec);
+}
+
+void Shader::SetVec4(const GLchar * name, const float & x, const float & y, const float & z, const float & w)
+{
+	GLfloat vec[4] = { x, y, z, w };
+	GLuint loc = glGetUniformLocation(m_program, name);
+	glUniform4fv(loc, 1, vec);
+}
+
+void Shader::SetVec4(const GLchar * name, const glm::vec4 & vec4)
+{
+	GLfloat vec[4] = { vec4.x, vec4.y, vec4.z, vec4.w };
+	GLuint loc = glGetUniformLocation(m_program, name);
+	glUniform4fv(loc, 1, vec);
+}
+
+void Shader::SetFloat(const GLchar * name, const float & f)
+{
 	GLuint loc = glGetUniformLocation(m_program, name);
 	glUniform1f(loc, f);
 }
 
-void Shader::setInt(const GLchar * name, const int & i)
+void Shader::SetInt(const GLchar * name, const int & i)
 {
 	GLuint loc = glGetUniformLocation(m_program, name);
 	glUniform1i(loc, i);
 }
 
-void Shader::update(const Transform& transform, const Camera& camera)
+void Shader::Update(const Transform& transform, const Camera& camera)
 {
 	//Using 4x4 matrices, you multiply the view projection by your transformation model in order to get the correct view.
-	glm::mat4 model = transform.getModel();
-	glm::mat4 view = camera.getView();
-	glm::mat4 projection = camera.getProjection();
+	glm::mat4 model = transform.GetModel();
+	glm::mat4 view = camera.GetView();
+	glm::mat4 projection = camera.GetProjection();
 
 	//Updates the uniform 4x4 matrix you defined earlier.
 	glUniformMatrix4fv(m_uniforms[MODEL_U], 1, GL_FALSE, &model[0][0]);
 	glUniformMatrix4fv(m_uniforms[VIEW_U], 1, GL_FALSE, &view[0][0]);
 	glUniformMatrix4fv(m_uniforms[PROJECTION_U], 1, GL_FALSE, &projection[0][0]);
+}
+
+void Shader::OutputMessage()
+{
+	if (optionalMessage != "") {
+		std::cout << optionalMessage << std::endl;
+	}
 }
 
 

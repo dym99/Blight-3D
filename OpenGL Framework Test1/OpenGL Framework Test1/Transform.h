@@ -18,7 +18,7 @@ public:
 	//End Methods
 
 	//Getters and Setters
-		inline glm::mat4 getModel() const
+		inline glm::mat4 GetModel() const
 		{
 			//Position matrix
 			glm::mat4 positionMatrix = glm::translate(m_position);
@@ -37,13 +37,13 @@ public:
 			return positionMatrix * rotationMatrix * scaleMatrix;
 		}
 		
-		inline glm::vec3& getPos() { return m_position; }
-		inline glm::vec3& getRot() { return m_rotation; }
-		inline glm::vec3& getScale() { return m_scale; }
+		inline glm::vec3& GetPos() { return m_position; }
+		inline glm::vec3& GetRot() { return m_rotation; }
+		inline glm::vec3& GetScale() { return m_scale; }
 
-		inline void setPos(glm::vec3 pos) {m_position = pos;}
-		inline void setRot(glm::vec3 rot) {m_rotation = rot;}
-		inline void setScale(glm::vec3 scale) {m_scale = scale;}
+		inline void SetPos(glm::vec3 pos) {m_position = pos;}
+		inline void SetRot(glm::vec3 rot) {m_rotation = rot;}
+		inline void SetScale(glm::vec3 scale) {m_scale = scale;}
 	//End Getters and Setters
 
 	//Deconstructors

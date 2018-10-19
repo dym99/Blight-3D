@@ -56,7 +56,7 @@ Display::Display(int width, int height, const std::string& name) : m_width(width
 	//Enables the depth test
 	
 	glEnable(GL_DEPTH_TEST);
-	glEnable(GL_TEXTURE_2D);
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
 	//If the face is facing away from the camera, we don't draw it;
 	glEnable(GL_CULL_FACE);
@@ -76,14 +76,14 @@ Display::~Display()
 }
 
 //Clears the window using the clear color
-void Display::clear(float r, float g, float b, float a)
+void Display::Clear(float r, float g, float b, float a)
 {
 	glClearColor(r, g, b, a);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 }
 
 //Swaps between the two buffers and performs event handling
-void Display::update()
+void Display::Update()
 {
 	//Swaps the buffers on the screen.
 	//We are double buffering things. 
@@ -108,7 +108,7 @@ void Display::update()
 }
 
 //Checks if the window is closed.
-bool Display::isClosed()
+bool Display::IsClosed()
 {
 	return m_isClosed;
 }

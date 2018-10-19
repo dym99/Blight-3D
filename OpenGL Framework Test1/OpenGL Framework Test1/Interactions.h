@@ -9,7 +9,7 @@
 
 class Interact {
 public:
-	static void interactionWithScene(std::vector<Model*>* models, std::vector<Model*>* lights, Camera& camera, int numShade, float dt, SDL_Window& window, Transform* transform = &Transform());
+	static void InteractionWithScene(std::vector<Model*>* models, std::vector<Model*>* lights, Camera& camera, int numShade, float dt, SDL_Window& window, Transform* transform = &Transform());
 
 	static int GetShaderIndex() { return shaderIndex; }
 	static int GetModelIndex() { return modelIndex; }
@@ -19,13 +19,13 @@ public:
 	static void SetModelIndex(int index) { modelIndex = index; }
 private:
 	//Private methods so that only interact with scene can be called
-	static void createModel(std::vector<Model*>* models, std::vector<Model*>* lights, Camera& camera);
-	static void changeSelection(int numObj);
-	static void changeShader(int numShade);
-	static void translateModel(Camera& camera, float dt);
-	static void rotateModel();
-	static void rotateCamera(Camera& camera, SDL_Window& window);
-	static void moveCamera(Camera& camera, float dt);
+	static void CreateModel(std::vector<Model*>* models, std::vector<Model*>* lights, Camera& camera);
+	static void ChangeSelection(int numObj);
+	static void ChangeShader(int numShade);
+	static void TranslateModel(Camera& camera, float dt);
+	static void RotateModel();
+	static void RotateCamera(Camera& camera, SDL_Window& window);
+	static void MoveCamera(Camera& camera, float dt);
 
 	//Containers
 	static bool rmb;

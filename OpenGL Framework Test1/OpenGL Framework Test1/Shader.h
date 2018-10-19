@@ -19,13 +19,18 @@ public:
 
 	//Methods
 		//Set the GPU to a state that makes it use the vertex and fragment shaders defined here
-		void bind();
+		void Bind();
 		//Updates all the uniforms we have to be correct
-		void update(const Transform& transform, const Camera& camera);
-		
-		void setVec3(const GLchar* name, const float& x, const float& y, const float& z);
-		void setFloat(const GLchar* name, const float& f);
-		void setInt(const GLchar* name, const int& i);
+		void Update(const Transform& transform, const Camera& camera);
+		void OutputMessage();
+
+		void setOptionalMessage(const std::string optionalMessage);
+		void SetVec3(const GLchar* name, const float& x, const float& y, const float& z);
+		void SetVec3(const GLchar* name, const glm::vec3& vec3);
+		void SetVec4(const GLchar* name, const float& x, const float& y, const float& z, const float& w);
+		void SetVec4(const GLchar* name, const glm::vec4& vec4);
+		void SetFloat(const GLchar* name, const float& f);
+		void SetInt(const GLchar* name, const int& i);
 	//End Methods
 
 	//Virtual Deconstructor
@@ -50,6 +55,9 @@ private:
 
 		NUM_UNIFORMS
 	};
+
+	//Optional Message When Enabled
+	std::string optionalMessage = "";
 
 	//Handle for the program you create in the constructor
 	//Allows you to affect the program later on

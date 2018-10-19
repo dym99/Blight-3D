@@ -10,13 +10,13 @@ public:
 	Game();
 	~Game();
 
-	void initGame(bool* debug);
-	void update();
-	void draw();
+	void InitGame(bool* debug);
+	void Update();
+	void Draw();
 
-	void keyboardUp();
-	void keyboardDown();
-	void keyboardPress();
+	void KeyboardUp();
+	void KeyboardDown();
+	void KeyboardPress();
 
 	//Camera stuff
 	Camera* camera;
@@ -32,11 +32,11 @@ public:
 	bool* debugFeatures;
 
 	//Helpers
-	Model& getPlayer() { return *player; }
-	std::vector<Model*>* getEnemies() { return &enemies; }
-	std::vector<Model*>* getEnvironments() { return &environments; }
-	std::vector<Model*>* getLights() { return &lights; }
-	std::vector<Shader*>* getShaders() { return &shaders; }
+	Model& GetPlayer() { return *player; }
+	std::vector<Model*>* GetEnemies() { return &enemies; }
+	std::vector<Model*>* GetEnvironments() { return &environments; }
+	std::vector<Model*>* GetLights() { return &lights; }
+	std::vector<Shader*>* GetShaders() { return &shaders; }
 
 	//Time stuff
 	Timer *updateTimer = nullptr;
@@ -53,6 +53,8 @@ private:
 
 	//Loads in scene info
 	Scene* scene;
+
+	Texture* texture;
 };
 
 #endif

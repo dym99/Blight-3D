@@ -13,13 +13,13 @@ public:
 	
 	//Methods to be used
 		//Wraps GLEW logic to just clear from the display object
-		void clear(float r, float g, float b, float a);
+		void Clear(float r, float g, float b, float a);
 		//Swaps between the two buffers and performs event handling
-		void update();
+		void Update();
 		//Checks if the window is closed
-		bool isClosed();
+		bool IsClosed();
 		//Gets window handle
-		inline SDL_Window& getWindow() { return *m_window; }
+		inline SDL_Window& GetWindow() { return *m_window; }
 		//Gets width
 		inline int GetWidth() { return m_width; }
 		//Gets height

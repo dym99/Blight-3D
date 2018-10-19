@@ -228,73 +228,73 @@ void Scene::Load(Model* player, std::vector<Model*>& enemies, std::vector<Model*
 {
 	if (playerPath != "") {
 		player = new Model();
-		player->LoadFromFile(getPlayerPath(), getPlayerName());
-		player->GetTransform()->setPos(getPlayerPosition());
-		player->GetTransform()->setRot(getPlayerRotation());
-		player->GetTransform()->setScale(getPlayerScale());
+		player->LoadFromFile(GetPlayerPath(), GetPlayerName());
+		player->GetTransform()->SetPos(GetPlayerPosition());
+		player->GetTransform()->SetRot(GetPlayerRotation());
+		player->GetTransform()->SetScale(GetPlayerScale());
 	}
-	for (int i = 0; i < getEnemyCount(); i++) {
+	for (int i = 0; i < GetEnemyCount(); i++) {
 		if (i > 0) {
 			for (int j = i-1; j >= 0; j--) {
-				if (getEnemyPaths().at(j) == getEnemyPaths().at(i)) {
+				if (GetEnemyPaths().at(j) == GetEnemyPaths().at(i)) {
 					enemies.push_back(new Model(*enemies[j]));
 					break;
 				}
 			}
 			if (enemies.size() < i + 1) {
 				enemies.push_back(new Model());
-				enemies.at(i)->LoadFromFile(getEnemyPaths().at(i), getEnemyNames().at(i));
+				enemies.at(i)->LoadFromFile(GetEnemyPaths().at(i), GetEnemyNames().at(i));
 			}
 		}
 		else {
 			enemies.push_back(new Model());
-			enemies.at(i)->LoadFromFile(getEnemyPaths().at(i), getEnemyNames().at(i));
+			enemies.at(i)->LoadFromFile(GetEnemyPaths().at(i), GetEnemyNames().at(i));
 		}
-		enemies.at(i)->GetTransform()->setPos(getEnemyPositions().at(i));
-		enemies.at(i)->GetTransform()->setRot(getEnemyRotations().at(i));
-		enemies.at(i)->GetTransform()->setScale(getEnemyScales().at(i));
+		enemies.at(i)->GetTransform()->SetPos(GetEnemyPositions().at(i));
+		enemies.at(i)->GetTransform()->SetRot(GetEnemyRotations().at(i));
+		enemies.at(i)->GetTransform()->SetScale(GetEnemyScales().at(i));
 	}
-	for (int i = 0; i < getEnvironmentCount(); i++) {
+	for (int i = 0; i < GetEnvironmentCount(); i++) {
 		if (i > 0) {
 			for (int j = i - 1; j >= 0; j--) {
-				if (getEnvironmentPaths().at(j) == getEnvironmentPaths().at(i)) {
+				if (GetEnvironmentPaths().at(j) == GetEnvironmentPaths().at(i)) {
 					environments.push_back(new Model(*environments[j]));
 					break;
 				}
 			}
 			if (environments.size() < i + 1) {
 				environments.push_back(new Model());
-				environments.at(i)->LoadFromFile(getEnvironmentPaths().at(i), getEnvironmentNames().at(i));
+				environments.at(i)->LoadFromFile(GetEnvironmentPaths().at(i), GetEnvironmentNames().at(i));
 			}
 		}
 		else {
 			environments.push_back(new Model());
-			environments.at(i)->LoadFromFile(getEnvironmentPaths().at(i), getEnvironmentNames().at(i));
+			environments.at(i)->LoadFromFile(GetEnvironmentPaths().at(i), GetEnvironmentNames().at(i));
 		}
-		environments.at(i)->GetTransform()->setPos(getEnvironmentPositions().at(i));
-		environments.at(i)->GetTransform()->setRot(getEnvironmentRotations().at(i));
-		environments.at(i)->GetTransform()->setScale(getEnvironmentScales().at(i));
+		environments.at(i)->GetTransform()->SetPos(GetEnvironmentPositions().at(i));
+		environments.at(i)->GetTransform()->SetRot(GetEnvironmentRotations().at(i));
+		environments.at(i)->GetTransform()->SetScale(GetEnvironmentScales().at(i));
 	}
-	for (int i = 0; i < getLightCount(); i++) {
+	for (int i = 0; i < GetLightCount(); i++) {
 		if (i > 0) {
 			for (int j = i - 1; j >= 0; j--) {
-				if (getLightPaths().at(j) == getLightPaths().at(i)) {
+				if (GetLightPaths().at(j) == GetLightPaths().at(i)) {
 					lights.push_back(new Model(*lights[j]));
 					break;
 				}
 			}
 			if (lights.size() < i + 1) {
 				lights.push_back(new Model());
-				lights.at(i)->LoadFromFile(getLightPaths().at(i), getLightNames().at(i));
+				lights.at(i)->LoadFromFile(GetLightPaths().at(i), GetLightNames().at(i));
 			}
 		}
 		else {
 			lights.push_back(new Model());
-			lights.at(i)->LoadFromFile(getLightPaths().at(i), getLightNames().at(i));
+			lights.at(i)->LoadFromFile(GetLightPaths().at(i), GetLightNames().at(i));
 		}
-		lights.at(i)->GetTransform()->setPos(getLightPositions().at(i));
-		lights.at(i)->GetTransform()->setRot(getLightRotations().at(i));
-		lights.at(i)->GetTransform()->setScale(getLightScales().at(i));
+		lights.at(i)->GetTransform()->SetPos(GetLightPositions().at(i));
+		lights.at(i)->GetTransform()->SetRot(GetLightRotations().at(i));
+		lights.at(i)->GetTransform()->SetScale(GetLightScales().at(i));
 	}
 }
 
@@ -317,43 +317,43 @@ bool Scene::Save(const Model &player, const std::vector<Model*> &enemies,
 	for (int i = 0; i < enemies.size(); i++) {
 		output << "Epa " + enemies[i]->path << std::endl;
 		output << "Ena " + enemies[i]->name << std::endl;
-		output << "Epo " + std::to_string(enemies[i]->GetTransform()->getPos().x) + " " +
-									std::to_string(enemies[i]->GetTransform()->getPos().y) + " " +
-										std::to_string(enemies[i]->GetTransform()->getPos().z) << std::endl;
-		output << "Ert " + std::to_string(enemies[i]->GetTransform()->getRot().x) + " " +
-									std::to_string(enemies[i]->GetTransform()->getRot().y) + " " +
-										std::to_string(enemies[i]->GetTransform()->getRot().z) << std::endl;
-		output << "Esc " + std::to_string(enemies[i]->GetTransform()->getScale().x) + " " +
-									std::to_string(enemies[i]->GetTransform()->getScale().y) + " " +
-										std::to_string(enemies[i]->GetTransform()->getScale().z) << std::endl;
+		output << "Epo " + std::to_string(enemies[i]->GetTransform()->GetPos().x) + " " +
+									std::to_string(enemies[i]->GetTransform()->GetPos().y) + " " +
+										std::to_string(enemies[i]->GetTransform()->GetPos().z) << std::endl;
+		output << "Ert " + std::to_string(enemies[i]->GetTransform()->GetRot().x) + " " +
+									std::to_string(enemies[i]->GetTransform()->GetRot().y) + " " +
+										std::to_string(enemies[i]->GetTransform()->GetRot().z) << std::endl;
+		output << "Esc " + std::to_string(enemies[i]->GetTransform()->GetScale().x) + " " +
+									std::to_string(enemies[i]->GetTransform()->GetScale().y) + " " +
+										std::to_string(enemies[i]->GetTransform()->GetScale().z) << std::endl;
 	}
 
 	for (int i = 0; i < environments.size(); i++) {
 		output << "Evpa " + environments[i]->path << std::endl;
 		output << "Evna " + environments[i]->name << std::endl;
-		output << "Evpo " + std::to_string(environments[i]->GetTransform()->getPos().x) + " " +
-									std::to_string(environments[i]->GetTransform()->getPos().y) + " " +
-										std::to_string(environments[i]->GetTransform()->getPos().z) << std::endl;
-		output << "Evrt " + std::to_string(environments[i]->GetTransform()->getRot().x) + " " +
-									std::to_string(environments[i]->GetTransform()->getRot().y) + " " +
-										std::to_string(environments[i]->GetTransform()->getRot().z) << std::endl;
-		output << "Evsc " + std::to_string(environments[i]->GetTransform()->getScale().x) + " " +
-									std::to_string(environments[i]->GetTransform()->getScale().y) + " " +
-										std::to_string(environments[i]->GetTransform()->getScale().z) << std::endl;
+		output << "Evpo " + std::to_string(environments[i]->GetTransform()->GetPos().x) + " " +
+									std::to_string(environments[i]->GetTransform()->GetPos().y) + " " +
+										std::to_string(environments[i]->GetTransform()->GetPos().z) << std::endl;
+		output << "Evrt " + std::to_string(environments[i]->GetTransform()->GetRot().x) + " " +
+									std::to_string(environments[i]->GetTransform()->GetRot().y) + " " +
+										std::to_string(environments[i]->GetTransform()->GetRot().z) << std::endl;
+		output << "Evsc " + std::to_string(environments[i]->GetTransform()->GetScale().x) + " " +
+									std::to_string(environments[i]->GetTransform()->GetScale().y) + " " +
+										std::to_string(environments[i]->GetTransform()->GetScale().z) << std::endl;
 	}
 
 	for (int i = 0; i < lights.size(); i++) {
 		output << "Lpa " + lights[i]->path << std::endl;
 		output << "Lna " + lights[i]->name << std::endl;
-		output << "Lpo " + std::to_string(lights[i]->GetTransform()->getPos().x) + " " +
-									std::to_string(lights[i]->GetTransform()->getPos().y) + " " +
-										std::to_string(lights[i]->GetTransform()->getPos().z) << std::endl;
-		output << "Lrt " + std::to_string(lights[i]->GetTransform()->getRot().x) + " " +
-									std::to_string(lights[i]->GetTransform()->getRot().y) + " " +
-										std::to_string(lights[i]->GetTransform()->getRot().z) << std::endl;
-		output << "Lsc " + std::to_string(lights[i]->GetTransform()->getScale().x) + " " +
-									std::to_string(lights[i]->GetTransform()->getScale().y) + " " +
-										std::to_string(lights[i]->GetTransform()->getScale().z) << std::endl;
+		output << "Lpo " + std::to_string(lights[i]->GetTransform()->GetPos().x) + " " +
+									std::to_string(lights[i]->GetTransform()->GetPos().y) + " " +
+										std::to_string(lights[i]->GetTransform()->GetPos().z) << std::endl;
+		output << "Lrt " + std::to_string(lights[i]->GetTransform()->GetRot().x) + " " +
+									std::to_string(lights[i]->GetTransform()->GetRot().y) + " " +
+										std::to_string(lights[i]->GetTransform()->GetRot().z) << std::endl;
+		output << "Lsc " + std::to_string(lights[i]->GetTransform()->GetScale().x) + " " +
+									std::to_string(lights[i]->GetTransform()->GetScale().y) + " " +
+										std::to_string(lights[i]->GetTransform()->GetScale().z) << std::endl;
 	}
 
 	output.close();
@@ -387,43 +387,43 @@ std::string Scene::New(const Model &player, const std::vector<Model*> &enemies,
 	for (int i = 0; i < enemies.size(); i++) {
 		output << "Epa " + enemies[i]->path << std::endl;
 		output << "Ena " + enemies[i]->name << std::endl;
-		output << "Epo " + std::to_string(enemies[i]->GetTransform()->getPos().x) + " " +
-									std::to_string(enemies[i]->GetTransform()->getPos().y) + " " +
-										std::to_string(enemies[i]->GetTransform()->getPos().z) << std::endl;
-		output << "Ert " + std::to_string(enemies[i]->GetTransform()->getRot().x) + " " +
-									std::to_string(enemies[i]->GetTransform()->getRot().y) + " " +
-										std::to_string(enemies[i]->GetTransform()->getRot().z) << std::endl;
-		output << "Esc " + std::to_string(enemies[i]->GetTransform()->getScale().x) + " " +
-									std::to_string(enemies[i]->GetTransform()->getScale().y) + " " +
-										std::to_string(enemies[i]->GetTransform()->getScale().z) << std::endl;
+		output << "Epo " + std::to_string(enemies[i]->GetTransform()->GetPos().x) + " " +
+									std::to_string(enemies[i]->GetTransform()->GetPos().y) + " " +
+										std::to_string(enemies[i]->GetTransform()->GetPos().z) << std::endl;
+		output << "Ert " + std::to_string(enemies[i]->GetTransform()->GetRot().x) + " " +
+									std::to_string(enemies[i]->GetTransform()->GetRot().y) + " " +
+										std::to_string(enemies[i]->GetTransform()->GetRot().z) << std::endl;
+		output << "Esc " + std::to_string(enemies[i]->GetTransform()->GetScale().x) + " " +
+									std::to_string(enemies[i]->GetTransform()->GetScale().y) + " " +
+										std::to_string(enemies[i]->GetTransform()->GetScale().z) << std::endl;
 	}
 
 	for (int i = 0; i < environments.size(); i++) {
 		output << "Evpa " + environments[i]->path << std::endl;
 		output << "Evna " + environments[i]->name << std::endl;
-		output << "Evpo " + std::to_string(environments[i]->GetTransform()->getPos().x) + " " +
-									std::to_string(environments[i]->GetTransform()->getPos().y) + " " +
-										std::to_string(environments[i]->GetTransform()->getPos().z) << std::endl;
-		output << "Evrt " + std::to_string(environments[i]->GetTransform()->getRot().x) + " " +
-									std::to_string(environments[i]->GetTransform()->getRot().y) + " " +
-										std::to_string(environments[i]->GetTransform()->getRot().z) << std::endl;
-		output << "Evsc " + std::to_string(environments[i]->GetTransform()->getScale().x) + " " +
-									std::to_string(environments[i]->GetTransform()->getScale().y) + " " +
-										std::to_string(environments[i]->GetTransform()->getScale().z) << std::endl;
+		output << "Evpo " + std::to_string(environments[i]->GetTransform()->GetPos().x) + " " +
+									std::to_string(environments[i]->GetTransform()->GetPos().y) + " " +
+										std::to_string(environments[i]->GetTransform()->GetPos().z) << std::endl;
+		output << "Evrt " + std::to_string(environments[i]->GetTransform()->GetRot().x) + " " +
+									std::to_string(environments[i]->GetTransform()->GetRot().y) + " " +
+										std::to_string(environments[i]->GetTransform()->GetRot().z) << std::endl;
+		output << "Evsc " + std::to_string(environments[i]->GetTransform()->GetScale().x) + " " +
+									std::to_string(environments[i]->GetTransform()->GetScale().y) + " " +
+										std::to_string(environments[i]->GetTransform()->GetScale().z) << std::endl;
 	}
 
 	for (int i = 0; i < lights.size(); i++) {
 		output << "Lpa " + lights[i]->path << std::endl;
 		output << "Lna " + lights[i]->name << std::endl;
-		output << "Lpo " + std::to_string(lights[i]->GetTransform()->getPos().x) + " " +
-									std::to_string(lights[i]->GetTransform()->getPos().y) + " " +
-										std::to_string(lights[i]->GetTransform()->getPos().z) << std::endl;
-		output << "Lrt " + std::to_string(lights[i]->GetTransform()->getRot().x) + " " +
-									std::to_string(lights[i]->GetTransform()->getRot().y) + " " +
-										std::to_string(lights[i]->GetTransform()->getRot().z) << std::endl;
-		output << "Lsc " + std::to_string(lights[i]->GetTransform()->getScale().x) + " " +
-									std::to_string(lights[i]->GetTransform()->getScale().y) + " " +
-										std::to_string(lights[i]->GetTransform()->getScale().z) << std::endl;
+		output << "Lpo " + std::to_string(lights[i]->GetTransform()->GetPos().x) + " " +
+									std::to_string(lights[i]->GetTransform()->GetPos().y) + " " +
+										std::to_string(lights[i]->GetTransform()->GetPos().z) << std::endl;
+		output << "Lrt " + std::to_string(lights[i]->GetTransform()->GetRot().x) + " " +
+									std::to_string(lights[i]->GetTransform()->GetRot().y) + " " +
+										std::to_string(lights[i]->GetTransform()->GetRot().z) << std::endl;
+		output << "Lsc " + std::to_string(lights[i]->GetTransform()->GetScale().x) + " " +
+									std::to_string(lights[i]->GetTransform()->GetScale().y) + " " +
+										std::to_string(lights[i]->GetTransform()->GetScale().z) << std::endl;
 	}
 
 	output.close();

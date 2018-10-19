@@ -17,28 +17,28 @@ public:
 	Camera(ProjectionType type);
 
 	//Methods
-	void perspective(float fovy, float aspect, float zNear, float zFar);
-	void orthographic(float left, float right, float bottom, float top, float zNear, float zFar);
-	inline void rotate(const glm::mat4& rot) { m_forward = rot * glm::vec4(m_forward, 1.0f); }
-	inline void rotateSideways(const glm::mat4& rot) { m_sideways = rot * glm::vec4(m_sideways, 1.0f); }
-	inline void translate(const glm::mat4& translate) { m_position = translate * glm::vec4(m_position, 1.0f); }
+	void Perspective(float fovy, float aspect, float zNear, float zFar);
+	void Orthographic(float left, float right, float bottom, float top, float zNear, float zFar);
+	inline void Rotate(const glm::mat4& rot) { m_forward = rot * glm::vec4(m_forward, 1.0f); }
+	inline void RotateSideways(const glm::mat4& rot) { m_sideways = rot * glm::vec4(m_sideways, 1.0f); }
+	inline void Translate(const glm::mat4& translate) { m_position = translate * glm::vec4(m_position, 1.0f); }
 
 	//gets our perspective projection
-	inline glm::mat4 getProjection() const { return m_projection; }
+	inline glm::mat4 GetProjection() const { return m_projection; }
 	//Gets our view projections matrix, that allows us to see what we needed to see
-	inline glm::mat4 getView() const { return glm::lookAt(m_position, m_position + m_forward, m_up); }
+	inline glm::mat4 GetView() const { return glm::lookAt(m_position, m_position + m_forward, m_up); }
 	
 	//Getters
-	inline glm::vec3& getPos() { return m_position; }
-	inline glm::vec3& getForward() { return m_forward; }
-	inline glm::vec3& getSideways() { return m_sideways; }
-	inline glm::vec3& getUp() { return m_up; }
+	inline glm::vec3& GetPos() { return m_position; }
+	inline glm::vec3& GetForward() { return m_forward; }
+	inline glm::vec3& GetSideways() { return m_sideways; }
+	inline glm::vec3& GetUp() { return m_up; }
 
 	//Setters
-	inline void setPos(glm::vec3 pos) { m_position = pos; }
-	inline void setForward(glm::vec3 forward) { m_forward = forward; }
-	inline void setSideways(glm::vec3 sideways) { m_sideways = sideways; }
-	inline void setUp(glm::vec3 up) { m_up = up; }
+	inline void SetPos(glm::vec3 pos) { m_position = pos; }
+	inline void SetForward(glm::vec3 forward) { m_forward = forward; }
+	inline void SetSideways(glm::vec3 sideways) { m_sideways = sideways; }
+	inline void SetUp(glm::vec3 up) { m_up = up; }
 
 private:
 	//Projection for the camera

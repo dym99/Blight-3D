@@ -15,9 +15,7 @@ struct Light {
 	vec3 position;
 	vec3 ambience;
 	vec3 diffuse;
-	vec3 specular;
-	
-	vec3 color;		
+	vec3 specular;	
 	
 	float constant;
 	float linear;
@@ -41,7 +39,7 @@ void main()
 	//Normal stuffs
 	if (hasNormMap == 1) {
 		normals = texture(material.normalTex, TexCoords).rgb;
-		normals = normalize(normal0 * 2.0 - 1.0);
+		normals = normalize(normals * 2.0 - 1.0);
 	}
 	else {
 		normals = normal0;
@@ -52,21 +50,21 @@ void main()
 	
 	 //Ambience stuffs
 	 vec3 ambience = light.ambience * vec3(texture(material.diffuseTex, TexCoords));
-	// ambience = ambience * attenuation;
+	 ambience = ambience * attenuation;
 
 	 //Diffusal stuffs
 	 vec3 norm = normalize(normals);
 	 vec3 lightDirection = normalize(light.position - fragPosition);
 	 float diff = max(dot(norm, lightDirection), 0.0);
 	 vec3 diffuse = light.diffuse * diff * vec3(texture(material.diffuseTex, TexCoords));
-	// diffuse = diffuse * attenuation;
+	 diffuse = diffuse * attenuation;
 
 	 //Specular stuffs
 	 vec3 viewDirection = normalize(viewPosition - fragPosition);
 	 vec3 reflectionDirection = reflect(-lightDirection, norm);
 	 float spec = pow(max(dot(viewDirection, reflectionDirection), 0.0), material.shininess);
-	 vec3 specular = light.specular * spec * light.color;
-	// specular = specular * attenuation;
+	 vec3 specular = light.specular * spec * vec3(texture(material.specularTex, TexCoords));
+	 specular = specular * attenuation;
 	
 	vec3 result = (ambience + diffuse + specular);
 	FragColor = vec4(result, 1.0f);

@@ -69,7 +69,7 @@ bool Model::LoadFromFile(const std::string & _path, const std::string & _name)
 
 			std::string temp = buf;
 
-			processMaterials(path + temp);
+			ProcessMaterials(path + temp);
 		}
 		else if (inputString[0] == 's') {
 			//This line is smooth shading
@@ -176,7 +176,7 @@ void Model::Draw(Shader * shader)
 	}
 }
 
-bool Model::processMaterials(const std::string & file)
+bool Model::ProcessMaterials(const std::string & file)
 {
 	std::ifstream input;
 

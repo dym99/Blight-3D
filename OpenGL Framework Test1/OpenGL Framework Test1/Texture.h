@@ -13,12 +13,12 @@ public:
 	bool Load(const std::string &file);
 	void Unload();
 
-	void bind();
+	void Bind();
 	void Unbind();
 		
 	//Helper functions
-	inline GLuint getTextureHandle() { return m_texture; }
-	inline std::string getType() { return type; }
+	inline GLuint GetTextureHandle() { return m_texture; }
+	inline std::string GetType() { return type; }
 
 private:
 	//Handle to the texture;

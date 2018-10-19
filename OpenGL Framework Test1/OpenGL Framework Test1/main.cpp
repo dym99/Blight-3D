@@ -13,28 +13,28 @@ bool debugFeatures = false;
 //Display callback, should be top of the list
 void displayCallback() {
 	//Clears the display
-	display.clear(0.0f, 0.05f, 0.10f, 1.0f);
+	display.Clear(0.0f, 0.05f, 0.10f, 1.0f);
 	//Draws everything to the second buffer
-	theGame->draw();
+	theGame->Draw();
 	//Swaps buffer and polls events
-	display.update();
+	display.Update();
 }
 
 void debugInteractionCallback() {
 	//Right idea.... wrong format, but will work for now.
-	if (theGame->getEnemies()->size() > 0) {
-		Interact::interactionWithScene(&theGame->modelHook, theGame->getLights(),
-										*theGame->camera, theGame->getShaders()->size(),
-											theGame->updateTimer->getElapsedTimeSeconds(),
-												display.getWindow(),
+	if (theGame->modelHook.size() > 0) {
+		Interact::InteractionWithScene(&theGame->modelHook, theGame->GetLights(),
+										*theGame->camera, theGame->GetShaders()->size(),
+											theGame->updateTimer->GetElapsedTimeSeconds(),
+												display.GetWindow(),
 													theGame->modelHook.at(Interact::GetModelIndex())->GetTransform());
 	}
 }
 
 void keyboardInteractionCallback() {
-	theGame->keyboardUp();
-	theGame->keyboardDown();
-	theGame->keyboardPress();
+	theGame->KeyboardUp();
+	theGame->KeyboardDown();
+	theGame->KeyboardPress();
 }
 
 void mouseInteractionCallback() {
@@ -58,15 +58,15 @@ void interactionCallback() {
 //Update callback, should be bottom of the list 
 void timerCallback() {
 	//Updates the game
-	theGame->update();
+	theGame->Update();
 }
 
 int main(int argc, char **argv) {
 
 	theGame = new Game();
-	theGame->initGame(&debugFeatures);
+	theGame->InitGame(&debugFeatures);
 
-	while (!display.isClosed()) {
+	while (!display.IsClosed()) {
 		
 		displayCallback();
 		interactionCallback();
