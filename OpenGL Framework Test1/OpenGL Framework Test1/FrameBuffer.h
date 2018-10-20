@@ -36,10 +36,10 @@ public:
 private:
 	GLuint FBO = GL_NONE;
 	GLuint depthAttachment = GL_NONE;
-	GLuint *colorAttachment = nullptr;
+	GLuint *colorAttachments = nullptr;
 	GLenum *bufs = nullptr;
 
-	unsigned int numColorAttachment = 0;
+	unsigned int numColorAttachments = 0;
 };
 
 #endif // !__FRAME_BUFFER_H__

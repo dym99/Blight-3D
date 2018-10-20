@@ -2,8 +2,6 @@
 #include <iostream>
 #include "Game.h"
 
-#define WINDOW_HEIGHT			600
-#define WINDOW_WIDTH			800
 #define FRAMES_PER_SECONDS		60
 
 Game *theGame;
@@ -14,6 +12,7 @@ bool debugFeatures = false;
 void displayCallback() {
 	//Clears the display
 	display.Clear(0.0f, 0.05f, 0.10f, 1.0f);
+	//display.Clear(0.0f, 0.0f, 0.0f, 1.0f);
 	//Draws everything to the second buffer
 	theGame->Draw();
 	//Swaps buffer and polls events

@@ -195,9 +195,28 @@ void Shader::Bind()
 	glUseProgram(m_program);
 }
 
-void Shader::setOptionalMessage(const std::string _optionalMessage)
+void Shader::Unbind()
+{
+	glUseProgram(GL_NONE);
+}
+
+void Shader::SetOptionalMessage(const std::string _optionalMessage)
 {
 	optionalMessage = _optionalMessage;
+}
+
+void Shader::SetVec2(const GLchar * name, const float & x, const float & y)
+{
+	GLfloat vec[2] = { x, y };
+	GLuint loc = glGetUniformLocation(m_program, name);
+	glUniform2fv(loc, 1, vec);
+}
+
+void Shader::SetVec2(const GLchar * name, const glm::vec2 & vec2)
+{
+	GLfloat vec[2] = { vec2.x, vec2.y };
+	GLuint loc = glGetUniformLocation(m_program, name);
+	glUniform2fv(loc, 1, vec);
 }
 
 void Shader::SetVec3(const GLchar* name, const float & x, const float & y, const float & z)

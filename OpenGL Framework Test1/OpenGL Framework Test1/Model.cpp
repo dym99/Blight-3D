@@ -34,6 +34,10 @@ Model::Model(const Model& copy)
 
 Model::~Model()
 {
+	for (int i = 0; i < meshes.size(); i++) {
+		meshes[i]->Unload();
+		delete meshes[i];
+	}
 	for (int i = 0; i < materials.size(); i++) {
 		delete materials[i];
 	}

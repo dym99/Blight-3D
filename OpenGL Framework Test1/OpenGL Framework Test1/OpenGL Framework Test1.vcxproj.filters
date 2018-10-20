@@ -20,11 +20,11 @@
     <Filter Include="Source Files\Handlers">
       <UniqueIdentifier>{cce71b84-6a9f-44fb-8589-7a03cc7ca67a}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Source Files\Interactions">
-      <UniqueIdentifier>{6dec2983-e8cd-4921-8a3f-5ba3b62ce7f8}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Source Files\Game">
       <UniqueIdentifier>{522a4125-a0da-4df0-a15f-b89655d26de5}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Utilities">
+      <UniqueIdentifier>{6dec2983-e8cd-4921-8a3f-5ba3b62ce7f8}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -38,7 +38,7 @@
       <Filter>Source Files\Display</Filter>
     </ClCompile>
     <ClCompile Include="Interactions.cpp">
-      <Filter>Source Files\Interactions</Filter>
+      <Filter>Source Files\Utilities</Filter>
     </ClCompile>
     <ClCompile Include="main.cpp">
       <Filter>Source Files</Filter>
@@ -67,6 +67,9 @@
     <ClCompile Include="FrameBuffer.cpp">
       <Filter>Source Files\Display</Filter>
     </ClCompile>
+    <ClCompile Include="Utilities.cpp">
+      <Filter>Source Files\Utilities</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Input.h">
@@ -82,7 +85,7 @@
       <Filter>Source Files\Display</Filter>
     </ClInclude>
     <ClInclude Include="Interactions.h">
-      <Filter>Source Files\Interactions</Filter>
+      <Filter>Source Files\Utilities</Filter>
     </ClInclude>
     <ClInclude Include="Game.h">
       <Filter>Source Files\Game</Filter>
@@ -110,6 +113,9 @@
     </ClInclude>
     <ClInclude Include="FrameBuffer.h">
       <Filter>Source Files\Display</Filter>
+    </ClInclude>
+    <ClInclude Include="Utilities.h">
+      <Filter>Source Files\Utilities</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

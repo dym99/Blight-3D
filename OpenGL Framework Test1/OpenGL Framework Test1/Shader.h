@@ -20,11 +20,14 @@ public:
 	//Methods
 		//Set the GPU to a state that makes it use the vertex and fragment shaders defined here
 		void Bind();
+		void Unbind();
 		//Updates all the uniforms we have to be correct
 		void Update(const Transform& transform, const Camera& camera);
 		void OutputMessage();
 
-		void setOptionalMessage(const std::string optionalMessage);
+		void SetOptionalMessage(const std::string optionalMessage);
+		void SetVec2(const GLchar* name, const float& x, const float& y);
+		void SetVec2(const GLchar* name, const glm::vec2& vec2);
 		void SetVec3(const GLchar* name, const float& x, const float& y, const float& z);
 		void SetVec3(const GLchar* name, const glm::vec3& vec3);
 		void SetVec4(const GLchar* name, const float& x, const float& y, const float& z, const float& w);
