@@ -29,7 +29,7 @@ public:
 		return elapsedTime / CLOCKS_PER_SEC;
 	}
 
-	float GetCurrentTime() {
+	float GetTimeCurrent() {
 		return currentTime;
 	}
 

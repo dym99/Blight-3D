@@ -63,6 +63,10 @@ void Game::InitGame(bool* debug)
 		enemies[0]->LoadFromFile("./Resources/Objects/Monkey/", "Monkey");
 		//enemies[0]->GetTransform()->SetPos(glm::vec3(0.f, -0.5f, 2.f));
 		//enemies[0]->GetTransform()->SetScale(glm::vec3(0.05f, 0.05f, 0.05f));
+
+		lights.push_back(new Model());
+		lights[0]->LoadFromFile("./Resources/Objects/Lamp/", "Lamp");
+		lights[0]->GetTransform()->SetScale(glm::vec3(0.5f, 0.5f, 0.5f));
 	}
 
 	//Camera init stuff
@@ -84,10 +88,10 @@ void Game::InitGame(bool* debug)
 		));
 		{
 			shaders.at(shaders.size() - 1)->Bind();
-			shaders.at(shaders.size() - 1)->SetVec4("light.position", glm::vec4(3.0f, 0.f, 0.f, 1.0f));
+			shaders.at(shaders.size() - 1)->SetVec4("light.position", glm::vec4(lights[0]->GetTransform()->GetPos(), 1.0f));
 			shaders.at(shaders.size() - 1)->SetVec3("light.ambience", 0.15f, 0.15f, 0.15f);
 			shaders.at(shaders.size() - 1)->SetVec3("light.diffuse", 0.7f, 0.7f, 0.7f);
-			shaders.at(shaders.size() - 1)->SetVec3("light.specular", 0.8f, 0.8f, 0.8f);
+			shaders.at(shaders.size() - 1)->SetVec3("light.specular", 0.4f, 0.1f, 0.f);
 			shaders.at(shaders.size() - 1)->SetFloat("light.constant", 1.0f);
 			shaders.at(shaders.size() - 1)->SetFloat("light.linear", 0.1f);
 			shaders.at(shaders.size() - 1)->SetFloat("light.quadratic", 0.01f);
@@ -200,6 +204,13 @@ void Game::Update()
 			enemies[i]->GetTransform()->GetRot().y += 1.0f * deltaTime;
 		}
 	}
+
+
+	shaders.at(shaders.size() - 1)->Bind();
+	shaders.at(shaders.size() - 1)->SetVec4("light.position", glm::vec4(lights[0]->GetTransform()->GetPos(), 1.0f));
+	shaders.at(shaders.size() - 1)->Unbind();
+
+	lights[0]->GetTransform()->SetPos(glm::vec3(glm::sin(updateTimer->GetTimeCurrent() / 1000.f) * 5.0f, 1.0f, 1.3f));
 }
 
 void Game::Draw()
@@ -212,60 +223,64 @@ void Game::Draw()
 	shaderHook = shaders.at(Interact::GetShaderIndex());
 	postProcShaderHook = postProcShaders.at(postProcShaderIndex);
 
-	glViewport(0, 0, WINDOW_WIDTH, WINDOW_HEIGHT);
 
-	if (frameBuffer) {
-		mainBuffer.Bind();
-	}
-	if (enemies.size() > 0) {
-		for (int i = 0; i < enemies.size(); i++) {
-			shaderHook->Bind();
-			shaderHook->Update(*enemies[i]->GetTransform(), *camera);
-			enemies[i]->Draw(shaderHook);
-			shaderHook->Unbind();
-			
+	//Camera 1
+	{
+		glViewport(0, 0, WINDOW_WIDTH, WINDOW_HEIGHT);
+
+		if (frameBuffer) {
+			mainBuffer.Bind();
 		}
-	}
-	if (environments.size() > 0) {
-		for (int i = 0; i < environments.size(); i++) {
-			shaderHook->Bind();
-			shaderHook->Update(*environments[i]->GetTransform(), *camera);
-			environments[i]->Draw(shaderHook);
-			shaderHook->Unbind();
+		if (enemies.size() > 0) {
+			for (int i = 0; i < enemies.size(); i++) {
+				shaderHook->Bind();
+				shaderHook->Update(*enemies[i]->GetTransform(), *camera);
+				enemies[i]->Draw(shaderHook);
+				shaderHook->Unbind();
+
+			}
 		}
-	}
-	if (lights.size() > 0) {
-		for (int i = 0; i < lights.size(); i++) {
-			glEnable(GL_BLEND);
-			//Light sources wouldn't be affected by other lights
-			lampShader->Bind();
-			lampShader->Update(*lights[i]->GetTransform(), *camera);
-			lights[i]->Draw(lampShader);
-			glDisable(GL_BLEND);
-			lampShader->Unbind();
+		if (environments.size() > 0) {
+			for (int i = 0; i < environments.size(); i++) {
+				shaderHook->Bind();
+				shaderHook->Update(*environments[i]->GetTransform(), *camera);
+				environments[i]->Draw(shaderHook);
+				shaderHook->Unbind();
+			}
 		}
-	}
-	mainBuffer.Unbind();
-	if (frameBuffer) {
-		if (hasBloom) {
-			ProcessBloom(mainBuffer, workBuffer1, workBuffer2, workBuffer3, bloomComponents, postProc);
+		if (lights.size() > 0) {
+			for (int i = 0; i < lights.size(); i++) {
+				glEnable(GL_BLEND);
+				//Light sources wouldn't be affected by other lights
+				lampShader->Bind();
+				lampShader->Update(*lights[i]->GetTransform(), *camera);
+				lights[i]->Draw(lampShader);
+				glDisable(GL_BLEND);
+				lampShader->Unbind();
+			}
 		}
-		if (postProc) {
-			FrameBuffer* temp;
+		mainBuffer.Unbind();
+		if (frameBuffer) {
 			if (hasBloom) {
-				temp = &workBuffer3;
+				ProcessBloom(mainBuffer, workBuffer1, workBuffer2, workBuffer3, bloomComponents, postProc);
 			}
-			else {
-				temp = &mainBuffer;
+			if (postProc) {
+				FrameBuffer* temp;
+				if (hasBloom) {
+					temp = &workBuffer3;
+				}
+				else {
+					temp = &mainBuffer;
+				}
+				postProcShaderHook->Bind();
+				postProcShaderHook->SetInt("uTex", 0);
+
+				glBindTexture(GL_TEXTURE_2D, temp->GetColorHandle(0));
+				DrawFullScreenQuad();
+				glBindTexture(GL_TEXTURE_2D, GL_NONE);
+
+				postProcShaderHook->Unbind();
 			}
-			postProcShaderHook->Bind();
-			postProcShaderHook->SetInt("uTex", 0);
-
-			glBindTexture(GL_TEXTURE_2D, temp->GetColorHandle(0));
-			DrawFullScreenQuad();
-			glBindTexture(GL_TEXTURE_2D, GL_NONE);
-
-			postProcShaderHook->Unbind();
 		}
 	}
 }
