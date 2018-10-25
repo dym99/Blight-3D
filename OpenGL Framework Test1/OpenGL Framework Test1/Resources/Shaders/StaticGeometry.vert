@@ -7,14 +7,14 @@ out vec2 TexCoords;
 out vec3 normal0;
 out vec3 fragPosition;
 
-uniform mat4 model;
-uniform mat4 view;
-uniform mat4 projection;
+uniform mat4 uModel;
+uniform mat4 uView;
+uniform mat4 uProj;
 
 void main()
 {
-	gl_Position = projection * view * model * vec4(position, 1.0);
+	gl_Position = uProj * uView * uModel * vec4(position, 1.0);
     TexCoords = texCoord;    
-	normal0 = mat3(model) * normal;
-	fragPosition = (model * vec4(position, 1.0)).rgb;
+	normal0 = mat3(uModel) * normal;
+	fragPosition = (uModel * vec4(position, 1.0)).rgb;
 }

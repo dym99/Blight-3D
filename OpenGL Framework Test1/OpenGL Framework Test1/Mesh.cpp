@@ -185,14 +185,14 @@ void Mesh::Draw(Shader * shader)
 			normalNr++;
 		}
 
-		if (normalNr == 0) {
-			shader->SetInt("hasNormMap", 0);
+		/*if (normalNr == 0) {
+			shader->SendUniform("hasNormMap", 0);
 		}
 		else {
-			shader->SetInt("hasNormMap", 1);
-		}
+			shader->SendUniform("hasNormMap", 1);
+		}*/
 
-		shader->SetInt(("material." + name).c_str(), i);
+		shader->SendUniform(("material." + name).c_str(), i);
 		glBindTexture(GL_TEXTURE_2D, material.textures[i]->GetTextureHandle());
 	}
 	glActiveTexture(GL_TEXTURE0);

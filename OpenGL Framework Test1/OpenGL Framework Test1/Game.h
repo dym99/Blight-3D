@@ -7,12 +7,27 @@
 #include "FrameBuffer.h"
 #include "Utilities.h"
 
+enum Shaders {
+	PHONG_SHADER,
+
+	NUM_SHADERS
+};
+
+enum PostProcess {
+	GREYSCALE_POST,
+	SEPIA_POST,
+	FOCUS_IN_POST,
+
+	NUM_POST
+};
+
 class Game {
 public:
 	Game();
 	~Game();
 
 	void InitGame(bool* debug);
+	void InitUniforms();
 	void Update();
 	void Draw();
 
@@ -20,10 +35,10 @@ public:
 	void KeyboardDown();
 	void KeyboardPress();
 
-	//Camera stuff
+	//Camera
 	Camera* camera;
 
-	//Time stuff
+	//Timer
 	Timer *updateTimer = nullptr;
 	float totalGameTime = 0.0f;
 
@@ -46,20 +61,16 @@ public:
 	std::vector<Shader*>* GetShaders() { return &shaders; }
 private:
 
-	//Object stuff
+	//Models stuff
 	Model* player;						//Player object
 	std::vector<Model*> enemies;		//Enemy Objects
 	std::vector<Model*> environments;	//Environment Objects (Walls, Floors, flora, fauna)
 	std::vector<Model*> lights;			//Lighting Objects (Handle with Care)
 
-	//Plain white shader
-	Shader* lampShader;
-
-	//Shader stuff
-	std::vector<Shader*> shaders;		//Shader objects
-	std::vector<Shader*> postProcShaders; //post processing shaders
-
-
+	//Shaders
+	Shader* lampShader;						//Plain white shader
+	std::vector<Shader*> shaders;			//Shader objects
+	std::vector<Shader*> postProcShaders;	//post processing shaders
 	std::vector<Shader*> bloomComponents;	//Bloom components
 
 	//Indexes
@@ -67,6 +78,8 @@ private:
 
 	//Hook to enable and disable debug features
 	bool* debugFeatures;
+
+	//Booleans to control framebuffer aspects
 	bool frameBuffer = false;
 	bool postProc = false;
 	bool hasBloom = false;

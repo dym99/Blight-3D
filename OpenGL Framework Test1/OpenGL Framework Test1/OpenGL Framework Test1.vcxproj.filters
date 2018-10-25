@@ -31,9 +31,6 @@
     <ClCompile Include="Input.cpp">
       <Filter>Source Files\Handlers</Filter>
     </ClCompile>
-    <ClCompile Include="Shader.cpp">
-      <Filter>Source Files\Shaders</Filter>
-    </ClCompile>
     <ClCompile Include="Display.cpp">
       <Filter>Source Files\Display</Filter>
     </ClCompile>
@@ -70,13 +67,13 @@
     <ClCompile Include="Utilities.cpp">
       <Filter>Source Files\Utilities</Filter>
     </ClCompile>
+    <ClCompile Include="Shader.cpp">
+      <Filter>Source Files\Shaders</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Input.h">
       <Filter>Source Files\Handlers</Filter>
-    </ClInclude>
-    <ClInclude Include="Shader.h">
-      <Filter>Source Files\Shaders</Filter>
     </ClInclude>
     <ClInclude Include="Transform.h">
       <Filter>Source Files\Maths</Filter>
@@ -116,6 +113,9 @@
     </ClInclude>
     <ClInclude Include="Utilities.h">
       <Filter>Source Files\Utilities</Filter>
+    </ClInclude>
+    <ClInclude Include="Shader.h">
+      <Filter>Source Files\Shaders</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

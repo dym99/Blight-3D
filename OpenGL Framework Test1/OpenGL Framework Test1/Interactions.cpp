@@ -26,7 +26,6 @@ void Interact::InteractionWithScene(std::vector<Model*>* models, std::vector<Mod
 		//Allows to change the selected object
 		ChangeSelection(numObj);
 		//Allows you to create a model based on inputs from numbers
-		CreateModel(models, lights, camera);
 		//Allows to change the selected shader
 		ChangeShader(numShade);
 		//Allows for control over model translation
@@ -41,39 +40,39 @@ void Interact::InteractionWithScene(std::vector<Model*>* models, std::vector<Mod
 	SDL_GetRelativeMouseState(NULL, NULL);
 }
 
-void Interact::CreateModel(std::vector<Model*>* models, std::vector<Model*>* lights, Camera& camera)
-{
-	int modelSize = models->size();
-	int lightSize = lights->size();
-	glm::vec3 position = camera.GetPos() + (camera.GetForward() * 2.f);
-	glm::vec3 lampScale(0.25f, 0.25f, 0.25f);
-	glm::vec3 modelScale(0.10f, 0.10f, 0.10f);
-
-	//Draws Box
-	if (Input::GetKeyPress(KeyCode::NumPad0)) {
-		models->push_back(new Model());
-		models->at(modelSize)->LoadFromFile(paths["box"], "cube");
-		models->at(modelSize)->GetTransform()->SetPos(position);
-	}
-	else if (Input::GetKeyPress(KeyCode::NumPad1)) {
-		models->push_back(new Model());
-		models->at(modelSize)->LoadFromFile(paths["Ravager"], "Ravager");
-		models->at(modelSize)->GetTransform()->SetScale(lampScale);
-		models->at(modelSize)->GetTransform()->SetPos(position);
-	}
-	else if (Input::GetKeyPress(KeyCode::NumPad2)) {
-		models->push_back(new Model());
-		models->at(modelSize)->LoadFromFile(paths["crysis"], "nanosuit");
-		models->at(modelSize)->GetTransform()->SetScale(modelScale);
-		models->at(modelSize)->GetTransform()->SetPos(position);
-	}
-	/*else if (Input::GetKeyPress(KeyCode::NumPad3)) {
-		lights->push_back(new Model());
-		models->at(modelSize)->LoadFromFile(paths["lamp"], "lamp");
-		lights->at(lightSize)->GetTransform()->setScale(lampScale);
-		lights->at(lightSize)->GetTransform()->setPos(position);
-	}*/
-}
+//void Interact::CreateModel(std::vector<Model*>* models, std::vector<Model*>* lights, Camera& camera)
+//{
+//	int modelSize = models->size();
+//	int lightSize = lights->size();
+//	glm::vec3 position = camera.GetPos() + (camera.GetForward() * 2.f);
+//	glm::vec3 lampScale(0.25f, 0.25f, 0.25f);
+//	glm::vec3 modelScale(0.10f, 0.10f, 0.10f);
+//
+//	//Draws Box
+//	if (Input::GetKeyPress(KeyCode::NumPad0)) {
+//		models->push_back(new Model());
+//		models->at(modelSize)->LoadFromFile(paths["box"], "cube");
+//		models->at(modelSize)->GetTransform()->SetPos(position);
+//	}
+//	else if (Input::GetKeyPress(KeyCode::NumPad1)) {
+//		models->push_back(new Model());
+//		models->at(modelSize)->LoadFromFile(paths["Ravager"], "Ravager");
+//		models->at(modelSize)->GetTransform()->SetScale(lampScale);
+//		models->at(modelSize)->GetTransform()->SetPos(position);
+//	}
+//	else if (Input::GetKeyPress(KeyCode::NumPad2)) {
+//		models->push_back(new Model());
+//		models->at(modelSize)->LoadFromFile(paths["crysis"], "nanosuit");
+//		models->at(modelSize)->GetTransform()->SetScale(modelScale);
+//		models->at(modelSize)->GetTransform()->SetPos(position);
+//	}
+//	/*else if (Input::GetKeyPress(KeyCode::NumPad3)) {
+//		lights->push_back(new Model());
+//		models->at(modelSize)->LoadFromFile(paths["lamp"], "lamp");
+//		lights->at(lightSize)->GetTransform()->setScale(lampScale);
+//		lights->at(lightSize)->GetTransform()->setPos(position);
+//	}*/
+//}
 
 void Interact::ChangeSelection(int numObj)
 {

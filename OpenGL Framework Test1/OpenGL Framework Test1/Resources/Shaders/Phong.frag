@@ -13,8 +13,7 @@ struct Material {
 struct Light {
 	vec4 position;
 	vec3 ambience;
-	vec3 diffuse;
-	vec3 specular;	
+	vec3 diffuse;	
 	
 	float shininess;
 	
@@ -27,9 +26,16 @@ in vec2 TexCoords;
 in vec3 normal0;
 in vec3 fragPosition;
 
-uniform Light light;
+uniform Light light = Light(
+	vec4(0.0, 0.0, 0.0, 0.0),
+	vec3(0.15, 0.15, 0.15),
+	vec3(0.7, 0.7, 0.7),
+	32.0,
+	1.0,
+	0.1,
+	0.01
+);
 uniform Material material;
-uniform bool hasNormMap;
 
 void main() 
 {
@@ -53,10 +59,13 @@ void main()
 		FragColor.rgb += light.diffuse * NdotL * attentuation;
 		
 		//Blinn-Phong bullshit
-		float NdotHV = max(dot(normal, normalize(lightDir + normalize(-fragPosition))), 0.0);
+		vec3 eye = normalize(-fragPosition);
+		vec3 reflection = reflect(-lightDir, normal);
+		float specularStrength = dot(reflection, eye);
+		specularStrength = max(specularStrength, 0.0);
 		
 		//Calculate specular
-		FragColor.rgb += light.specular * pow(NdotHV, light.shininess) * attentuation;
+		FragColor.rgb += light.diffuse * pow(specularStrength, light.shininess) * attentuation;
 	}
 	
 	vec4 textureColor = texture(material.diffuseTex, TexCoords);
