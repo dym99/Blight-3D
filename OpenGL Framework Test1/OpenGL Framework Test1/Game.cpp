@@ -60,7 +60,7 @@ void Game::InitGame(bool* debug)
 	
 	#pragma region Scene Init Stuff
 		enemies.push_back(new Model());
-		enemies[0]->LoadFromFile("./Resources/Objects/Monkey/", "Monkey");
+		enemies[0]->LoadFromFile("./Resources/Objects/Crysis/", "nanosuit");
 		//enemies[0]->GetTransform()->SetPos(glm::vec3(0.f, -0.5f, 2.f));
 		//enemies[0]->GetTransform()->SetScale(glm::vec3(0.05f, 0.05f, 0.05f));
 
@@ -89,6 +89,12 @@ void Game::InitGame(bool* debug)
 		shaders.push_back(new Shader(
 			"./Resources/Shaders/StaticGeometry.vert",
 			"./Resources/Shaders/Phong.frag"
+		));
+
+		//Tangent space normals maybe?
+		shaders.push_back(new Shader(
+			"./Resources/Shaders/tangentNormalMapping.vert",
+			"./Resources/Shaders/tangentNormalMapping.frag"
 		));
 #pragma endregion
 
@@ -216,7 +222,7 @@ void Game::Update()
 	postProcShaders.at(FOCUS_IN_POST)->SendUniform("uTime", totalGameTime);
 	Shader::Unbind();
 
-	lights[0]->GetTransform()->SetPos(glm::vec3(glm::sin(updateTimer->GetTimeCurrent() / 1000.f) * 5.0f, 1.0f, 1.3f));
+	//lights[0]->GetTransform()->SetPos(glm::vec3(glm::sin(updateTimer->GetTimeCurrent() / 1000.f) * 5.0f, 1.0f, 1.3f));
 }
 
 void Game::Draw()

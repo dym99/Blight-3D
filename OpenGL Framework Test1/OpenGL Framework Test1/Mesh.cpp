@@ -19,90 +19,59 @@ Mesh::~Mesh()
 
 bool Mesh::ProcessMesh(std::vector<glm::vec3> &vertexData, std::vector<glm::vec2> &textureData, std::vector<glm::vec3> &normalData, std::vector<MeshFace> &faceData)
 {
-	{
-		//
-		//while (!input.eof()) {
-		//	input.getline(inputString, CHAR_BUFFER_SIZE);
-
-		//	if (inputString[0] == '#') {
-		//		//This line is a comment
-		//		continue;
-		//	}
-		//	else if (inputString[0] == 'o') {
-		//		//This line is an object
-		//		char buf[CHAR_BUFFER_SIZE];
-
-		//		std::strncpy(buf, &inputString[2], CHAR_BUFFER_SIZE);
-
-		//		std::string temp = buf;
-		//	}
-		//	if (loadingData) {
-		//		if (std::strstr(inputString, "usemtl") != nullptr) {
-		//			char buf[CHAR_BUFFER_SIZE];
-
-		//			std::strncpy(buf, &inputString[7], CHAR_BUFFER_SIZE);
-
-		//			std::string temp = buf;
-
-		//			LoadMaterial(temp);
-		//		}
-		//		else if (inputString[0] == 's') {
-		//			//this line is for smooth shading
-		//			continue;
-		//		}
-		//		else if (inputString[0] == 'v') {
-		//			if (inputString[1] == 'n') {
-		//				//This line has normal data in it
-		//				glm::vec3 temp;
-
-		//				std::sscanf(inputString, "vn %f %f %f", &temp.x, &temp.y, &temp.z);
-		//				normalData.push_back(temp);
-		//			}
-		//			else if (inputString[1] == 't') {
-		//				//This line has texture data in it
-		//				glm::vec2 temp;
-
-		//				hasUVs ? true : hasUVs = true;
-
-		//				std::sscanf(inputString, "vt %f %f", &temp.x, &temp.y);
-		//				textureData.push_back(temp);
-		//			}
-		//			else {
-		//				//This line has vertex data in it
-		//				glm::vec3 temp;
-
-		//				std::sscanf(inputString, "v %f %f %f", &temp.x, &temp.y, &temp.z);
-		//				vertexData.push_back(temp);
-		//			}
-		//		}
-		//		else if (inputString[0] == 'f') {
-		//			//This line has face data in it
-		//			MeshFace temp;
-
-		//			if (hasUVs) {
-		//				std::sscanf(inputString, "f %u/%u/%u %u/%u/%u %u/%u/%u",
-		//					&temp.vertices[0], &temp.textureUVs[0], &temp.normals[0],
-		//					&temp.vertices[1], &temp.textureUVs[1], &temp.normals[1],
-		//					&temp.vertices[2], &temp.textureUVs[2], &temp.normals[2]);
-		//			}
-		//			else {
-		//				std::sscanf(inputString, "f %u//%u %u//%u %u//%u",
-		//					&temp.vertices[0], &temp.normals[0],
-		//					&temp.vertices[1], &temp.normals[1],
-		//					&temp.vertices[2], &temp.normals[2]);
-		//			}
-		//			faceData.push_back(temp);
-		//		}
-		//	}
-		//}
-
-		////Closes the file stream
-		//input.close();
-	}
-
 	std::vector<float> unPackedVertexData;
 	std::vector<float> unPackedTextureData;
 	std::vector<float> unPackedNormalData;
+	std::vector<float> unPackedTangentData;
+	std::vector<float> unPackedBitangentData;
+	
+	tangentData.resize(vertexData.size());
+	bitangentData.resize(vertexData.size());
+
+	//Calculate tangent and bitangent data here
+	//V IMPORTANT PLS AND THANK FOR TANGENT SPACE NORMALS
+	for (unsigned i = 0; i < faceData.size(); i++) {
+		std::vector<glm::vec3> tempPos;
+		std::vector<glm::vec2> tempUV;
+
+		for (unsigned j = 0; j < 3; j++) {
+			glm::vec3 tempP;
+			glm::vec2 tempU;
+
+			tempP.x = vertexData[faceData[i].vertices[j] - 1].x;
+			tempP.y = vertexData[faceData[i].vertices[j] - 1].y;
+			tempP.z = vertexData[faceData[i].vertices[j] - 1].z;
+			tempPos.push_back(tempP);
+
+			tempU.x = textureData[faceData[i].textureUVs[j] - 1].x;
+			tempU.y = textureData[faceData[i].textureUVs[j] - 1].y;
+			tempUV.push_back(tempU);
+		}
+
+		//Tangent and bitangent calculation here
+		glm::vec3 deltaPos1 = tempPos[1] - tempPos[0];
+		glm::vec3 deltaPos2 = tempPos[2] - tempPos[0];
+
+		glm::vec2 deltaUV1 = tempUV[1] - tempUV[0];
+		glm::vec2 deltaUV2 = tempUV[2] - tempUV[0];
+
+		float r = 1.0f / (deltaUV1.x * deltaUV2.y - deltaUV1.y * deltaUV2.x);
+		glm::vec3 tangent = (deltaPos1 * deltaUV2.y - deltaPos2 * deltaUV1.y)*r;
+		glm::vec3 bitangent = (deltaPos2 * deltaUV1.x - deltaPos1 * deltaUV2.x)*r;
+
+		//Puts the current tangent and bitangent data into the correct slot in the tangentData and
+		//bitangent data vectors
+		for (unsigned j = 0; j < 3; j++) {
+			tangentData[faceData[i].vertices[j] - 1].x = tangent.x;
+			tangentData[faceData[i].vertices[j] - 1].y = tangent.y;
+			tangentData[faceData[i].vertices[j] - 1].z = tangent.z;
+
+			bitangentData[faceData[i].vertices[j] - 1].x = bitangent.x;
+			bitangentData[faceData[i].vertices[j] - 1].y = bitangent.y;
+			bitangentData[faceData[i].vertices[j] - 1].z = bitangent.z;
+		}
+		
+	}
 
 	//Unpack the data
 	//Face data important here
@@ -118,7 +87,17 @@ bool Mesh::ProcessMesh(std::vector<glm::vec3> &vertexData, std::vector<glm::vec2
 			unPackedNormalData.push_back(normalData[faceData[i].normals[j] - 1].x);
 			unPackedNormalData.push_back(normalData[faceData[i].normals[j] - 1].y);
 			unPackedNormalData.push_back(normalData[faceData[i].normals[j] - 1].z);
+
+			unPackedTangentData.push_back(tangentData[faceData[i].vertices[j] - 1].x);
+			unPackedTangentData.push_back(tangentData[faceData[i].vertices[j] - 1].y);
+			unPackedTangentData.push_back(tangentData[faceData[i].vertices[j] - 1].z);
+
+			unPackedBitangentData.push_back(bitangentData[faceData[i].vertices[j] - 1].x);
+			unPackedBitangentData.push_back(bitangentData[faceData[i].vertices[j] - 1].y);
+			unPackedBitangentData.push_back(bitangentData[faceData[i].vertices[j] - 1].z);
 		}
+		
+
 	}
 
 	m_NumFaces = faceData.size();
@@ -129,12 +108,16 @@ bool Mesh::ProcessMesh(std::vector<glm::vec3> &vertexData, std::vector<glm::vec2
 	glGenBuffers(1, &VBO_Vertices);
 	glGenBuffers(1, &VBO_UVs);
 	glGenBuffers(1, &VBO_Normals);
+	glGenBuffers(1, &VBO_Tangents);
+	glGenBuffers(1, &VBO_Bitangents);
 
 	glBindVertexArray(VAO);
 
 	glEnableVertexAttribArray(0);	//Vertexes
 	glEnableVertexAttribArray(1);	//UVs
 	glEnableVertexAttribArray(2);	//Normals
+	glEnableVertexAttribArray(3);	//Tangents
+	glEnableVertexAttribArray(4);	//Bitangents
 	
 	//Send the Vertex data to OpenGL
 	glBindBuffer(GL_ARRAY_BUFFER, VBO_Vertices);
@@ -150,6 +133,16 @@ bool Mesh::ProcessMesh(std::vector<glm::vec3> &vertexData, std::vector<glm::vec2
 	glBindBuffer(GL_ARRAY_BUFFER, VBO_Normals);
 	glBufferData(GL_ARRAY_BUFFER, sizeof(float) * unPackedNormalData.size(), &unPackedNormalData[0], GL_STATIC_DRAW);
 	glVertexAttribPointer((GLuint)2, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 3, BUFFER_OFFSET(0));
+
+	//Send the tangent data to OpenGL
+	glBindBuffer(GL_ARRAY_BUFFER, VBO_Tangents);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(float) * unPackedTangentData.size(), &unPackedTangentData[0], GL_STATIC_DRAW);
+	glVertexAttribPointer((GLuint)3, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 3, BUFFER_OFFSET(0));
+
+	//Send the bitangent data to OpenGL
+	glBindBuffer(GL_ARRAY_BUFFER, VBO_Bitangents);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(float) * unPackedBitangentData.size(), &unPackedBitangentData[0], GL_STATIC_DRAW);
+	glVertexAttribPointer((GLuint)4, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 3, BUFFER_OFFSET(0));
 
 	//Cleanup after the buffers you bound
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
@@ -185,12 +178,12 @@ void Mesh::Draw(Shader * shader)
 			normalNr++;
 		}
 
-		/*if (normalNr == 0) {
+		if (normalNr == 0) {
 			shader->SendUniform("hasNormMap", 0);
 		}
 		else {
 			shader->SendUniform("hasNormMap", 1);
-		}*/
+		}
 
 		shader->SendUniform(("material." + name).c_str(), i);
 		glBindTexture(GL_TEXTURE_2D, material.textures[i]->GetTextureHandle());
