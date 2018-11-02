@@ -27,42 +27,42 @@ public:
 
 	//Helpers
 		//Filename
-		inline std::string& getFileName() { return fileName; }
+		inline std::string& GetFileName() { return fileName; }
 
 		//counts
-		inline unsigned int& getEnemyCount() { return enemyCount; }
-		inline unsigned int& getEnvironmentCount() { return environmentCount; };
-		inline unsigned int& getLightCount() { return lightCount; }
+		inline unsigned int& GetEnemyCount() { return enemyCount; }
+		inline unsigned int& GetEnvironmentCount() { return environmentCount; };
+		inline unsigned int& GetLightCount() { return lightCount; }
 
 		//paths
-		inline std::string& getPlayerPath() { return playerPath; }
-		inline std::vector<std::string>& getEnemyPaths() { return enemyPaths; }
-		inline std::vector<std::string>& getEnvironmentPaths() { return environmentPaths; }
-		inline std::vector<std::string>& getLightPaths() { return lightPaths; }
+		inline std::string& GetPlayerPath() { return playerPath; }
+		inline std::vector<std::string>& GetEnemyPaths() { return enemyPaths; }
+		inline std::vector<std::string>& GetEnvironmentPaths() { return environmentPaths; }
+		inline std::vector<std::string>& GetLightPaths() { return lightPaths; }
 
 		//names
-		inline std::string& getPlayerName() { return playerName; }
-		inline std::vector<std::string>& getEnemyNames() { return enemyNames; }
-		inline std::vector<std::string>& getEnvironmentNames() { return environmentNames; }
-		inline std::vector<std::string>& getLightNames() { return lightNames; }
+		inline std::string& GetPlayerName() { return playerName; }
+		inline std::vector<std::string>& GetEnemyNames() { return enemyNames; }
+		inline std::vector<std::string>& GetEnvironmentNames() { return environmentNames; }
+		inline std::vector<std::string>& GetLightNames() { return lightNames; }
 			
 		//positions
-		inline glm::vec3& getPlayerPosition() { return playerPosition; }
-		inline std::vector<glm::vec3>& getEnemyPositions() { return enemyPositions; }
-		inline std::vector<glm::vec3>& getEnvironmentPositions() { return environmentPositions; }
-		inline std::vector<glm::vec3>& getLightPositions() { return lightPositions; }
+		inline glm::vec3& GetPlayerPosition() { return playerPosition; }
+		inline std::vector<glm::vec3>& GetEnemyPositions() { return enemyPositions; }
+		inline std::vector<glm::vec3>& GetEnvironmentPositions() { return environmentPositions; }
+		inline std::vector<glm::vec3>& GetLightPositions() { return lightPositions; }
 		
 		//rotations
-		inline glm::vec3& getPlayerRotation() { return playerRotation; }
-		inline std::vector<glm::vec3>& getEnemyRotations() { return enemyRotations; }
-		inline std::vector<glm::vec3>& getEnvironmentRotations() { return environmentRotations; }
-		inline std::vector<glm::vec3>& getLightRotations() { return lightRotations; }
+		inline glm::vec3& GetPlayerRotation() { return playerRotation; }
+		inline std::vector<glm::vec3>& GetEnemyRotations() { return enemyRotations; }
+		inline std::vector<glm::vec3>& GetEnvironmentRotations() { return environmentRotations; }
+		inline std::vector<glm::vec3>& GetLightRotations() { return lightRotations; }
 		
 		//scales
-		inline glm::vec3& getPlayerScale() { return playerScale; }
-		inline std::vector<glm::vec3>& getEnemyScales() { return enemyScales; }
-		inline std::vector<glm::vec3>& getEnvironmentScales() { return environmentScales; }
-		inline std::vector<glm::vec3>& getLightScales() { return lightScales; }
+		inline glm::vec3& GetPlayerScale() { return playerScale; }
+		inline std::vector<glm::vec3>& GetEnemyScales() { return enemyScales; }
+		inline std::vector<glm::vec3>& GetEnvironmentScales() { return environmentScales; }
+		inline std::vector<glm::vec3>& GetLightScales() { return lightScales; }
 	//!Helpers
 
 private:

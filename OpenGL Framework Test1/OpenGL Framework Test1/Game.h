@@ -4,55 +4,85 @@
 #include "Scene.h"
 #include "Shader.h"
 #include "Interactions.h"
+#include "FrameBuffer.h"
+#include "Utilities.h"
+
+enum Shaders {
+	PHONG_SHADER,
+
+	NUM_SHADERS
+};
+
+enum PostProcess {
+	GREYSCALE_POST,
+	SEPIA_POST,
+	FOCUS_IN_POST,
+
+	NUM_POST
+};
 
 class Game {
 public:
 	Game();
 	~Game();
 
-	void initGame(bool* debug);
-	void update();
-	void draw();
+	void InitGame(bool* debug);
+	void InitUniforms();
+	void Update();
+	void Draw();
 
-	void keyboardUp();
-	void keyboardDown();
-	void keyboardPress();
+	void KeyboardUp();
+	void KeyboardDown();
+	void KeyboardPress();
 
-	//Camera stuff
+	//Camera
 	Camera* camera;
+
+	//Timer
+	Timer *updateTimer = nullptr;
+	float totalGameTime = 0.0f;
 
 	//Hooks
 	Shader* shaderHook;
+	Shader* postProcShaderHook;
 	std::vector<Model*> modelHook;
 
-	//Plain white shader
-	Shader* lampShader;
-
-	//Hook to enable and disable debug features
-	bool* debugFeatures;
+	//Framebuffers
+	FrameBuffer mainBuffer;
+	FrameBuffer workBuffer1;
+	FrameBuffer workBuffer2;
+	FrameBuffer workBuffer3;
 
 	//Helpers
-	Model& getPlayer() { return *player; }
-	std::vector<Model*>* getEnemies() { return &enemies; }
-	std::vector<Model*>* getEnvironments() { return &environments; }
-	std::vector<Model*>* getLights() { return &lights; }
-	std::vector<Shader*>* getShaders() { return &shaders; }
-
-	//Time stuff
-	Timer *updateTimer = nullptr;
-	float totalGameTime = 0.0f;
+	Model& GetPlayer() { return *player; }
+	std::vector<Model*>* GetEnemies() { return &enemies; }
+	std::vector<Model*>* GetEnvironments() { return &environments; }
+	std::vector<Model*>* GetLights() { return &lights; }
+	std::vector<Shader*>* GetShaders() { return &shaders; }
 private:
-	//Object stuff
+
+	//Models stuff
 	Model* player;						//Player object
 	std::vector<Model*> enemies;		//Enemy Objects
 	std::vector<Model*> environments;	//Environment Objects (Walls, Floors, flora, fauna)
 	std::vector<Model*> lights;			//Lighting Objects (Handle with Care)
 
-	//Shader stuff
-	std::vector<Shader*> shaders;		//Shader objects
+	//Shaders
+	Shader* lampShader;						//Plain white shader
+	std::vector<Shader*> shaders;			//Shader objects
+	std::vector<Shader*> postProcShaders;	//post processing shaders
+	std::vector<Shader*> bloomComponents;	//Bloom components
 
-	//Loads in scene info
-	Scene* scene;
+	//Indexes
+	int postProcShaderIndex = 0;
+
+	//Hook to enable and disable debug features
+	bool* debugFeatures;
+
+	//Booleans to control framebuffer aspects
+	bool frameBuffer = false;
+	bool postProc = false;
+	bool hasBloom = false;
 };
 
 #endif

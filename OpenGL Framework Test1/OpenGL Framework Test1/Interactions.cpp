@@ -19,63 +19,62 @@ std::unordered_map<std::string, const char*> Interact::paths = {
 	{"lamp", "./Resources/Objects/Lamp/" }
 };
 
-void Interact::interactionWithScene(std::vector<Model*>* models, std::vector<Model*>* lights, Camera& camera, int numShade, float dt, SDL_Window& window, Transform* _transform) {
+void Interact::InteractionWithScene(std::vector<Model*>* models, std::vector<Model*>* lights, Camera& camera, int numShade, float dt, SDL_Window& window, Transform* _transform) {
 	transform = _transform;
 	int numObj = models->size();
 	if (activeWindow) {
 		//Allows to change the selected object
-		changeSelection(numObj);
+		ChangeSelection(numObj);
 		//Allows you to create a model based on inputs from numbers
-		createModel(models, lights, camera);
 		//Allows to change the selected shader
-		changeShader(numShade);
+		ChangeShader(numShade);
 		//Allows for control over model translation
-		translateModel(camera, dt);
+		TranslateModel(camera, dt);
 		//Allows for control over model rotation
-		rotateModel();
+		RotateModel();
 		//Allows for rotation of the camera
-		rotateCamera(camera, window);
+		RotateCamera(camera, window);
 		//Allows for movement of the camera
-		moveCamera(camera, dt);
+		MoveCamera(camera, dt);
 	}
 	SDL_GetRelativeMouseState(NULL, NULL);
 }
 
-void Interact::createModel(std::vector<Model*>* models, std::vector<Model*>* lights, Camera& camera)
-{
-	int modelSize = models->size();
-	int lightSize = lights->size();
-	glm::vec3 position = camera.getPos() + (camera.getForward() * 2.f);
-	glm::vec3 lampScale(0.25f, 0.25f, 0.25f);
-	glm::vec3 modelScale(0.10f, 0.10f, 0.10f);
+//void Interact::CreateModel(std::vector<Model*>* models, std::vector<Model*>* lights, Camera& camera)
+//{
+//	int modelSize = models->size();
+//	int lightSize = lights->size();
+//	glm::vec3 position = camera.GetPos() + (camera.GetForward() * 2.f);
+//	glm::vec3 lampScale(0.25f, 0.25f, 0.25f);
+//	glm::vec3 modelScale(0.10f, 0.10f, 0.10f);
+//
+//	//Draws Box
+//	if (Input::GetKeyPress(KeyCode::NumPad0)) {
+//		models->push_back(new Model());
+//		models->at(modelSize)->LoadFromFile(paths["box"], "cube");
+//		models->at(modelSize)->GetTransform()->SetPos(position);
+//	}
+//	else if (Input::GetKeyPress(KeyCode::NumPad1)) {
+//		models->push_back(new Model());
+//		models->at(modelSize)->LoadFromFile(paths["Ravager"], "Ravager");
+//		models->at(modelSize)->GetTransform()->SetScale(lampScale);
+//		models->at(modelSize)->GetTransform()->SetPos(position);
+//	}
+//	else if (Input::GetKeyPress(KeyCode::NumPad2)) {
+//		models->push_back(new Model());
+//		models->at(modelSize)->LoadFromFile(paths["crysis"], "nanosuit");
+//		models->at(modelSize)->GetTransform()->SetScale(modelScale);
+//		models->at(modelSize)->GetTransform()->SetPos(position);
+//	}
+//	/*else if (Input::GetKeyPress(KeyCode::NumPad3)) {
+//		lights->push_back(new Model());
+//		models->at(modelSize)->LoadFromFile(paths["lamp"], "lamp");
+//		lights->at(lightSize)->GetTransform()->setScale(lampScale);
+//		lights->at(lightSize)->GetTransform()->setPos(position);
+//	}*/
+//}
 
-	//Draws Box
-	if (Input::GetKeyPress(KeyCode::NumPad0)) {
-		models->push_back(new Model());
-		models->at(modelSize)->LoadFromFile(paths["box"], "cube");
-		models->at(modelSize)->GetTransform()->setPos(position);
-	}
-	else if (Input::GetKeyPress(KeyCode::NumPad1)) {
-		models->push_back(new Model());
-		models->at(modelSize)->LoadFromFile(paths["Ravager"], "Ravager");
-		models->at(modelSize)->GetTransform()->setScale(lampScale);
-		models->at(modelSize)->GetTransform()->setPos(position);
-	}
-	else if (Input::GetKeyPress(KeyCode::NumPad2)) {
-		models->push_back(new Model());
-		models->at(modelSize)->LoadFromFile(paths["crysis"], "nanosuit");
-		models->at(modelSize)->GetTransform()->setScale(modelScale);
-		models->at(modelSize)->GetTransform()->setPos(position);
-	}
-	/*else if (Input::GetKeyPress(KeyCode::NumPad3)) {
-		lights->push_back(new Model());
-		models->at(modelSize)->LoadFromFile(paths["lamp"], "lamp");
-		lights->at(lightSize)->GetTransform()->setScale(lampScale);
-		lights->at(lightSize)->GetTransform()->setPos(position);
-	}*/
-}
-
-void Interact::changeSelection(int numObj)
+void Interact::ChangeSelection(int numObj)
 {
 	if (Input::GetKeyPress(KeyCode::Left)) {
 		if (modelIndex == 0) {
@@ -97,7 +96,7 @@ void Interact::changeSelection(int numObj)
 	}
 }
 
-void Interact::changeShader(int numShade) {
+void Interact::ChangeShader(int numShade) {
 	if (Input::GetKeyPress(KeyCode::Subtract)) {
 		if (shaderIndex == 0) {
 			shaderIndex = numShade - 1;
@@ -118,7 +117,7 @@ void Interact::changeShader(int numShade) {
 	}
 }
 
-void Interact::translateModel(Camera& camera, float dt)
+void Interact::TranslateModel(Camera& camera, float dt)
 {
 	/*if (!lmb) {
 		if (SDL_GetMouseState(NULL, NULL) & SDL_BUTTON_LMASK) {
@@ -144,19 +143,19 @@ void Interact::translateModel(Camera& camera, float dt)
 	int modifier = -1;
 
 	if (Input::GetKey(KeyCode::I)) {
-		glm::vec3 forward = glm::vec3(-modifier * camera.getForward().x, -modifier * camera.getForward().y, -modifier * camera.getForward().z);
+		glm::vec3 forward = glm::vec3(-modifier * camera.GetForward().x, -modifier * camera.GetForward().y, -modifier * camera.GetForward().z);
 		forwardBack += forward * dt;
 	}
 	else if (Input::GetKey(KeyCode::K)) {
-		glm::vec3 back = glm::vec3(modifier * camera.getForward().x, modifier * camera.getForward().y, modifier * camera.getForward().z);
+		glm::vec3 back = glm::vec3(modifier * camera.GetForward().x, modifier * camera.GetForward().y, modifier * camera.GetForward().z);
 		forwardBack += back * dt;
 	}
 	if (Input::GetKey(KeyCode::J)) {
-		glm::vec3 left = glm::vec3(-modifier * camera.getSideways().x, -modifier * camera.getSideways().y, -modifier * camera.getSideways().z);
+		glm::vec3 left = glm::vec3(-modifier * camera.GetSideways().x, -modifier * camera.GetSideways().y, -modifier * camera.GetSideways().z);
 		rightLeft += left * dt;
 	}
 	else if (Input::GetKey(KeyCode::L)) {
-		glm::vec3 right = glm::vec3(modifier * camera.getSideways().x, modifier * camera.getSideways().y, modifier * camera.getSideways().z);
+		glm::vec3 right = glm::vec3(modifier * camera.GetSideways().x, modifier * camera.GetSideways().y, modifier * camera.GetSideways().z);
 		rightLeft += right * dt;
 	}
 	if (Input::GetKey(KeyCode::O)) {
@@ -168,10 +167,10 @@ void Interact::translateModel(Camera& camera, float dt)
 		upDown += down * dt;
 	}
 
-	transform->getPos() += forwardBack + rightLeft + upDown;
+	transform->GetPos() += forwardBack + rightLeft + upDown;
 }
 
-void Interact::rotateModel()
+void Interact::RotateModel()
 {
 	if (!rmb) {
 		if (SDL_GetMouseState(NULL, NULL) & SDL_BUTTON_RMASK) {
@@ -183,8 +182,8 @@ void Interact::rotateModel()
 	else {
 		if (SDL_GetRelativeMouseState(&deltPosX, &deltPosY) & SDL_BUTTON_RMASK) {
 			glm::vec2 deltaPos(deltPosX, deltPosY);
-			transform->getRot().x += deltaPos.y * glm::pi<float>() / 400;
-			transform->getRot().y += deltaPos.x * glm::pi<float>() / 400;
+			transform->GetRot().x += deltaPos.y * glm::pi<float>() / 400;
+			transform->GetRot().y += deltaPos.x * glm::pi<float>() / 400;
 		}
 		else {
 			SDL_GetRelativeMouseState(NULL, NULL);
@@ -194,7 +193,7 @@ void Interact::rotateModel()
 	}
 }
 
-void Interact::rotateCamera(Camera& camera, SDL_Window& window)
+void Interact::RotateCamera(Camera& camera, SDL_Window& window)
 {
 	//Gets key press for escape
 	if (Input::GetKeyPress(KeyCode::Escape)) {
@@ -215,7 +214,7 @@ void Interact::rotateCamera(Camera& camera, SDL_Window& window)
 		glm::vec3 rotation(0.0, 0.0, 0.0);
 		glm::vec2 deltaPos(-deltPosX, -deltPosY);
 
-		if (camera.getForward().z > 0) {
+		if (camera.GetForward().z > 0) {
 			deltaPos.y *= -1;
 		}
 
@@ -228,12 +227,12 @@ void Interact::rotateCamera(Camera& camera, SDL_Window& window)
 
 		glm::mat4 rotationMatrix = rotationZMatrix * rotationYMatrix * rotationXMatrix;
 
-		camera.rotate(rotationMatrix);
-		camera.rotateSideways(rotationYMatrix);
+		camera.Rotate(rotationMatrix);
+		camera.RotateSideways(rotationYMatrix);
 	}
 }
 
-void Interact::moveCamera(Camera& camera, float dt) {
+void Interact::MoveCamera(Camera& camera, float dt) {
 	//Holds the movement on the axes
 	glm::vec3 forwardBack = glm::vec3(0.0f, 0.0f, 0.0f);
 	glm::vec3 rightLeft = glm::vec3(0.0f, 0.0f, 0.0f);
@@ -246,19 +245,19 @@ void Interact::moveCamera(Camera& camera, float dt) {
 	//}
 
 	if (Input::GetKey(KeyCode::W)) {
-		glm::vec3 forward = glm::vec3(-modifier * camera.getForward().x, -modifier * camera.getForward().y, -modifier * camera.getForward().z);
+		glm::vec3 forward = glm::vec3(-modifier * camera.GetForward().x, -modifier * camera.GetForward().y, -modifier * camera.GetForward().z);
 		forwardBack += forward * dt;
 	}
 	else if (Input::GetKey(KeyCode::S)) {
-		glm::vec3 back = glm::vec3(modifier * camera.getForward().x, modifier * camera.getForward().y, modifier * camera.getForward().z);
+		glm::vec3 back = glm::vec3(modifier * camera.GetForward().x, modifier * camera.GetForward().y, modifier * camera.GetForward().z);
 		forwardBack += back * dt;
 	}
 	if (Input::GetKey(KeyCode::A)) {
-		glm::vec3 left = glm::vec3(-modifier * camera.getSideways().x, -modifier * camera.getSideways().y, -modifier * camera.getSideways().z);
+		glm::vec3 left = glm::vec3(-modifier * camera.GetSideways().x, -modifier * camera.GetSideways().y, -modifier * camera.GetSideways().z);
 		rightLeft += left * dt;
 	}
 	else if (Input::GetKey(KeyCode::D)) {
-		glm::vec3 right = glm::vec3(modifier * camera.getSideways().x, modifier * camera.getSideways().y, modifier * camera.getSideways().z);
+		glm::vec3 right = glm::vec3(modifier * camera.GetSideways().x, modifier * camera.GetSideways().y, modifier * camera.GetSideways().z);
 		rightLeft += right * dt;
 	}
 	if (Input::GetKey(KeyCode::Space)) {
@@ -273,5 +272,5 @@ void Interact::moveCamera(Camera& camera, float dt) {
 	glm::vec3 translate = forwardBack + rightLeft + upDown;
 	glm::mat4 transMatrix = glm::translate(translate);
 
-	camera.translate(transMatrix);
+	camera.Translate(transMatrix);
 }

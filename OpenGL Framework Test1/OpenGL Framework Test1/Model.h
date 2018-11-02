@@ -39,7 +39,7 @@ public:
 	bool hasUVs = false;
 
 private:
-	bool processMaterials(const std::string &file);
+	bool ProcessMaterials(const std::string &file);
 	Transform transform;
 };
 

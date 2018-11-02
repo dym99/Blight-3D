@@ -72,9 +72,13 @@ public:
 	GLuint VBO_Vertices = 0;
 	GLuint VBO_UVs = 0;
 	GLuint VBO_Normals = 0;
+	GLuint VBO_Tangents = 0;
+	GLuint VBO_Bitangents = 0;
 	GLuint VAO = 0;
 
-	//Data ready for OpenGL
+	//Tangent space Normal mapping
+	std::vector<glm::vec3> tangentData;
+	std::vector<glm::vec3> bitangentData;
 
 private:
 	unsigned int m_NumFaces;

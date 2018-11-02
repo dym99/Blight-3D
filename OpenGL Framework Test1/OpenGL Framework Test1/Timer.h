@@ -21,15 +21,15 @@ public:
 		return elapsedTime;
 	}
 
-	float getElapsedTimeTicks() {
+	float GetElapsedTimeTicks() {
 		return elapsedTime;
 	}
 
-	float getElapsedTimeSeconds() {
+	float GetElapsedTimeSeconds() {
 		return elapsedTime / CLOCKS_PER_SEC;
 	}
 
-	float getCurrentTime() {
+	float GetTimeCurrent() {
 		return currentTime;
 	}
 

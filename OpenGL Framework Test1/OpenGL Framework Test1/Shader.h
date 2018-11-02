@@ -1,65 +1,64 @@
-#ifndef __SHADER_H__
-#define __SHADER_H__
-
+#pragma once
 #include <string>
-#include <GL/glew.h>
-#include "Transform.h"
+#include <utility>
+#include <glm/glm.hpp>
+#include "GL/glew.h"
+#include <vector>
+#include <stdio.h>
+#include <iostream>
+#include <fstream>
 #include "Camera.h"
 
 
-//All the shaders are written in separate files, this class only compiles the shaders into something readable by the GPU
 class Shader
 {
 public:
-	//Constructor
-	//Shader(const std::string& fileName);
+	Shader();
+	Shader(const std::string &vertFile, const std::string &fragFile);
+	~Shader();
 
-	//Alternate constructor for vert and frag shaders with diff names
-	Shader(const std::string& vertFileName, const std::string& fragFileName = "");
+	static bool InitDefault();
+	void SetDefault();
 
-	//Methods
-		//Set the GPU to a state that makes it use the vertex and fragment shaders defined here
-		void bind();
-		//Updates all the uniforms we have to be correct
-		void update(const Transform& transform, const Camera& camera);
-		
-		void setVec3(const GLchar* name, const float& x, const float& y, const float& z);
-		void setFloat(const GLchar* name, const float& f);
-		void setInt(const GLchar* name, const int& i);
-	//End Methods
+	void Reload();
 
-	//Virtual Deconstructor
-	virtual ~Shader();
+	bool Load(const std::string &vertFile, const std::string &fragFile);
+	bool IsLoaded() const;
+	void Unload();
+	bool LinkProgram();
+
+	void Update(Camera& camera);
+	void Bind() const;
+	static void Unbind();
+
+	void SendUniform(const std::string &uniformName, const int &i) const;
+	void SendUniform(const std::string &uniformName, const unsigned int &i) const;
+	void SendUniform(const std::string &uniformName, const float &f) const;
+	void SendUniform(const std::string &uniformName, const glm::vec2 &vector) const;
+	void SendUniform(const std::string &uniformName, const float &x, const float &y) const;
+	void SendUniform(const std::string &uniformName, const glm::vec3 &vector) const;
+	void SendUniform(const std::string &uniformName, const float &x, const float &y, const float &z) const;
+	void SendUniform(const std::string &uniformName, const glm::vec4 &vector) const;
+	void SendUniform(const std::string &uniformName, const float &x, const float &y, const float &z, const float &w) const;
+	void SendUniform(const std::string &uniformName, const glm::mat3 &matrix) const;
+	void SendUniform(const std::string &uniformName, const glm::mat4 &matrix) const;
 private:
-	//We are only using the fragment shader and vertex shaders right now.
-	//Hence we only need 2 shaders.
-	static const unsigned int NUM_SHADERS = 2;
+	std::string vertShaderFile, fragShaderFile, shaderSettingFile;
 
-	//Copy constructor
-	Shader(const Shader& other) {}
+	GLuint _VertexShader = GL_NONE;
+	GLuint _FragShader = GL_NONE;
+	GLuint _Program = GL_NONE;
+	bool _IsInit = GL_FALSE;
 
-	//Assignment operator overload
-	void operator=(const Shader& other) {}
+	static bool _IsInitDefault;
+	static GLuint _VertexShaderDefault;
+	static GLuint _FragShaderDefault;
+	static GLuint _ProgramDefault;
 
-	//To help with future uniforms
-	enum
-	{
-		MODEL_U,
-		VIEW_U,
-		PROJECTION_U,
+	std::string ReadFile(const std::string &fileName) const;
+	bool CompileShader(GLuint shader) const;
+	void OutputShaderLog(GLuint shader) const;
+	void OutputProgramLog() const;
 
-		NUM_UNIFORMS
-	};
-
-	//Handle for the program you create in the constructor
-	//Allows you to affect the program later on
-	GLuint m_program;
-
-	//Holds the shaders
-	GLuint m_shaders[NUM_SHADERS];
-
-	//Holds the uniforms
-	GLuint m_uniforms[NUM_UNIFORMS];
+	GLint GetUniformLocation(const std::string &uniformName) const;
 };
-#endif //!__SHADER_H__
-
