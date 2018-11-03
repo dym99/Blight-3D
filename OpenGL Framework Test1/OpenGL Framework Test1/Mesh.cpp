@@ -121,7 +121,7 @@ bool Mesh::ProcessMesh(std::vector<glm::vec3> &vertexData, std::vector<glm::vec2
 		}
 	}
 
-	m_NumFaces = faceData.size();
+	m_NumFaces = (int)faceData.size();
 	m_NumVertices = m_NumFaces * 3;
 	
 	//Send the data to OpenGL

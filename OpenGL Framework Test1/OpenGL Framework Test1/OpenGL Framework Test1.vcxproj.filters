@@ -26,6 +26,21 @@
     <Filter Include="Source Files\Game">
       <UniqueIdentifier>{522a4125-a0da-4df0-a15f-b89655d26de5}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\Game\Scene Management">
+      <UniqueIdentifier>{52399175-82a3-4cdf-af8e-aede6b564514}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Behaviours">
+      <UniqueIdentifier>{1802de89-949a-43dc-9fea-4493c122596d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Behaviours\Rendering">
+      <UniqueIdentifier>{3b43db4d-7cbe-4e7c-8b45-aaf327b18b5c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Behaviours\Test">
+      <UniqueIdentifier>{cc19d891-a9ab-4e99-8549-abf64051f8c6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Behaviours\Camera Control">
+      <UniqueIdentifier>{c07b9c05-369a-41d0-899e-23693463f00a}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Input.cpp">
@@ -58,11 +73,32 @@
     <ClCompile Include="Model.cpp">
       <Filter>Source Files\Loaders</Filter>
     </ClCompile>
-    <ClCompile Include="Scene.cpp">
-      <Filter>Source Files\Game</Filter>
-    </ClCompile>
     <ClCompile Include="Camera.cpp">
       <Filter>Source Files\Display</Filter>
+    </ClCompile>
+    <ClCompile Include="Scene.cpp">
+      <Filter>Source Files\Game\Scene Management</Filter>
+    </ClCompile>
+    <ClCompile Include="GameObject.cpp">
+      <Filter>Source Files\Game\Scene Management</Filter>
+    </ClCompile>
+    <ClCompile Include="Behaviour.cpp">
+      <Filter>Source Files\Game\Scene Management</Filter>
+    </ClCompile>
+    <ClCompile Include="Utils.cpp">
+      <Filter>Source Files\Game</Filter>
+    </ClCompile>
+    <ClCompile Include="MeshRenderBehaviour.cpp">
+      <Filter>Source Files\Behaviours\Rendering</Filter>
+    </ClCompile>
+    <ClCompile Include="TestRotateBehaviour.cpp">
+      <Filter>Source Files\Behaviours\Test</Filter>
+    </ClCompile>
+    <ClCompile Include="MouseLook.cpp">
+      <Filter>Source Files\Behaviours\Camera Control</Filter>
+    </ClCompile>
+    <ClCompile Include="CameraBehaviour.cpp">
+      <Filter>Source Files\Behaviours\Camera Control</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -100,10 +136,28 @@
       <Filter>Source Files\Loaders</Filter>
     </ClInclude>
     <ClInclude Include="Scene.h">
+      <Filter>Source Files\Game\Scene Management</Filter>
+    </ClInclude>
+    <ClInclude Include="GameObject.h">
+      <Filter>Source Files\Game\Scene Management</Filter>
+    </ClInclude>
+    <ClInclude Include="Behaviour.h">
+      <Filter>Source Files\Game\Scene Management</Filter>
+    </ClInclude>
+    <ClInclude Include="Utils.h">
       <Filter>Source Files\Game</Filter>
     </ClInclude>
-    <ClInclude Include="Timer.h">
-      <Filter>Source Files\Maths</Filter>
+    <ClInclude Include="MeshRenderBehaviour.h">
+      <Filter>Source Files\Behaviours\Rendering</Filter>
+    </ClInclude>
+    <ClInclude Include="TestRotateBehaviour.h">
+      <Filter>Source Files\Behaviours\Test</Filter>
+    </ClInclude>
+    <ClInclude Include="MouseLook.h">
+      <Filter>Source Files\Behaviours\Camera Control</Filter>
+    </ClInclude>
+    <ClInclude Include="CameraBehaviour.h">
+      <Filter>Source Files\Behaviours\Camera Control</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

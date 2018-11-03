@@ -287,4 +287,5 @@ bool Model::processMaterials(const std::string & file)
 		}
 	}
 	input.close();
+	return true;
 }

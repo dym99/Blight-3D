@@ -100,7 +100,7 @@ static GLuint CreateShader(const std::string& text, GLenum shaderType)
 	shaderSourceStrings[0] = text.c_str();	
 	//Here we store the length of the c++ string, text, (will be the same as the c-string
 	//version) at index 0.
-	shaderSourceStringLengths[0] = text.length();
+	shaderSourceStringLengths[0] = (GLint)text.length();
 
 	//Sends our source code to openGL and lets the GPU do its work.
 	glShaderSource(shader, 1, shaderSourceStrings, shaderSourceStringLengths);
@@ -215,12 +215,12 @@ void Shader::setInt(const GLchar * name, const int & i)
 	glUniform1i(loc, i);
 }
 
-void Shader::update(const Transform& transform, const Camera& camera)
+void Shader::update(const glm::mat4& _model, const Camera& _camera)
 {
 	//Using 4x4 matrices, you multiply the view projection by your transformation model in order to get the correct view.
-	glm::mat4 model = transform.getModel();
-	glm::mat4 view = camera.getView();
-	glm::mat4 projection = camera.getProjection();
+	glm::mat4 model = _model;
+	glm::mat4 view = _camera.getView();
+	glm::mat4 projection = _camera.getProjection();
 
 	//Updates the uniform 4x4 matrix you defined earlier.
 	glUniformMatrix4fv(m_uniforms[MODEL_U], 1, GL_FALSE, &model[0][0]);

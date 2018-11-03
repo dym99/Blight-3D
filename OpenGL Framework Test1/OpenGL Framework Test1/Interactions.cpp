@@ -21,7 +21,7 @@ std::unordered_map<std::string, const char*> Interact::paths = {
 
 void Interact::interactionWithScene(std::vector<Model*>* models, std::vector<Model*>* lights, Camera& camera, int numShade, float dt, SDL_Window& window, Transform* _transform) {
 	transform = _transform;
-	int numObj = models->size();
+	int numObj = (int)models->size();
 	if (activeWindow) {
 		//Allows to change the selected object
 		changeSelection(numObj);
@@ -43,8 +43,8 @@ void Interact::interactionWithScene(std::vector<Model*>* models, std::vector<Mod
 
 void Interact::createModel(std::vector<Model*>* models, std::vector<Model*>* lights, Camera& camera)
 {
-	int modelSize = models->size();
-	int lightSize = lights->size();
+	int modelSize = (int)models->size();
+	int lightSize = (int)lights->size();
 	glm::vec3 position = camera.getPos() + (camera.getForward() * 2.f);
 	glm::vec3 lampScale(0.25f, 0.25f, 0.25f);
 	glm::vec3 modelScale(0.10f, 0.10f, 0.10f);

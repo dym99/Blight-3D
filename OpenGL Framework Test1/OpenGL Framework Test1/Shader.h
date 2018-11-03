@@ -21,7 +21,7 @@ public:
 		//Set the GPU to a state that makes it use the vertex and fragment shaders defined here
 		void bind();
 		//Updates all the uniforms we have to be correct
-		void update(const Transform& transform, const Camera& camera);
+		void update(const glm::mat4& _model, const Camera& _camera);
 		
 		void setVec3(const GLchar* name, const float& x, const float& y, const float& z);
 		void setFloat(const GLchar* name, const float& f);

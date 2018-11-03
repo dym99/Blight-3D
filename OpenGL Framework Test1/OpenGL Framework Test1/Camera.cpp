@@ -1,5 +1,7 @@
 #include "Camera.h"
 
+Camera *Camera::mainCamera = nullptr;
+
 Camera::Camera(ProjectionType type)
 {
 	if (type == ProjectionType::Perspective)
@@ -11,7 +13,7 @@ Camera::Camera(ProjectionType type)
 
 	m_forward = glm::vec3(0.f, 0.f, -1.f);
 	m_sideways = glm::vec3(-1.f, 0.f, 0.f);
-	m_up = glm::vec3(0.f, 1.f, 0.f);
+	m_up = glm::normalize(glm::vec3(0.f, 1.f, 0.f));
 }
 
 void Camera::perspective(float fovy, float aspect, float zNear, float zFar)
