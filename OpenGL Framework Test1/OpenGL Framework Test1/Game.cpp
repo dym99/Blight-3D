@@ -57,10 +57,9 @@ void Game::InitGame(bool* debug)
 	//Init timer
 	updateTimer = new Timer();
 
-	
 	#pragma region Scene Init Stuff
 		enemies.push_back(new Model());
-		enemies[0]->LoadFromFile("./Resources/Objects/Crysis/", "nanosuit");
+		enemies[0]->LoadFromFile("./Resources/Objects/Monkey/", "Monkey");
 		//enemies[0]->GetTransform()->SetPos(glm::vec3(0.f, -0.5f, 2.f));
 		//enemies[0]->GetTransform()->SetScale(glm::vec3(0.05f, 0.05f, 0.05f));
 
@@ -111,9 +110,19 @@ void Game::InitGame(bool* debug)
 			"./Resources/Shaders/PassThrough.vert",
 			"./Resources/Shaders/PostProcess/FocusIn.frag"
 		));
+		postProcShaders.push_back(new Shader(
+			"./Resources/Shaders/PassThrough.vert",
+			"./Resources/Shaders/PostProcess/InvertColor.frag"
+		));
+		postProcShaders.push_back(new Shader(
+			"./Resources/Shaders/PassThrough.vert",
+			"./Resources/Shaders/PostProcess/InvertLuminence.frag"
+		));
+		postProcShaders.push_back(new Shader(
+			"./Resources/Shaders/PassThrough.vert",
+			"./Resources/Shaders/PostProcess/Rainbow.frag"
+		));
 #pragma endregion
-	
-	InitUniforms();
 
 	#pragma region Bloom stuffs
 		bloomComponents.push_back(new Shader(
@@ -191,6 +200,9 @@ void Game::InitGame(bool* debug)
 			std::cout << "You are now in control of the lights model list.\n\n";
 		}
 #pragma endregion
+	
+	InitUniforms();
+	printDebugControls();
 }
 
 void Game::InitUniforms()
@@ -220,6 +232,9 @@ void Game::Update()
 
 	postProcShaders.at(FOCUS_IN_POST)->Bind();
 	postProcShaders.at(FOCUS_IN_POST)->SendUniform("uTime", totalGameTime);
+	postProcShaders.at(RAINBOW_POST)->Bind();
+	postProcShaders.at(RAINBOW_POST)->SendUniform("uTime", totalGameTime);
+
 	Shader::Unbind();
 
 	//lights[0]->GetTransform()->SetPos(glm::vec3(glm::sin(updateTimer->GetTimeCurrent() / 1000.f) * 5.0f, 1.0f, 1.3f));
@@ -573,6 +588,7 @@ void Game::KeyboardPress()
 			for (int i = 0; i < bloomComponents.size(); i++) {
 				bloomComponents[i]->Reload();
 			}
+			printDebugControls();
 			InitUniforms();
 		}
 	}

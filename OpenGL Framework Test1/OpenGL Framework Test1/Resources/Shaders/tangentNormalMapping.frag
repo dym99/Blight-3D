@@ -54,7 +54,6 @@ void main()
 	}
 	else {
 		normal = normalize(normal0);
-		
 	}
 	
 	vec3 lightVec = light.position.xyz - fragPosition;
@@ -83,5 +82,5 @@ void main()
 	
 	vec4 textureColor = texture(material.diffuseTex, TexCoords);
 	FragColor.rgb *= textureColor.rgb;
-	FragColor.a = textureColor.a;
+	FragColor.a = 1.0;
 }

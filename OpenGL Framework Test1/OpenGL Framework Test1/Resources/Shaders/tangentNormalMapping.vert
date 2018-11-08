@@ -21,6 +21,8 @@ void main()
     TexCoords = texCoord;
 	normal0 = mat3(uModel) * normal;
 	
+	vec3 bitangent = cross(normal, tangent);
+	
 	//TBN matrix calculation
 	vec3 T = normalize(vec3(uView * uModel * vec4(tangent, 0.0)));
 	vec3 B = normalize(vec3(uView * uModel * vec4(bitangent, 0.0)));

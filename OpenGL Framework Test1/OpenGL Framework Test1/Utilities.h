@@ -19,6 +19,8 @@ void InitFullScreenQuad();
 //Draws the full screen quad to the screen for framebuffering
 void DrawFullScreenQuad();
 
+void printDebugControls();
+
 //Runs the high pass for the bloom effect
 void BloomHighPass(Shader& BloomHighPass, FrameBuffer& _main, FrameBuffer& _work1);
 
