@@ -26,6 +26,12 @@
     <Filter Include="Source Files\Game">
       <UniqueIdentifier>{522a4125-a0da-4df0-a15f-b89655d26de5}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\Maths\Physics">
+      <UniqueIdentifier>{3a208770-2105-4169-be62-7ad7393ad2e6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Maths\Math Functions">
+      <UniqueIdentifier>{dfcaeff3-8ac7-4d41-8822-e6a2d753b49f}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Input.cpp">
@@ -63,6 +69,15 @@
     </ClCompile>
     <ClCompile Include="Camera.cpp">
       <Filter>Source Files\Display</Filter>
+    </ClCompile>
+    <ClCompile Include="P_PhysicsBody.cpp">
+      <Filter>Source Files\Maths\Physics</Filter>
+    </ClCompile>
+    <ClCompile Include="P_Collider.cpp">
+      <Filter>Source Files\Maths\Physics</Filter>
+    </ClCompile>
+    <ClCompile Include="MathFunc.cpp">
+      <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -104,6 +119,15 @@
     </ClInclude>
     <ClInclude Include="Timer.h">
       <Filter>Source Files\Maths</Filter>
+    </ClInclude>
+    <ClInclude Include="P_PhysicsBody.h">
+      <Filter>Source Files\Maths\Physics</Filter>
+    </ClInclude>
+    <ClInclude Include="P_Collider.h">
+      <Filter>Source Files\Maths\Physics</Filter>
+    </ClInclude>
+    <ClInclude Include="MathFunc.h">
+      <Filter>Source Files\Maths\Math Functions</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

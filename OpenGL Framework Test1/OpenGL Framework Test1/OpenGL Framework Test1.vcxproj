@@ -149,14 +149,19 @@
     <ClCompile Include="Input.cpp" />
     <ClCompile Include="Interactions.cpp" />
     <ClCompile Include="Material.cpp" />
+    <ClCompile Include="MathFunc.cpp" />
     <ClCompile Include="Mesh.cpp" />
     <ClCompile Include="Model.cpp" />
+    <ClCompile Include="P_Collider.cpp" />
+    <ClCompile Include="P_PhysicsBody.cpp" />
     <ClCompile Include="Scene.cpp" />
     <ClCompile Include="Shader.cpp" />
     <ClCompile Include="Texture.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Camera.h" />
+    <ClInclude Include="MathFunc.h" />
+    <ClInclude Include="P_Collider.h" />
     <ClInclude Include="Display.h" />
     <ClInclude Include="Game.h" />
     <ClInclude Include="Input.h" />
@@ -164,6 +169,7 @@
     <ClInclude Include="Material.h" />
     <ClInclude Include="Mesh.h" />
     <ClInclude Include="Model.h" />
+    <ClInclude Include="P_PhysicsBody.h" />
     <ClInclude Include="Scene.h" />
     <ClInclude Include="Shader.h" />
     <ClInclude Include="Texture.h" />
