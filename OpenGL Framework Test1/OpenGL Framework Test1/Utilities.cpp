@@ -55,6 +55,43 @@ void DrawFullScreenQuad()
 	glBindVertexArray(GL_NONE);
 }
 
+void printDebugControls()
+{
+	std::cout << "Non-Debug Mode Controls:\n\n";
+	std::cout << "Q - exit program\n";
+	std::cout << "Insert - Enable Debug Mode\n\n";
+	std::cout << "When Debug Mode Enabled:\n\n";
+	std::cout << "Camera Controls:\n";
+	std::cout << "Esc - toggle relative mouse motion (starts enabled after you hit insert, Esc makes it so when you tab out\n the camera won't go nuts)\n";
+	std::cout << "Mouse Movement - rotaates camera and rotates the various axes the camera moves on (camera moves relative to rotation)\n";
+	std::cout << "W - Move camera forward\n";
+	std::cout << "A - Move camera left\n";
+	std::cout << "S - Move camera backwards\n";
+	std::cout << "D - Move camera right\n";
+	std::cout << "Q - Move camera up\n";
+	std::cout << "E - Move camera down\n\n";
+	std::cout << "Model Controls:\n";
+	std::cout << "Tab - Cycle through model lists (environments, waterplane)\n";
+	std::cout << "I - Move camera forward\n";
+	std::cout << "J - Move camera left\n";
+	std::cout << "K - Move camera backwards\n";
+	std::cout << "L - Move camera right\n";
+	std::cout << "U - Move camera up\n";
+	std::cout << "O - Move camera down\n";
+	std::cout << "Left Arrow - Cycle through model list backwards (are no separate models in here)\n";
+	std::cout << "Right Arrow - Cycle through the model lsit forwards (are no separate models in here)\n\n";
+	std::cout << "Shader controls:\n";
+	std::cout << "F1 - Toggles post processing effect (like greyscale or sepia or vignette)\n";
+	std::cout << "F2 - Toggles Bloom effect (don't recommend for this project, may actually just make everything bloom)\n";
+	std::cout << "F5 - Reloads the shaders\n";
+	std::cout << "Plus - Moves up in the shader list (there's only one shader in the list, won't do anything)\n";
+	std::cout << "Minus - Moves down in the shader list (there's only one shader in the list, won't do anything)\n\n";
+	std::cout << "IF ANY POST PROCESSING EFFECT IS ENABLED:\n";
+	std::cout << "Page Up - Moves up in the post processing shader list\n";
+	std::cout << "Page down - Moves down in the post processing shader list\n\n";
+	std::cout << "This was a long debug control list\n";
+}
+
 void BloomHighPass(Shader & BloomHighPass, FrameBuffer & _main, FrameBuffer & _work1)
 {
 	/// Compute High pass ///

@@ -165,7 +165,7 @@ GLint Shader::GetUniformLocation(const std::string & uniformName) const
 #if _DEBUG
 	if (uniLoc == -1 && _Program != _ProgramDefault)
 	{
-		std::cerr << "WARNING: Uniform " << uniformName << " does not exist!\n";
+		//std::cerr << "WARNING: Uniform " << uniformName << " does not exist!\n";
 	}
 #endif
 
