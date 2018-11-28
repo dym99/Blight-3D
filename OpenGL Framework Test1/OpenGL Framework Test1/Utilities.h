@@ -7,8 +7,8 @@
 #include "FrameBuffer.h"
 #include <vector>
 
-#define WINDOW_HEIGHT			600
-#define WINDOW_WIDTH			800
+#define WINDOW_WIDTH			1280
+#define WINDOW_HEIGHT			720
 #define BLOOM_THRESHOLD         0.15f
 #define BLOOM_DOWNSCALE			4.0f
 #define BLOOM_BLUR_PASSES		4

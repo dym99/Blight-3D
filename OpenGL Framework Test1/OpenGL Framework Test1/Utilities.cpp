@@ -97,9 +97,9 @@ void BloomHighPass(Shader & BloomHighPass, FrameBuffer & _main, FrameBuffer & _w
 	/// Compute High pass ///
 	glViewport(0, 0, WINDOW_WIDTH / BLOOM_DOWNSCALE, WINDOW_HEIGHT / BLOOM_DOWNSCALE);
 
-	BloomHighPass.Bind();
-	BloomHighPass.SendUniform("uTex", 0);
-	BloomHighPass.SendUniform("uThreshold", BLOOM_THRESHOLD);
+	BloomHighPass.bind();
+	BloomHighPass.sendUniform("uTex", 0);
+	BloomHighPass.sendUniform("uThreshold", BLOOM_THRESHOLD);
 
 	_work1.Bind();
 
@@ -109,7 +109,7 @@ void BloomHighPass(Shader & BloomHighPass, FrameBuffer & _main, FrameBuffer & _w
 	glBindTexture(GL_TEXTURE_2D, GL_NONE);
 
 	_work1.Unbind();
-	BloomHighPass.Unbind();
+	BloomHighPass.unbind();
 }
 
 void ComputeBlur(Shader & BlurVertical, Shader & BlurHorizontal, FrameBuffer & _work1, FrameBuffer & _work2)
@@ -117,9 +117,9 @@ void ComputeBlur(Shader & BlurVertical, Shader & BlurHorizontal, FrameBuffer & _
 	/// Computer Blur ///
 	for (int i = 0; i < BLOOM_BLUR_PASSES; i++) {
 		//Horizontal Blur
-		BlurHorizontal.Bind();
-		BlurHorizontal.SendUniform("uTex", 0);
-		BlurHorizontal.SendUniform("uPixelSize", 1.0f / WINDOW_WIDTH);
+		BlurHorizontal.bind();
+		BlurHorizontal.sendUniform("uTex", 0);
+		BlurHorizontal.sendUniform("uPixelSize", 1.0f / WINDOW_WIDTH);
 
 		_work2.Bind();
 
@@ -128,12 +128,12 @@ void ComputeBlur(Shader & BlurVertical, Shader & BlurHorizontal, FrameBuffer & _
 		glBindTexture(GL_TEXTURE_2D, GL_NONE);
 
 		_work2.Unbind();
-		BlurHorizontal.Unbind();
+		BlurHorizontal.unbind();
 
 		//Vertical Blur
-		BlurVertical.Bind();
-		BlurVertical.SendUniform("uTex", 0);
-		BlurVertical.SendUniform("uPixelSize", 1.0f / WINDOW_HEIGHT);
+		BlurVertical.bind();
+		BlurVertical.sendUniform("uTex", 0);
+		BlurVertical.sendUniform("uPixelSize", 1.0f / WINDOW_HEIGHT);
 
 		_work1.Bind();
 
@@ -142,7 +142,7 @@ void ComputeBlur(Shader & BlurVertical, Shader & BlurHorizontal, FrameBuffer & _
 		glBindTexture(GL_TEXTURE_2D, GL_NONE);
 
 		_work1.Unbind();
-		BlurVertical.Unbind();
+		BlurVertical.unbind();
 	}
 }
 
@@ -151,9 +151,9 @@ void BloomComposite(Shader & BloomComposite, FrameBuffer & _main, FrameBuffer & 
 	/// Composite the Scene ///
 	glViewport(0, 0, WINDOW_WIDTH, WINDOW_HEIGHT);
 
-	BloomComposite.Bind();
-	BloomComposite.SendUniform("uScene", 0);
-	BloomComposite.SendUniform("uBloom", 1);
+	BloomComposite.bind();
+	BloomComposite.sendUniform("uScene", 0);
+	BloomComposite.sendUniform("uBloom", 1);
 
 	if (postProc) {
 		_work3.Bind();
@@ -169,7 +169,7 @@ void BloomComposite(Shader & BloomComposite, FrameBuffer & _main, FrameBuffer & 
 	glBindTexture(GL_TEXTURE_2D, GL_NONE);
 
 	_work3.Unbind();
-	BloomComposite.Unbind();
+	BloomComposite.unbind();
 }
 
 void ProcessBloom(FrameBuffer & _main, FrameBuffer & _work1, FrameBuffer & _work2, FrameBuffer& _work3, std::vector<Shader*>& bloomComponents, bool postProc)
@@ -181,14 +181,14 @@ void ProcessBloom(FrameBuffer & _main, FrameBuffer & _work1, FrameBuffer & _work
 
 void ProcessPostProc(FrameBuffer & _buffer, Shader & shader)
 {
-	shader.Bind();
-	shader.SendUniform("uTex", 0);
+	shader.bind();
+	shader.sendUniform("uTex", 0);
 
 	glBindTexture(GL_TEXTURE_2D, _buffer.GetColorHandle(0));
 	DrawFullScreenQuad();
 	glBindTexture(GL_TEXTURE_2D, GL_NONE);
 
-	Shader::Unbind();
+	Shader::unbind();
 }
 
 void ProcessFramebufferStuff(FrameBuffer & _main, FrameBuffer & _work1, FrameBuffer & _work2, FrameBuffer & _work3, 

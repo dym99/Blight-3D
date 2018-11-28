@@ -21,7 +21,7 @@ std::unordered_map<std::string, const char*> Interact::paths = {
 
 void Interact::InteractionWithScene(std::vector<Model*>* models, std::vector<Model*>* lights, Camera& camera, int numShade, float dt, SDL_Window& window, Transform* _transform) {
 	transform = _transform;
-	int numObj = models->size();
+	int numObj = (int)models->size();
 	if (activeWindow) {
 		//Allows to change the selected object
 		ChangeSelection(numObj);
@@ -167,7 +167,7 @@ void Interact::TranslateModel(Camera& camera, float dt)
 		upDown += down * dt;
 	}
 
-	transform->GetPos() += forwardBack + rightLeft + upDown;
+	transform->getPos() += forwardBack + rightLeft + upDown;
 }
 
 void Interact::RotateModel()
@@ -182,8 +182,8 @@ void Interact::RotateModel()
 	else {
 		if (SDL_GetRelativeMouseState(&deltPosX, &deltPosY) & SDL_BUTTON_RMASK) {
 			glm::vec2 deltaPos(deltPosX, deltPosY);
-			transform->GetRot().x += deltaPos.y * glm::pi<float>() / 400;
-			transform->GetRot().y += deltaPos.x * glm::pi<float>() / 400;
+			transform->getRot().x += deltaPos.y * glm::pi<float>() / 400;
+			transform->getRot().y += deltaPos.x * glm::pi<float>() / 400;
 		}
 		else {
 			SDL_GetRelativeMouseState(NULL, NULL);

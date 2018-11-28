@@ -27,21 +27,21 @@ public:
 	void Unload();
 	bool LinkProgram();
 
-	void Update(Camera& camera);
-	void Bind() const;
-	static void Unbind();
+	void update(Camera& camera);
+	void bind() const;
+	static void unbind();
 
-	void SendUniform(const std::string &uniformName, const int &i) const;
-	void SendUniform(const std::string &uniformName, const unsigned int &i) const;
-	void SendUniform(const std::string &uniformName, const float &f) const;
-	void SendUniform(const std::string &uniformName, const glm::vec2 &vector) const;
-	void SendUniform(const std::string &uniformName, const float &x, const float &y) const;
-	void SendUniform(const std::string &uniformName, const glm::vec3 &vector) const;
-	void SendUniform(const std::string &uniformName, const float &x, const float &y, const float &z) const;
-	void SendUniform(const std::string &uniformName, const glm::vec4 &vector) const;
-	void SendUniform(const std::string &uniformName, const float &x, const float &y, const float &z, const float &w) const;
-	void SendUniform(const std::string &uniformName, const glm::mat3 &matrix) const;
-	void SendUniform(const std::string &uniformName, const glm::mat4 &matrix) const;
+	void sendUniform(const std::string &uniformName, const int &i) const;
+	void sendUniform(const std::string &uniformName, const unsigned int &i) const;
+	void sendUniform(const std::string &uniformName, const float &f) const;
+	void sendUniform(const std::string &uniformName, const glm::vec2 &vector) const;
+	void sendUniform(const std::string &uniformName, const float &x, const float &y) const;
+	void sendUniform(const std::string &uniformName, const glm::vec3 &vector) const;
+	void sendUniform(const std::string &uniformName, const float &x, const float &y, const float &z) const;
+	void sendUniform(const std::string &uniformName, const glm::vec4 &vector) const;
+	void sendUniform(const std::string &uniformName, const float &x, const float &y, const float &z, const float &w) const;
+	void sendUniform(const std::string &uniformName, const glm::mat3 &matrix) const;
+	void sendUniform(const std::string &uniformName, const glm::mat4 &matrix) const;
 private:
 	std::string vertShaderFile, fragShaderFile, shaderSettingFile;
 

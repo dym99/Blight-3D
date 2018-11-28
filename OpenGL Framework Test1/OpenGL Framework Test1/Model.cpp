@@ -291,4 +291,5 @@ bool Model::ProcessMaterials(const std::string & file)
 		}
 	}
 	input.close();
+	return true;
 }

@@ -1,595 +1,245 @@
 #include "Game.h"
 #include <iostream>
 
-int indexWrap(int cur, int incr, int max) {
-	return ((cur + incr) % max);
+
+#include "ShaderManager.h"
+#include "MeshRenderBehaviour.h"
+#include "TestRotateBehaviour.h"
+#include "MouseLook.h"
+#include "CameraBehaviour.h"
+Game::Game()
+{
 }
-
-
-Game::Game() :
-	mainBuffer(1), workBuffer1(1), workBuffer2(1), workBuffer3(1)
-{}
 
 Game::~Game()
 {
-	delete updateTimer;
+	for (unsigned int i = 0; i < m_activeScenes.size(); ++i) {
+		m_activeScenes[i] = nullptr;
+	}
+	m_activeScenes.clear();
+
+	delete mainBuffer;
+	mainBuffer = nullptr;
+	delete workBuffer1;
+	workBuffer1 = nullptr;
+	delete workBuffer2;
+	workBuffer2 = nullptr;
+	delete workBuffer3;
+	workBuffer3 = nullptr;
+}
+
+void Game::initGame()
+{
+	///Initialise SDL
+	initSDL();
+
+	///Initialise the display
+	m_display = new Display("Blight");
+
+	///Initialise GLEW
+	initGLEW();
+
+	//Initialise Framebuffers
+	mainBuffer = new FrameBuffer(1);
+	workBuffer1 = new FrameBuffer(1);
+	workBuffer2 = new FrameBuffer(1);
+	workBuffer3 = new FrameBuffer(1);
+
+	//Initialise Camera
+	auto camera = new Camera();
+	camera->Perspective(70.f, 16.f/9.f, 0.001f, 1000.f);
+	camera->setPos(glm::vec3(0.f, 0.f, 3.0f));
+	Camera::mainCamera = camera;
+	//Load in resources
+	m_ravager = new Model();
+	m_ravager->LoadFromFile("./Resources/Objects/Ravager2/", "Ravager");
+	m_testArea = new Model();
+	m_testArea->LoadFromFile("./Resources/Objects/TestArea/", "TestArea");
 	
-	//Handle the models
-	{
-		delete player;
-		for (int i = 0; i < enemies.size(); i++) {
-			delete enemies[i];
-		}
-		for (int i = 0; i < environments.size(); i++) {
-			delete environments[i];
-		}
-		for (int i = 0; i < lights.size(); i++) {
-			delete lights[i];
-		}
+	ShaderManager::loadShaders();
+
+	//Frame Buffers
+#pragma region FrameBuffers
+	mainBuffer->InitDepthTexture(WINDOW_WIDTH, WINDOW_HEIGHT);
+	mainBuffer->InitColorTexture(0, WINDOW_WIDTH, WINDOW_HEIGHT, GL_RGBA8, GL_NEAREST, GL_CLAMP_TO_EDGE);
+
+	if (!mainBuffer->CheckFBO()) {
+		std::cout << "FBO1 failed to load.\n\n";
+		system("pause");
+		exit(0);
 	}
 
-	//Handle shaders
-	{
-		delete lampShader;
-		for (int i = 0; i < shaders.size(); i++) {
-			delete shaders[i];
-		}
-		for (int i = 0; i < postProcShaders.size(); i++) {
-			delete postProcShaders[i];
-		}
-		for (int i = 0; i < bloomComponents.size(); i++) {
-			delete bloomComponents[i];
-		}
+	workBuffer1->InitColorTexture(0, WINDOW_WIDTH / BLOOM_DOWNSCALE, WINDOW_HEIGHT / BLOOM_DOWNSCALE,
+		GL_RGB8, GL_LINEAR, GL_CLAMP_TO_EDGE);
+
+	if (!workBuffer1->CheckFBO()) {
+		std::cout << "FBO2 failed to load.\n\n";
+		system("pause");
+		exit(0);
 	}
 
-	//Handle camera
-	delete camera;
-}
+	workBuffer2->InitColorTexture(0, WINDOW_WIDTH / BLOOM_DOWNSCALE, WINDOW_HEIGHT / BLOOM_DOWNSCALE,
+		GL_RGB8, GL_LINEAR, GL_CLAMP_TO_EDGE);
 
-void Game::InitGame(bool* debug)
-{
-	//Hook from main for debug features
-	debugFeatures = debug;
+	if (!workBuffer2->CheckFBO()) {
+		std::cout << "FBO3 failed to load.\n\n";
+		system("pause");
+		exit(0);
+	}
 
-	//Inits the full screen quad for the framebuffer
-	InitFullScreenQuad();
+	workBuffer3->InitColorTexture(0, WINDOW_WIDTH, WINDOW_HEIGHT, GL_RGBA8, GL_NEAREST, GL_CLAMP_TO_EDGE);
 
-	//Init timer
-	updateTimer = new Timer();
-
-	#pragma region Scene Init Stuff
-		enemies.push_back(new Model());
-		enemies[0]->LoadFromFile("./Resources/Objects/Monkey/", "Monkey");
-		//enemies[0]->GetTransform()->SetPos(glm::vec3(0.f, -0.5f, 2.f));
-		//enemies[0]->GetTransform()->SetScale(glm::vec3(0.05f, 0.05f, 0.05f));
-
-		lights.push_back(new Model());
-		lights[0]->LoadFromFile("./Resources/Objects/Lamp/", "Lamp");
-		lights[0]->GetTransform()->SetScale(glm::vec3(0.5f, 0.5f, 0.5f));
+	if (!workBuffer3->CheckFBO()) {
+		std::cout << "FBO4 Failed to load.\n\n";
+		system("pause");
+		exit(0);
+	}
 #pragma endregion
 
-	#pragma region Camera init stuff
-		camera = new Camera();
-		camera->Perspective(70.f, 800.f / 600.f, 0.001f, 1000.f);
-		camera->SetPos(glm::vec3(0.f, 0.f, 5.0f));
-#pragma endregion
+	//Set up the test Scene
 
-	#pragma region Normal Shaders
-		//Init the default shader
-		Shader::InitDefault();
+	auto ravager = new GameObject("Ravager");
+	ravager->addBehaviour(new MeshRenderBehaviour(m_ravager, ShaderManager::getShader(PHONG_SHADER)));
 
-		//Pure White Shader
-		lampShader = new Shader(
-			"./Resources/Shaders/BasicPass.vert",
-			"./Resources/Shaders/BasicPass.frag"
-		);
+	auto cameraPivot = new GameObject("CameraPivot");
+	cameraPivot->localTransform.setPos(glm::vec3(0.f,1.f,0.f));
+	cameraPivot->addBehaviour(new MouseLook(ravager));
 
-		//Shader init stuff
-		shaders.push_back(new Shader(
-			"./Resources/Shaders/StaticGeometry.vert",
-			"./Resources/Shaders/Phong.frag"
-		));
+	auto cameraObject = new GameObject("Camera");
 
-		//Tangent space normals maybe?
-		shaders.push_back(new Shader(
-			"./Resources/Shaders/tangentNormalMapping.vert",
-			"./Resources/Shaders/tangentNormalMapping.frag"
-		));
-#pragma endregion
+	cameraObject->localTransform.setPos(glm::vec3(0, 0, 3.f));
 
-	#pragma region Post processing Shaders
-		postProcShaders.push_back(new Shader(
-			"./Resources/Shaders/PassThrough.vert",
-			"./Resources/Shaders/PostProcess/GreyScalePost.frag"
-		));
-		postProcShaders.push_back(new Shader(
-			"./Resources/Shaders/PassThrough.vert",
-			"./Resources/Shaders/PostProcess/SepiaPost.frag"
-		));
-		postProcShaders.push_back(new Shader(
-			"./Resources/Shaders/PassThrough.vert",
-			"./Resources/Shaders/PostProcess/FocusIn.frag"
-		));
-		postProcShaders.push_back(new Shader(
-			"./Resources/Shaders/PassThrough.vert",
-			"./Resources/Shaders/PostProcess/InvertColor.frag"
-		));
-		postProcShaders.push_back(new Shader(
-			"./Resources/Shaders/PassThrough.vert",
-			"./Resources/Shaders/PostProcess/InvertLuminence.frag"
-		));
-		postProcShaders.push_back(new Shader(
-			"./Resources/Shaders/PassThrough.vert",
-			"./Resources/Shaders/PostProcess/Rainbow.frag"
-		));
-#pragma endregion
+	camera->setTransform(&cameraObject->worldTransform);
 
-	#pragma region Bloom stuffs
-		bloomComponents.push_back(new Shader(
-			"./Resources/Shaders/PassThrough.vert",
-			"./Resources/Shaders/Bloom/BloomHighPass.frag"
-		));
-		bloomComponents.push_back(new Shader(
-			"./Resources/Shaders/PassThrough.vert",
-			"./Resources/Shaders/Bloom/BlurVertical.frag"
-		));
-		bloomComponents.push_back(new Shader(
-			"./Resources/Shaders/PassThrough.vert",
-			"./Resources/Shaders/Bloom/BlurHorizontal.frag"
-		));
-		bloomComponents.push_back(new Shader(
-			"./Resources/Shaders/PassThrough.vert",
-			"./Resources/Shaders/Bloom/BloomComposite.frag"
-		));
-#pragma endregion
-
-	#pragma region FrameBuffers
-		mainBuffer.InitDepthTexture(WINDOW_WIDTH, WINDOW_HEIGHT);
-		mainBuffer.InitColorTexture(0, WINDOW_WIDTH, WINDOW_HEIGHT, GL_RGBA8, GL_NEAREST, GL_CLAMP_TO_EDGE);
-
-		if (!mainBuffer.CheckFBO()) {
-			std::cout << "FBO1 failed to load.\n\n";
-			system("pause");
-			exit(0);
-		}
-
-		workBuffer1.InitColorTexture(0, WINDOW_WIDTH / BLOOM_DOWNSCALE, WINDOW_HEIGHT / BLOOM_DOWNSCALE, 
-										GL_RGB8, GL_LINEAR, GL_CLAMP_TO_EDGE);
-
-		if (!workBuffer1.CheckFBO()) {
-			std::cout << "FBO2 failed to load.\n\n";
-			system("pause");
-			exit(0);
-		}
-
-		workBuffer2.InitColorTexture(0, WINDOW_WIDTH / BLOOM_DOWNSCALE, WINDOW_HEIGHT / BLOOM_DOWNSCALE, 
-										GL_RGB8, GL_LINEAR, GL_CLAMP_TO_EDGE);
-
-		if (!workBuffer2.CheckFBO()) {
-			std::cout << "FBO3 failed to load.\n\n";
-			system("pause");
-			exit(0);
-		}
-
-		workBuffer3.InitColorTexture(0, WINDOW_WIDTH, WINDOW_HEIGHT, GL_RGBA8, GL_NEAREST, GL_CLAMP_TO_EDGE);
-
-		if (!workBuffer3.CheckFBO()) {
-			std::cout << "FBO4 Failed to load.\n\n";
-			system("pause");
-			exit(0);
-		}
-#pragma endregion
-
-	#pragma region Hooks for shaders and models
-		if (shaders.size() > 0)
-			shaderHook = shaders.at(Interact::GetShaderIndex());
-
-		if (postProcShaders.size() > 0)
-			postProcShaderHook = shaders.at(postProcShaderIndex);
-
-		if (enemies.size() > 0) {
-			modelHook = enemies;
-			std::cout << "You are now in control of the enemies model list.\n\n";
-		}
-		else if (environments.size() > 0) {
-			modelHook = environments;
-			std::cout << "You are now in control of the environment model list.\n\n";
-		}
-		else if (lights.size() > 0) {
-			modelHook = lights;
-			std::cout << "You are now in control of the lights model list.\n\n";
-		}
-#pragma endregion
+	cameraPivot->addChild(cameraObject);
+	ravager->addChild(cameraPivot);
 	
-	InitUniforms();
-	printDebugControls();
+
+	auto testArea = new GameObject("TestArea");
+	testArea->addBehaviour(new MeshRenderBehaviour(m_testArea, ShaderManager::getShader(PHONG_SHADER)));
+
+
+	auto scene = new Scene("DemoScene");
+	scene->addChild(ravager);
+	scene->addChild(testArea);
+
+	Camera::mainCameraTransform = &(cameraObject->worldTransform);
+
+	m_activeScenes.push_back(scene);
 }
 
-void Game::InitUniforms()
+void Game::update()
 {
-	postProcShaders.at(FOCUS_IN_POST)->Bind();
-	postProcShaders.at(FOCUS_IN_POST)->SendUniform("windowWidth", static_cast<float>(WINDOW_WIDTH));
-	postProcShaders.at(FOCUS_IN_POST)->SendUniform("windowHeight", static_cast<float>(WINDOW_HEIGHT));
-	Shader::Unbind();
-}
+	Time::update();
 
-void Game::Update()
-{
-	updateTimer->Tick();
 
-	float deltaTime = updateTimer->GetElapsedTimeSeconds();
-	totalGameTime += deltaTime;
-
-	if (enemies.size() > 0) {
-		for (int i = 0; i < enemies.size(); i++) {
-			enemies[i]->GetTransform()->GetRot().y += 1.0f * deltaTime;
-		}
+	for (unsigned int i = 0; i < m_activeScenes.size(); ++i) {
+		m_activeScenes[i]->update();
 	}
+	ShaderManager::getShader(PHONG_SHADER)->bind();
+	ShaderManager::getShader(PHONG_SHADER)->sendUniform("light.position", glm::vec4(glm::vec3(0,0,0),1));
+	Shader::unbind();
 
-	shaders.at(PHONG_SHADER)->Bind();
-	shaders.at(PHONG_SHADER)->SendUniform("light.position", glm::vec4(lights[0]->GetTransform()->GetPos(), 1.0f));
-	Shader::Unbind();
+	//postProcShaders.at(FOCUS_IN_POST)->Bind();
+	//postProcShaders.at(FOCUS_IN_POST)->SendUniform("uTime", totalGameTime);
+	//postProcShaders.at(RAINBOW_POST)->Bind();
+	//postProcShaders.at(RAINBOW_POST)->SendUniform("uTime", totalGameTime);
 
-	postProcShaders.at(FOCUS_IN_POST)->Bind();
-	postProcShaders.at(FOCUS_IN_POST)->SendUniform("uTime", totalGameTime);
-	postProcShaders.at(RAINBOW_POST)->Bind();
-	postProcShaders.at(RAINBOW_POST)->SendUniform("uTime", totalGameTime);
-
-	Shader::Unbind();
+	Shader::unbind();
 
 	//lights[0]->GetTransform()->SetPos(glm::vec3(glm::sin(updateTimer->GetTimeCurrent() / 1000.f) * 5.0f, 1.0f, 1.3f));
 }
 
-void Game::Draw()
+void Game::draw()
 {
 	/// Clear Buffers ///
-	mainBuffer.Clear();
-	workBuffer1.Clear();
-	workBuffer2.Clear();
+	mainBuffer->Clear();
+	workBuffer1->Clear();
+	workBuffer2->Clear();
 
-	shaderHook = shaders.at(Interact::GetShaderIndex());
-	postProcShaderHook = postProcShaders.at(postProcShaderIndex);
-
-	shaderHook->Bind();
-	shaderHook->Update(*camera);
-	Shader::Unbind();
-	lampShader->Bind();
-	lampShader->Update(*camera);
-	Shader::Unbind();
+	ShaderManager::update(*Camera::mainCamera);
 
 	//Camera 1
 	{
 		glViewport(0, 0, WINDOW_WIDTH, WINDOW_HEIGHT);
 
-		if (frameBuffer) {
-			mainBuffer.Bind();
-		}
-		if (enemies.size() > 0) {
-			for (int i = 0; i < enemies.size(); i++) {
-				shaderHook->Bind();
-				shaderHook->SendUniform("uModel", enemies[i]->GetTransform()->GetModel());
-				enemies[i]->Draw(shaderHook);
-				Shader::Unbind();
-			}
-		}
-		if (environments.size() > 0) {
-			for (int i = 0; i < environments.size(); i++) {
-				shaderHook->Bind();
-				shaderHook->SendUniform("uModel", environments[i]->GetTransform()->GetModel());
-				environments[i]->Draw(shaderHook);
-				Shader::Unbind();
-			}
-		}
-		if (lights.size() > 0) {
-			for (int i = 0; i < lights.size(); i++) {
-				glEnable(GL_BLEND);
-				//Light sources wouldn't be affected by other lights
-				lampShader->Bind();
-				lampShader->SendUniform("uModel", lights[i]->GetTransform()->GetModel());
-				lights[i]->Draw(lampShader);
-				glDisable(GL_BLEND);
-				Shader::Unbind();
-			}
-		}
-		mainBuffer.Unbind();
-
-		if (frameBuffer) {
-			ProcessFramebufferStuff(mainBuffer, workBuffer1, workBuffer2, workBuffer3, 
-										bloomComponents, *postProcShaderHook, postProc, hasBloom);
+		for (unsigned int i = 0; i < m_activeScenes.size(); ++i) {
+			m_activeScenes[i]->onRender();
+			
 		}
 	}
+}
+	
+int Game::run() {
+	while (m_display->isOpen()) {
 
-	//Working for 4 viewports, just doesn't work as great with current framebuffer stuff as it'll draw
-	//Smaller and smaller versions and triple the amounts on screen, I can fix it, but idk if it's worth it
+
+		ShaderManager::getShader(PHONG_SHADER)->bind();
+		//ShaderManager::getShader(PHONG_SHADER)->SendUniform("light.position", glm::vec4(lights[0]->GetTransform()->GetPos(), 1.0f));
+		Shader::unbind();
+
+		update();
+
+		m_display->clear(0.f, 0.f, 0.f, 1.f);
+
+		draw();
+
+		m_display->flip();
+		SDL_Event event;
+		while (SDL_PollEvent(&event)) {
+			if (event.type == SDL_QUIT) {
+				m_display->close();
+			}
+		}
+	}
+	SDL_Quit();
+	return 0;
+}
+
+void Game::initGLEW() {
+	//Holds the result of the initialization of glew.
+	//glewInit finds every OpenGl function that our system supports
+	GLenum status = glewInit();
+
+	//Checks if glewInit didn't returned okay.
+	if (status != GLEW_OK)
 	{
-		////Camera 2
-		//{
-		//	glViewport(0, 0, WINDOW_WIDTH / 2.f, WINDOW_HEIGHT / 2.f);
-
-		//	if (frameBuffer) {
-		//		mainBuffer.Bind();
-		//	}
-		//	if (enemies.size() > 0) {
-		//		for (int i = 0; i < enemies.size(); i++) {
-		//			shaderHook->Bind();
-		//			shaderHook->Update(*enemies[i]->GetTransform(), *camera);
-		//			enemies[i]->Draw(shaderHook);
-		//			shaderHook->Unbind();
-
-		//		}
-		//	}
-		//	if (environments.size() > 0) {
-		//		for (int i = 0; i < environments.size(); i++) {
-		//			shaderHook->Bind();
-		//			shaderHook->Update(*environments[i]->GetTransform(), *camera);
-		//			environments[i]->Draw(shaderHook);
-		//			shaderHook->Unbind();
-		//		}
-		//	}
-		//	if (lights.size() > 0) {
-		//		for (int i = 0; i < lights.size(); i++) {
-		//			glEnable(GL_BLEND);
-		//			//Light sources wouldn't be affected by other lights
-		//			lampShader->Bind();
-		//			lampShader->Update(*lights[i]->GetTransform(), *camera);
-		//			lights[i]->Draw(lampShader);
-		//			glDisable(GL_BLEND);
-		//			lampShader->Unbind();
-		//		}
-		//	}
-		//	mainBuffer.Unbind();
-		//	if (frameBuffer) {
-		//		if (hasBloom) {
-		//			ProcessBloom(mainBuffer, workBuffer1, workBuffer2, workBuffer3, bloomComponents, postProc);
-		//		}
-		//		if (postProc) {
-		//			FrameBuffer* temp;
-		//			if (hasBloom) {
-		//				temp = &workBuffer3;
-		//			}
-		//			else {
-		//				temp = &mainBuffer;
-		//			}
-		//			postProcShaderHook->Bind();
-		//			postProcShaderHook->SetInt("uTex", 0);
-
-		//			glBindTexture(GL_TEXTURE_2D, temp->GetColorHandle(0));
-		//			DrawFullScreenQuad();
-		//			glBindTexture(GL_TEXTURE_2D, GL_NONE);
-
-		//			postProcShaderHook->Unbind();
-		//		}
-		//	}
-		//}
-
-		////Camera 3
-		//{
-		//	glViewport(WINDOW_WIDTH / 2.f, WINDOW_HEIGHT / 2.f, WINDOW_WIDTH / 2.f, WINDOW_HEIGHT / 2.f);
-
-		//	if (frameBuffer) {
-		//		mainBuffer.Bind();
-		//	}
-		//	if (enemies.size() > 0) {
-		//		for (int i = 0; i < enemies.size(); i++) {
-		//			shaderHook->Bind();
-		//			shaderHook->Update(*enemies[i]->GetTransform(), *camera);
-		//			enemies[i]->Draw(shaderHook);
-		//			shaderHook->Unbind();
-
-		//		}
-		//	}
-		//	if (environments.size() > 0) {
-		//		for (int i = 0; i < environments.size(); i++) {
-		//			shaderHook->Bind();
-		//			shaderHook->Update(*environments[i]->GetTransform(), *camera);
-		//			environments[i]->Draw(shaderHook);
-		//			shaderHook->Unbind();
-		//		}
-		//	}
-		//	if (lights.size() > 0) {
-		//		for (int i = 0; i < lights.size(); i++) {
-		//			glEnable(GL_BLEND);
-		//			//Light sources wouldn't be affected by other lights
-		//			lampShader->Bind();
-		//			lampShader->Update(*lights[i]->GetTransform(), *camera);
-		//			lights[i]->Draw(lampShader);
-		//			glDisable(GL_BLEND);
-		//			lampShader->Unbind();
-		//		}
-		//	}
-		//	mainBuffer.Unbind();
-		//	if (frameBuffer) {
-		//		if (hasBloom) {
-		//			ProcessBloom(mainBuffer, workBuffer1, workBuffer2, workBuffer3, bloomComponents, postProc);
-		//		}
-		//		if (postProc) {
-		//			FrameBuffer* temp;
-		//			if (hasBloom) {
-		//				temp = &workBuffer3;
-		//			}
-		//			else {
-		//				temp = &mainBuffer;
-		//			}
-		//			postProcShaderHook->Bind();
-		//			postProcShaderHook->SetInt("uTex", 0);
-
-		//			glBindTexture(GL_TEXTURE_2D, temp->GetColorHandle(0));
-		//			DrawFullScreenQuad();
-		//			glBindTexture(GL_TEXTURE_2D, GL_NONE);
-
-		//			postProcShaderHook->Unbind();
-		//		}
-		//	}
-		//}
-
-		////Camera 4
-		//{
-		//	glViewport(WINDOW_WIDTH / 2.f, 0, WINDOW_WIDTH / 2.f, WINDOW_HEIGHT / 2.f);
-
-		//	if (frameBuffer) {
-		//		mainBuffer.Bind();
-		//	}
-		//	if (enemies.size() > 0) {
-		//		for (int i = 0; i < enemies.size(); i++) {
-		//			shaderHook->Bind();
-		//			shaderHook->Update(*enemies[i]->GetTransform(), *camera);
-		//			enemies[i]->Draw(shaderHook);
-		//			shaderHook->Unbind();
-
-		//		}
-		//	}
-		//	if (environments.size() > 0) {
-		//		for (int i = 0; i < environments.size(); i++) {
-		//			shaderHook->Bind();
-		//			shaderHook->Update(*environments[i]->GetTransform(), *camera);
-		//			environments[i]->Draw(shaderHook);
-		//			shaderHook->Unbind();
-		//		}
-		//	}
-		//	if (lights.size() > 0) {
-		//		for (int i = 0; i < lights.size(); i++) {
-		//			glEnable(GL_BLEND);
-		//			//Light sources wouldn't be affected by other lights
-		//			lampShader->Bind();
-		//			lampShader->Update(*lights[i]->GetTransform(), *camera);
-		//			lights[i]->Draw(lampShader);
-		//			glDisable(GL_BLEND);
-		//			lampShader->Unbind();
-		//		}
-		//	}
-		//	mainBuffer.Unbind();
-		//	if (frameBuffer) {
-		//		if (hasBloom) {
-		//			ProcessBloom(mainBuffer, workBuffer1, workBuffer2, workBuffer3, bloomComponents, postProc);
-		//		}
-		//		if (postProc) {
-		//			FrameBuffer* temp;
-		//			if (hasBloom) {
-		//				temp = &workBuffer3;
-		//			}
-		//			else {
-		//				temp = &mainBuffer;
-		//			}
-		//			postProcShaderHook->Bind();
-		//			postProcShaderHook->SetInt("uTex", 0);
-
-		//			glBindTexture(GL_TEXTURE_2D, temp->GetColorHandle(0));
-		//			DrawFullScreenQuad();
-		//			glBindTexture(GL_TEXTURE_2D, GL_NONE);
-
-		//			postProcShaderHook->Unbind();
-		//		}
-		//	}
-		//}
+		//If it didn't, prints an error message
+		std::cerr << "Glew failed to initialize!" << std::endl;
 	}
+
+	glEnable(GL_DEPTH_TEST);
+	glEnable(GL_TEXTURE_2D);
+
+	glEnable(GL_CULL_FACE);
+	glCullFace(GL_BACK);
+
+	glEnable(GL_MULTISAMPLE);
 }
 
-void Game::KeyboardUp()
-{
-	//I can't even think of anything to put here tbh I never use keyboard up tbh
-}
+void Game::initSDL() {
+	SDL_Init(SDL_INIT_VIDEO | SDL_INIT_EVENTS);
 
-void Game::KeyboardDown()
-{
-	if (Input::GetKeyPress(KeyCode::Q)) {
-		exit(0);
-	}
-}
-
-void Game::KeyboardPress()
-{
-	if (Input::GetKeyPress(KeyCode::Insert)) {
-		*debugFeatures = !*debugFeatures;
-		std::cout << "Debug features are now ";
-		*debugFeatures ? std::cout << "enabled\n\n" : std::cout << "disabled\n\n";
-	}
-	if (!Input::GetKey(KeyCode::Alt)) {
-		if (Input::GetKeyPress(KeyCode::Tab)) {
-			if (modelHook == enemies) {
-				if (environments.size() > 0) {
-					modelHook = environments;
-					std::cout << "Environments control\n\n";
-				}
-				else if (lights.size() > 0) {
-					modelHook = lights;
-					std::cout << "Lights control\n\n";
-				}
-				else {
-					std::cout << "Unable to switch, Enemy Control\n\n";
-				}
-			}
-			else if (modelHook == environments) {
-				if (lights.size() > 0) {
-					modelHook = lights;
-					std::cout << "Lights control\n\n";
-				}
-				else if (enemies.size() > 0) {
-					modelHook = enemies;
-					std::cout << "Enemy control\n\n";
-				}
-				else {
-					std::cout << "Unable to switch, Environments Control\n\n";
-				}
-			}
-			else if (modelHook == lights) {
-				if (enemies.size() > 0) {
-					modelHook = enemies;
-					std::cout << "Enemy control\n\n";
-				}
-				else if (environments.size() > 0) {
-					modelHook = environments;
-					std::cout << "Environments control\n\n";
-				}
-				else {
-					std::cout << "Unable to switch, Lights Control\n\n";
-				}
-			}
-		}
-	}
-	if (*debugFeatures) {
-		if (postProc) {
-			if (Input::GetKeyPress(KeyCode::PageUp)) {
-				postProcShaderIndex = indexWrap(postProcShaderIndex, 1, postProcShaders.size());
-				std::cout << "You are now using post processing shader" << postProcShaderIndex << "\n\n";
-			}
-		}
-		if (Input::GetKeyPress(KeyCode::F1)) {
-			postProc = !postProc;
-			std::cout << "Post Processing effects are now ";
-			postProc ? std::cout << "enabled\n\n" : std::cout << "disabled\n\n";
-
-			if (!postProc && !hasBloom) {
-				frameBuffer = false;
-			}
-			else {
-				frameBuffer = true;
-			}
-		}
-		if (Input::GetKeyPress(KeyCode::F2)) {
-			//toggles bloom usage
-			hasBloom = !hasBloom;
-			std::cout << "Bloom effect is now ";
-			hasBloom ? std::cout << "enabled\n\n" : std::cout << "disabled\n\n";
-
-			if (!hasBloom && !postProc) {
-				frameBuffer = false;
-			}
-			else {
-				frameBuffer = true;
-			}
-		}
-		if (Input::GetKeyPress(KeyCode::F5)) {
-			for (int i = 0; i < shaders.size(); i++) {
-				shaders[i]->Reload();
-			}
-			for (int i = 0; i < postProcShaders.size(); i++) {
-				postProcShaders[i]->Reload();
-			}
-			for (int i = 0; i < bloomComponents.size(); i++) {
-				bloomComponents[i]->Reload();
-			}
-			printDebugControls();
-			InitUniforms();
-		}
-	}
+	///Setting attributes
+		//2 to the 8th power shades of Red (256)
+	SDL_GL_SetAttribute(SDL_GL_RED_SIZE, 8);
+	//2 to the 8th power shades of Green (256)
+	SDL_GL_SetAttribute(SDL_GL_GREEN_SIZE, 8);
+	//2 to the 8th power shades of Blue (256)
+	SDL_GL_SetAttribute(SDL_GL_BLUE_SIZE, 8);
+	//2 to the 8th power of shades of transparancy (256)
+	SDL_GL_SetAttribute(SDL_GL_ALPHA_SIZE, 8);
+	//How many bits allocated for each pixel, we have 32 bits of color, hence we want 32 here
+	SDL_GL_SetAttribute(SDL_GL_BUFFER_SIZE, 32);
+	//Sets the depth buffer for openGL, basically, is needed for z buffering 
+	SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE, 24);
+	//Allocates the space for a second window that won't be displayed
+	SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
+	//Set GL Context Version (Forces OpenGL version 3.2)
+	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
+	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 2);
+	//Set up anti-aliasing (4xMSAA)
+	SDL_GL_SetAttribute(SDL_GL_MULTISAMPLEBUFFERS, 1);
+	SDL_GL_SetAttribute(SDL_GL_MULTISAMPLESAMPLES, 4);
+	///End Attributes
 }

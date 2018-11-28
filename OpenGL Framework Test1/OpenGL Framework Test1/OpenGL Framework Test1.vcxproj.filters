@@ -26,6 +26,18 @@
     <Filter Include="Source Files\Utilities">
       <UniqueIdentifier>{6dec2983-e8cd-4921-8a3f-5ba3b62ce7f8}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\Scene Management">
+      <UniqueIdentifier>{726a6b44-450d-410f-b95b-83fbfc86f39b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Behaviours">
+      <UniqueIdentifier>{3a6fc7c3-e7ab-4830-8d16-c6e7db8a005e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Behaviours\Camera">
+      <UniqueIdentifier>{36f1be96-b85e-4848-9533-340bb3205378}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Behaviours\Graphics">
+      <UniqueIdentifier>{8e7c7854-081e-405a-ae8d-180e6b5412da}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Input.cpp">
@@ -36,9 +48,6 @@
     </ClCompile>
     <ClCompile Include="Interactions.cpp">
       <Filter>Source Files\Utilities</Filter>
-    </ClCompile>
-    <ClCompile Include="main.cpp">
-      <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Game.cpp">
       <Filter>Source Files\Game</Filter>
@@ -55,9 +64,6 @@
     <ClCompile Include="Model.cpp">
       <Filter>Source Files\Loaders</Filter>
     </ClCompile>
-    <ClCompile Include="Scene.cpp">
-      <Filter>Source Files\Game</Filter>
-    </ClCompile>
     <ClCompile Include="Camera.cpp">
       <Filter>Source Files\Game</Filter>
     </ClCompile>
@@ -68,6 +74,36 @@
       <Filter>Source Files\Utilities</Filter>
     </ClCompile>
     <ClCompile Include="Shader.cpp">
+      <Filter>Source Files\Shaders</Filter>
+    </ClCompile>
+    <ClCompile Include="GameObject.cpp">
+      <Filter>Source Files\Scene Management</Filter>
+    </ClCompile>
+    <ClCompile Include="Scene.cpp">
+      <Filter>Source Files\Scene Management</Filter>
+    </ClCompile>
+    <ClCompile Include="Utils.cpp">
+      <Filter>Source Files\Utilities</Filter>
+    </ClCompile>
+    <ClCompile Include="Behaviour.cpp">
+      <Filter>Source Files\Behaviours</Filter>
+    </ClCompile>
+    <ClCompile Include="CameraBehaviour.cpp">
+      <Filter>Source Files\Behaviours\Camera</Filter>
+    </ClCompile>
+    <ClCompile Include="MouseLook.cpp">
+      <Filter>Source Files\Behaviours\Camera</Filter>
+    </ClCompile>
+    <ClCompile Include="MeshRenderBehaviour.cpp">
+      <Filter>Source Files\Behaviours\Graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="TestRotateBehaviour.cpp">
+      <Filter>Source Files\Behaviours\Graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="main.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="ShaderManager.cpp">
       <Filter>Source Files\Shaders</Filter>
     </ClCompile>
   </ItemGroup>
@@ -99,12 +135,6 @@
     <ClInclude Include="Model.h">
       <Filter>Source Files\Loaders</Filter>
     </ClInclude>
-    <ClInclude Include="Scene.h">
-      <Filter>Source Files\Game</Filter>
-    </ClInclude>
-    <ClInclude Include="Timer.h">
-      <Filter>Source Files\Maths</Filter>
-    </ClInclude>
     <ClInclude Include="Camera.h">
       <Filter>Source Files\Game</Filter>
     </ClInclude>
@@ -115,6 +145,33 @@
       <Filter>Source Files\Utilities</Filter>
     </ClInclude>
     <ClInclude Include="Shader.h">
+      <Filter>Source Files\Shaders</Filter>
+    </ClInclude>
+    <ClInclude Include="GameObject.h">
+      <Filter>Source Files\Scene Management</Filter>
+    </ClInclude>
+    <ClInclude Include="Scene.h">
+      <Filter>Source Files\Scene Management</Filter>
+    </ClInclude>
+    <ClInclude Include="Utils.h">
+      <Filter>Source Files\Utilities</Filter>
+    </ClInclude>
+    <ClInclude Include="Behaviour.h">
+      <Filter>Source Files\Behaviours</Filter>
+    </ClInclude>
+    <ClInclude Include="CameraBehaviour.h">
+      <Filter>Source Files\Behaviours\Camera</Filter>
+    </ClInclude>
+    <ClInclude Include="MouseLook.h">
+      <Filter>Source Files\Behaviours\Camera</Filter>
+    </ClInclude>
+    <ClInclude Include="MeshRenderBehaviour.h">
+      <Filter>Source Files\Behaviours\Graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="TestRotateBehaviour.h">
+      <Filter>Source Files\Behaviours\Graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="ShaderManager.h">
       <Filter>Source Files\Shaders</Filter>
     </ClInclude>
   </ItemGroup>

@@ -38,6 +38,7 @@ bool Shader::InitDefault()
 			exit(EXIT_FAILURE);
 		}
 
+
 		_VertexShaderDefault =	errorShader._VertexShader;
 		_FragShaderDefault =	errorShader._FragShader;
 		_ProgramDefault =		errorShader._Program;
@@ -140,21 +141,21 @@ bool Shader::LinkProgram()
 	return (success == GL_TRUE);
 }
 
-void Shader::Update(Camera & camera)
+void Shader::update(Camera & camera)
 {
-	glm::mat4 view = camera.GetView();
+	glm::mat4 view = camera.getView();
 	glm::mat4 proj = camera.GetProjection();
 
-	SendUniform("uView", view);
-	SendUniform("uProj", proj);
+	sendUniform("uView", view);
+	sendUniform("uProj", proj);
 }
 
-void Shader::Bind() const
+void Shader::bind() const
 {
 	glUseProgram(_Program);
 }
 
-void Shader::Unbind()
+void Shader::unbind()
 {
 	glUseProgram(GL_NONE);
 }
@@ -172,73 +173,73 @@ GLint Shader::GetUniformLocation(const std::string & uniformName) const
 	return uniLoc;
 }
 
-void Shader::SendUniform(const std::string & uniformName, const int & i) const
+void Shader::sendUniform(const std::string & uniformName, const int & i) const
 {
 	GLint loc = GetUniformLocation(uniformName);
 	glUniform1i(loc, i);
 }
 
-void Shader::SendUniform(const std::string & uniformName, const unsigned int & i) const
+void Shader::sendUniform(const std::string & uniformName, const unsigned int & i) const
 {
 	GLint loc = GetUniformLocation(uniformName);
 	glUniform1i(loc, i);
 }
 
-void Shader::SendUniform(const std::string & uniformName, const float & f) const
+void Shader::sendUniform(const std::string & uniformName, const float & f) const
 {
 	GLint loc = GetUniformLocation(uniformName);
 	glUniform1f(loc, f);
 }
 
-void Shader::SendUniform(const std::string & uniformName, const glm::vec2 & vector) const
+void Shader::sendUniform(const std::string & uniformName, const glm::vec2 & vector) const
 {
 	GLint loc = GetUniformLocation(uniformName);
 	GLfloat vec[2] = { vector.x, vector.y };
 	glUniform2fv(loc, 1, vec);
 }
 
-void Shader::SendUniform(const std::string & uniformName, const float & x, const float & y) const
+void Shader::sendUniform(const std::string & uniformName, const float & x, const float & y) const
 {
 	GLint loc = GetUniformLocation(uniformName);
 	GLfloat vec[2] = { x, y };
 	glUniform2fv(loc, 1, vec);
 }
 
-void Shader::SendUniform(const std::string & uniformName, const glm::vec3 & vector) const
+void Shader::sendUniform(const std::string & uniformName, const glm::vec3 & vector) const
 {
 	GLint loc = GetUniformLocation(uniformName);
 	GLfloat vec[3] = { vector.x, vector.y, vector.z };
 	glUniform3fv(loc, 1, vec);
 }
 
-void Shader::SendUniform(const std::string & uniformName, const float & x, const float & y, const float & z) const
+void Shader::sendUniform(const std::string & uniformName, const float & x, const float & y, const float & z) const
 {
 	GLint loc = GetUniformLocation(uniformName);
 	GLfloat vec[3] = { x, y, z };
 	glUniform3fv(loc, 1, vec);
 }
 
-void Shader::SendUniform(const std::string & uniformName, const glm::vec4 & vector) const
+void Shader::sendUniform(const std::string & uniformName, const glm::vec4 & vector) const
 {
 	GLint loc = GetUniformLocation(uniformName);
 	GLfloat vec[4] = { vector.x, vector.y, vector.z, vector.w };
 	glUniform4fv(loc, 1, vec);
 }
 
-void Shader::SendUniform(const std::string & uniformName, const float & x, const float & y, const float & z, const float & w) const
+void Shader::sendUniform(const std::string & uniformName, const float & x, const float & y, const float & z, const float & w) const
 {
 	GLint loc = GetUniformLocation(uniformName);
 	GLfloat vec[4] = { x, y, z, w };
 	glUniform4fv(loc, 1, vec);
 }
 
-void Shader::SendUniform(const std::string & uniformName, const glm::mat3 & matrix) const
+void Shader::sendUniform(const std::string & uniformName, const glm::mat3 & matrix) const
 {
 	GLint loc = GetUniformLocation(uniformName);
 	glUniformMatrix3fv(loc, 1, GL_FALSE, &matrix[0][0]);
 }
 
-void Shader::SendUniform(const std::string & uniformName, const glm::mat4 & matrix) const
+void Shader::sendUniform(const std::string & uniformName, const glm::mat4 & matrix) const
 {
 	GLint loc = GetUniformLocation(uniformName);
 	glUniformMatrix4fv(loc, 1, GL_FALSE, &matrix[0][0]);

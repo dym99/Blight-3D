@@ -100,7 +100,7 @@ bool Mesh::ProcessMesh(std::vector<glm::vec3> &vertexData, std::vector<glm::vec2
 
 	}
 
-	m_NumFaces = faceData.size();
+	m_NumFaces = (int)faceData.size();
 	m_NumVertices = m_NumFaces * 3;
 	
 	//Send the data to OpenGL
@@ -179,13 +179,13 @@ void Mesh::Draw(Shader * shader)
 		}
 
 		if (normalNr == 0) {
-			shader->SendUniform("hasNormMap", 0);
+			shader->sendUniform("hasNormMap", 0);
 		}
 		else {
-			shader->SendUniform("hasNormMap", 1);
+			shader->sendUniform("hasNormMap", 1);
 		}
 
-		shader->SendUniform(("material." + name).c_str(), i);
+		shader->sendUniform(("material." + name).c_str(), i);
 		glBindTexture(GL_TEXTURE_2D, material.textures[i]->GetTextureHandle());
 	}
 	glActiveTexture(GL_TEXTURE0);
