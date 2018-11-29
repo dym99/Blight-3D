@@ -49,6 +49,9 @@ void Game::initGame()
 	workBuffer2 = new FrameBuffer(1);
 	workBuffer3 = new FrameBuffer(1);
 
+	//Initializes the screen quad
+	InitFullScreenQuad();
+
 	//Initialise Camera
 	auto camera = new Camera();
 	camera->Perspective(70.f, 16.f/9.f, 0.001f, 1000.f);
@@ -182,11 +185,23 @@ void Game::draw()
 	{
 		glViewport(0, 0, WINDOW_WIDTH, WINDOW_HEIGHT);
 
+		//mainBuffer->Bind();
+
 		for (unsigned int i = 0; i < m_activeScenes.size(); ++i) {
 			m_activeScenes[i]->onRender();
 			
 		}
+
+		//mainBuffer->Unbind();
 	}
+
+	//////////////////////////////////////////////////////////////////////////////////////////////
+	/// * Performs Frame buffer stuffs, don't remove pls and thank
+	/*ProcessFramebufferStuff(*mainBuffer, *workBuffer1, *workBuffer2, *workBuffer3,
+								ShaderManager::getBloom(), *ShaderManager::getPost(FOCUS_IN_POST),
+									true, false);*/
+	/// * Will be commented out in case this branch gets used for Expo
+	//////////////////////////////////////////////////////////////////////////////////////////////
 }
 	
 int Game::run() {

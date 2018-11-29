@@ -35,11 +35,15 @@ public:
 	static void update(Camera& _camera);
 
 	static Shader* getShader(int shader);
+	static Shader* getPost(int post);
+	
+	static std::vector<Shader*>& getBloom();
 
 
 private:
 	static std::vector<Shader*> m_shaders;
 	static std::vector<Shader*> m_postShaders;
+	static std::vector<Shader*> m_bloomComponents;
 };
 
 #endif
