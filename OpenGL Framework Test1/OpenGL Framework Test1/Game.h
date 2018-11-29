@@ -4,10 +4,10 @@
 #include "Utils.h"
 #include "Scene.h"
 #include "Shader.h"
-#include "Interactions.h"
 #include "FrameBuffer.h"
+#include "Display.h"
 #include "Utilities.h"
-
+#include "P_PhysicsBody.h"
 
 class Game {
 public:
@@ -44,6 +44,8 @@ private:
 
 	std::vector<Scene>  m_scenes;
 	std::vector<Scene*> m_activeScenes;
+
+	P_PhysicsBody *ravagerPhys;
 };
 
 #endif

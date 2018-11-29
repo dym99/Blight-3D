@@ -2,11 +2,15 @@
 #include <iostream>
 
 
+#include "P_PhysicsBody.h"
+
 #include "ShaderManager.h"
 #include "MeshRenderBehaviour.h"
 #include "TestRotateBehaviour.h"
 #include "MouseLook.h"
 #include "CameraBehaviour.h"
+
+#include "Input.h"
 Game::Game()
 {
 }
@@ -125,6 +129,15 @@ void Game::initGame()
 
 	Camera::mainCameraTransform = &(cameraObject->worldTransform);
 
+
+	//TODO: Set up transform class so that a world transform can exist
+	ravagerPhys = new P_PhysicsBody(&ravager->localTransform, 1.f, true, SPHERE, 1.f, 0.f, 0.f, glm::vec3(0, 0.5f, 0));
+	P_PhysicsBody::P_bodyCount.push_back(ravagerPhys);
+	P_PhysicsBody::P_bodyCount.push_back(new P_PhysicsBody(new Transform(), 1.f, false, BOX, 1.f, 8.f, 8.f, glm::vec3(0, -0.5f, 0), 0, true));
+	P_PhysicsBody::P_bodyCount.push_back(new P_PhysicsBody(new Transform(), 1.f, false, BOX, 1.f, 2.f, 2.f, glm::vec3(0, -0.5f, 5), 0, true));
+	P_PhysicsBody::P_bodyCount.push_back(new P_PhysicsBody(new Transform(), 1.f, false, BOX, 1.f, 8.f, 8.f, glm::vec3(0, -0.5f, 10), 0, true));
+
+
 	m_activeScenes.push_back(scene);
 }
 
@@ -132,7 +145,13 @@ void Game::update()
 {
 	Time::update();
 
+	//Remove this when done testing. Or use as a jump for testing purposes.
+	if (Input::GetKeyDown(KeyCode::Space)) {
+		ravagerPhys->P_velocity.y = 4.f;
+	}
 
+
+	P_PhysicsBody::P_physicsUpdate(Time::deltaTime);
 	for (unsigned int i = 0; i < m_activeScenes.size(); ++i) {
 		m_activeScenes[i]->update();
 	}
@@ -146,7 +165,7 @@ void Game::update()
 	//postProcShaders.at(RAINBOW_POST)->SendUniform("uTime", totalGameTime);
 
 	Shader::unbind();
-
+	Input::ResetKeys();
 	//lights[0]->GetTransform()->SetPos(glm::vec3(glm::sin(updateTimer->GetTimeCurrent() / 1000.f) * 5.0f, 1.0f, 1.3f));
 }
 
