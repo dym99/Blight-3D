@@ -36,17 +36,22 @@ void ShaderManager::loadShaders()
 
 	m_postShaders.push_back(new Shader(
 		"./Resources/Shaders/PassThrough.vert",
-		"./Resources/Shaders/InvertColor.frag"
+		"./Resources/Shaders/PostProcess/InvertColor.frag"
 	));
 
 	m_postShaders.push_back(new Shader(
 		"./Resources/Shaders/PassThrough.vert",
-		"./Resources/Shaders/InvertLuminence.frag"
+		"./Resources/Shaders/PostProcess/InvertLuminence.frag"
 	));
 
 	m_postShaders.push_back(new Shader(
 		"./Resources/Shaders/PassThrough.vert",
-		"./Resources/Shaders/Rainbow.frag"
+		"./Resources/Shaders/PostProcess/Rainbow.frag"
+	));
+
+	m_postShaders.push_back(new Shader(
+		"./Resources/Shaders/PassThrough.vert",
+		"./Resources/Shaders/PostProcess/UserInterface.frag"
 	));
 
 

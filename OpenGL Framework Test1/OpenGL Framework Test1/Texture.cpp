@@ -45,9 +45,23 @@ void Texture::Unload()
 	}
 }
 
+void Texture::Bind(int unit)
+{
+	glActiveTexture(GL_TEXTURE0 + unit);
+	glBindTexture(GL_TEXTURE_2D, m_texture);
+	glActiveTexture(GL_TEXTURE0);
+}
+
 void Texture::Bind()
 {
 	glBindTexture(GL_TEXTURE_2D, m_texture);
+}
+
+void Texture::Unbind(int unit)
+{
+	glActiveTexture(GL_TEXTURE0 + unit);
+	glBindTexture(GL_TEXTURE_2D, GL_NONE);
+	glActiveTexture(GL_TEXTURE0);
 }
 
 void Texture::Unbind()

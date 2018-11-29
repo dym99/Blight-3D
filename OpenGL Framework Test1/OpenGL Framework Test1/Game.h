@@ -42,6 +42,9 @@ private:
 	FrameBuffer *workBuffer2;
 	FrameBuffer *workBuffer3;
 
+	//Textures
+	Texture *uiImage;
+
 	std::vector<Scene>  m_scenes;
 	std::vector<Scene*> m_activeScenes;
 
