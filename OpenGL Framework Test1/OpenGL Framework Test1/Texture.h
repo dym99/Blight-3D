@@ -13,7 +13,9 @@ public:
 	bool Load(const std::string &file);
 	void Unload();
 
+	void Bind(int unit);
 	void Bind();
+	void Unbind(int unit);
 	void Unbind();
 		
 	//Helper functions
