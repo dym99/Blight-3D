@@ -1,5 +1,5 @@
 #include "GameObject.h"
-
+#include "Input.h"
 
 
 GameObject::GameObject(const std::string& _name)
@@ -62,6 +62,13 @@ void GameObject::update()
 	//Update all children
 	for (unsigned int i = 0; i < m_children.size(); ++i) {
 		m_children[i]->update();
+	}
+
+	if (m_name == "Player")
+	{
+		if (Input::GetKeyPress(KeyCode::F1)) {
+			printf("(%f, %f, %f)", localTransform.getPos().x, localTransform.getPos().y, localTransform.getPos().z);
+		}
 	}
 }
 

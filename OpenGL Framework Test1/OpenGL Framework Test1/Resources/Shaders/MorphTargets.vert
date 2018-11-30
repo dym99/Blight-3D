@@ -33,5 +33,5 @@ void main()
 	gl_Position = pos;//uProj * uView * uModel * vec4(position, 1.0);
     TexCoords = texCoord;    
 	normal0 = mat3(uModel) * normal;
-	fragPosition = (uModel * pos).rgb;
+	fragPosition = (uModel * vec4(position, 1.0)).rgb;
 }

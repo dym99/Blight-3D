@@ -447,23 +447,23 @@ bool Model::LoadFromFile(const std::string & _path, const std::string & _name, u
 		meshes.erase(meshes.begin() + 1);
 		meshes.erase(meshes.begin() + 1);
 		meshes.erase(meshes.begin() + 1);
-		
-		//Send the Target data to OpenGL
-		glBindBuffer(GL_ARRAY_BUFFER, meshes[0]->VBO_HandlesA);
-		glBufferData(GL_ARRAY_BUFFER, sizeof(float) * meshes[0]->targets[0].size(), &meshes[0]->targets[0][0], GL_DYNAMIC_DRAW);
-		glVertexAttribPointer((GLuint)6, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 3, BUFFER_OFFSET(0));
-		//Send the Target data to OpenGL
-		glBindBuffer(GL_ARRAY_BUFFER, meshes[0]->VBO_Vertices);
-		glBufferData(GL_ARRAY_BUFFER, sizeof(float) * meshes[0]->targets[1].size(), &meshes[0]->targets[1][0], GL_DYNAMIC_DRAW);
-		glVertexAttribPointer((GLuint)0, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 3, BUFFER_OFFSET(0));
-		//Send the Target data to OpenGL
-		glBindBuffer(GL_ARRAY_BUFFER, meshes[0]->VBO_Targets);
-		glBufferData(GL_ARRAY_BUFFER, sizeof(float) * meshes[0]->targets[2].size(), &meshes[0]->targets[2][0], GL_DYNAMIC_DRAW);
-		glVertexAttribPointer((GLuint)5, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 3, BUFFER_OFFSET(0));
-		//Send the Target data to OpenGL
-		glBindBuffer(GL_ARRAY_BUFFER, meshes[0]->VBO_HandlesB);
-		glBufferData(GL_ARRAY_BUFFER, sizeof(float) * meshes[0]->targets[3].size(), &meshes[0]->targets[3][0], GL_DYNAMIC_DRAW);
-		glVertexAttribPointer((GLuint)7, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 3, BUFFER_OFFSET(0));
+
+		////Send the Target data to OpenGL
+		//glBindBuffer(GL_ARRAY_BUFFER, meshes[0]->VBO_HandlesA);
+		//glBufferData(GL_ARRAY_BUFFER, sizeof(float) * meshes[0]->targets[0].size(), &meshes[0]->targets[0][0], GL_DYNAMIC_DRAW);
+		//glVertexAttribPointer((GLuint)6, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 3, BUFFER_OFFSET(0));
+		////Send the Target data to OpenGL
+		//glBindBuffer(GL_ARRAY_BUFFER, meshes[0]->VBO_Vertices);
+		//glBufferData(GL_ARRAY_BUFFER, sizeof(float) * meshes[0]->targets[1].size(), &meshes[0]->targets[1][0], GL_DYNAMIC_DRAW);
+		//glVertexAttribPointer((GLuint)0, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 3, BUFFER_OFFSET(0));
+		////Send the Target data to OpenGL
+		//glBindBuffer(GL_ARRAY_BUFFER, meshes[0]->VBO_Targets);
+		//glBufferData(GL_ARRAY_BUFFER, sizeof(float) * meshes[0]->targets[2].size(), &meshes[0]->targets[2][0], GL_DYNAMIC_DRAW);
+		//glVertexAttribPointer((GLuint)5, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 3, BUFFER_OFFSET(0));
+		////Send the Target data to OpenGL
+		//glBindBuffer(GL_ARRAY_BUFFER, meshes[0]->VBO_HandlesB);
+		//glBufferData(GL_ARRAY_BUFFER, sizeof(float) * meshes[0]->targets[3].size(), &meshes[0]->targets[3][0], GL_DYNAMIC_DRAW);
+		//glVertexAttribPointer((GLuint)7, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 3, BUFFER_OFFSET(0));
 
 		return true;
 	

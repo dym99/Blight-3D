@@ -7,18 +7,13 @@ std::vector<Shader*> ShaderManager::m_bloomComponents = std::vector<Shader*>();
 
 void ShaderManager::loadShaders()
 {
+	//Regular shaders
 	m_shaders.push_back(new Shader(
 		"./Resources/Shaders/StaticGeometry.vert",
 		"./Resources/Shaders/Phong.frag"
 	));
 	m_shaders.push_back(new Shader(
 		"./Resources/Shaders/MorphTargets.vert",
-		"./Resources/Shaders/Phong.frag"
-	));
-
-	//Regular shaders
-	m_shaders.push_back(new Shader(
-		"./Resources/Shaders/StaticGeometry.vert",
 		"./Resources/Shaders/Phong.frag"
 	));
 

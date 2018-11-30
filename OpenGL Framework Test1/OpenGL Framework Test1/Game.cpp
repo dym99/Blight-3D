@@ -163,14 +163,20 @@ void Game::update()
 	for (unsigned int i = 0; i < m_activeScenes.size(); ++i) {
 		m_activeScenes[i]->update();
 	}
-	ShaderManager::getShader(PHONG_SHADER)->bind();
-	ShaderManager::getShader(PHONG_SHADER)->sendUniform("light.position", glm::vec4(glm::vec3(0,0,0),1));
-	Shader::unbind();
+
+	//ShaderManager::getShader(PHONG_SHADER)->bind();
+	//ShaderManager::getShader(PHONG_SHADER)->sendUniform("light.position", glm::vec4(glm::vec3(0,0,0),1));
+	//Shader::unbind();
 
 	//postProcShaders.at(FOCUS_IN_POST)->Bind();
 	//postProcShaders.at(FOCUS_IN_POST)->SendUniform("uTime", totalGameTime);
 	//postProcShaders.at(RAINBOW_POST)->Bind();
 	//postProcShaders.at(RAINBOW_POST)->SendUniform("uTime", totalGameTime);
+
+	if (Input::GetKeyPress(KeyCode::F5))
+	{
+		ShaderManager::reloadShaders();
+	}
 
 	Shader::unbind();
 	Input::ResetKeys();
@@ -194,7 +200,6 @@ void Game::draw()
 
 		for (unsigned int i = 0; i < m_activeScenes.size(); ++i) {
 			m_activeScenes[i]->onRender();
-			
 		}
 
 		//mainBuffer->Unbind();

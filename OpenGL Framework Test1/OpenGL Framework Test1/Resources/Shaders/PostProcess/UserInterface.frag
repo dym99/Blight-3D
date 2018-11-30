@@ -14,5 +14,4 @@ void main()
 
     FragColor.rgb = source.rgb;
     FragColor += userInterface;
-	//FragColor.a = 1.0;
 }

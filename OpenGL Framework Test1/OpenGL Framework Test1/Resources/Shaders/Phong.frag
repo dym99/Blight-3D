@@ -27,9 +27,9 @@ in vec3 normal0;
 in vec3 fragPosition;
 
 uniform Light light = Light(
-	vec4(-0.963056028, 0.000000060, -0.0385486856, 0.0),
+	vec4(0.345458, 4.000000060, -0.525171, 0.0),
 	vec3(0.15, 0.15, 0.15),
-	vec3(0.7, 0.7, 0.7),
+	vec3(0.2, 0.4, 0.6),
 	32.0,
 	1.0,
 	0.1,
@@ -37,14 +37,25 @@ uniform Light light = Light(
 );
 
 uniform Light light2 = Light(
-	vec4(-0.211108208, 0.000000060, 11.6930666, 0.0),
+	vec4(0.175572, 4.000000060, -15.286768, 0.0),
 	vec3(0.15, 0.15, 0.15),
-	vec3(0.7, 0.7, 0.7),
+	vec3(0.2, 0.4, 0.6),
 	32.0,
 	1.0,
 	0.1,
 	0.01
 );
+
+uniform Light light3 = Light(
+	vec4(12.423399, 4.000000060, -15.848742, 0.0),
+	vec3(0.15, 0.15, 0.15),
+	vec3(0.2, 0.4, 0.6),
+	32.0,
+	1.0,
+	0.1,
+	0.01
+);
+
 
 uniform Material material;
 
@@ -84,6 +95,7 @@ void main()
 	FragColor.rgb = textureColor.rgb * light.ambience;
 	FragColor.a = textureColor.a;
 
-	calculatePointLight(light2);
 	calculatePointLight(light);
+	calculatePointLight(light2);
+	calculatePointLight(light3);
 }

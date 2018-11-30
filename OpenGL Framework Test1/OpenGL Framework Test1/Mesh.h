@@ -76,7 +76,8 @@ public:
 					targets[1] = targets[0];
 					targets[0] = newFirst;
 
-
+					glBindVertexArray(VAO);
+					
 					//Send the Target data to OpenGL
 					glBindBuffer(GL_ARRAY_BUFFER, VBO_HandlesA);
 					glBufferData(GL_ARRAY_BUFFER, sizeof(float) * targets[0].size(), &targets[0][0], GL_DYNAMIC_DRAW);
@@ -93,6 +94,8 @@ public:
 					glBindBuffer(GL_ARRAY_BUFFER, VBO_HandlesB);
 					glBufferData(GL_ARRAY_BUFFER, sizeof(float) * targets[3].size(), &targets[3][0], GL_DYNAMIC_DRAW);
 					glVertexAttribPointer((GLuint)7, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 3, BUFFER_OFFSET(0));
+
+					glBindVertexArray(GL_NONE);
 				}
 				else {
 					if (oName != "Plane")
