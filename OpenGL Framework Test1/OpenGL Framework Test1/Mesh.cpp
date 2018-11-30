@@ -17,7 +17,7 @@ Mesh::~Mesh()
 {
 }
 
-bool Mesh::ProcessMesh(std::vector<glm::vec3> &vertexData, std::vector<glm::vec2> &textureData, std::vector<glm::vec3> &normalData, std::vector<MeshFace> &faceData)
+bool Mesh::ProcessMesh(std::vector<glm::vec3> &vertexData, std::vector<glm::vec2> &textureData, std::vector<glm::vec3> &normalData, std::vector<MeshFace> &faceData, bool isMorphTarget)
 {
 	std::vector<float> unPackedVertexData;
 	std::vector<float> unPackedTextureData;
@@ -110,6 +110,9 @@ bool Mesh::ProcessMesh(std::vector<glm::vec3> &vertexData, std::vector<glm::vec2
 	glGenBuffers(1, &VBO_Normals);
 	glGenBuffers(1, &VBO_Tangents);
 	glGenBuffers(1, &VBO_Bitangents);
+	glGenBuffers(1, &VBO_Targets);
+	glGenBuffers(1, &VBO_HandlesA);
+	glGenBuffers(1, &VBO_HandlesB);
 
 	glBindVertexArray(VAO);
 
@@ -118,12 +121,15 @@ bool Mesh::ProcessMesh(std::vector<glm::vec3> &vertexData, std::vector<glm::vec2
 	glEnableVertexAttribArray(2);	//Normals
 	glEnableVertexAttribArray(3);	//Tangents
 	glEnableVertexAttribArray(4);	//Bitangents
-	
+	glEnableVertexAttribArray(5);	//Targets
+	glEnableVertexAttribArray(6);	//HandleA
+	glEnableVertexAttribArray(7);	//HandleB
+
 	//Send the Vertex data to OpenGL
 	glBindBuffer(GL_ARRAY_BUFFER, VBO_Vertices);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(float) * unPackedVertexData.size(), &unPackedVertexData[0], GL_STATIC_DRAW);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(float) * unPackedVertexData.size(), &unPackedVertexData[0], GL_DYNAMIC_DRAW);
 	glVertexAttribPointer((GLuint)0, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 3, BUFFER_OFFSET(0));
-
+	
 	//Send the texture data to OpenGL
 	glBindBuffer(GL_ARRAY_BUFFER, VBO_UVs);
 	glBufferData(GL_ARRAY_BUFFER, sizeof(float) * unPackedTextureData.size(), &unPackedTextureData[0], GL_STATIC_DRAW);
@@ -144,9 +150,26 @@ bool Mesh::ProcessMesh(std::vector<glm::vec3> &vertexData, std::vector<glm::vec2
 	glBufferData(GL_ARRAY_BUFFER, sizeof(float) * unPackedBitangentData.size(), &unPackedBitangentData[0], GL_STATIC_DRAW);
 	glVertexAttribPointer((GLuint)4, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 3, BUFFER_OFFSET(0));
 
+	//Send the Target data to OpenGL
+	glBindBuffer(GL_ARRAY_BUFFER, VBO_Targets);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(float) * unPackedVertexData.size(), &unPackedVertexData[0], GL_DYNAMIC_DRAW);
+	glVertexAttribPointer((GLuint)5, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 3, BUFFER_OFFSET(0));
+	//Send the Target data to OpenGL
+	glBindBuffer(GL_ARRAY_BUFFER, VBO_HandlesA);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(float) * unPackedVertexData.size(), &unPackedVertexData[0], GL_DYNAMIC_DRAW);
+	glVertexAttribPointer((GLuint)6, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 3, BUFFER_OFFSET(0));
+	//Send the Target data to OpenGL
+	glBindBuffer(GL_ARRAY_BUFFER, VBO_HandlesB);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(float) * unPackedVertexData.size(), &unPackedVertexData[0], GL_DYNAMIC_DRAW);
+	glVertexAttribPointer((GLuint)7, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 3, BUFFER_OFFSET(0));
+
 	//Cleanup after the buffers you bound
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 	glBindVertexArray(0);
+
+	if (isMorphTarget) {
+		verticesForTarget = unPackedVertexData;
+	}
 
 	faceData.clear();
 
@@ -186,6 +209,7 @@ void Mesh::Draw(Shader * shader)
 		}
 
 		shader->sendUniform(("material." + name).c_str(), i);
+		shader->sendUniform("uInterp", uInterp);
 		glBindTexture(GL_TEXTURE_2D, material.textures[i]->GetTextureHandle());
 	}
 	glActiveTexture(GL_TEXTURE0);

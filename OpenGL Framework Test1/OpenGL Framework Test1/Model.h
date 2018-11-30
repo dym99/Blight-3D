@@ -2,6 +2,11 @@
 #define __MODEL_H__
 #include "Mesh.h"
 
+#define _CRT_SECURE_NO_WARNINGS
+
+#define BUFFER_OFFSET(i) ((char *) 0 + (i))
+#define CHAR_BUFFER_SIZE 128
+
 class Model {
 public:
 	Model();
@@ -11,7 +16,8 @@ public:
 	~Model();
 	
 	bool LoadFromFile(const std::string &_path, const std::string &_name);
-	void Draw(Shader* shader);
+	bool LoadFromFile(const std::string &_path, const std::string& _name, unsigned int _numFiles);
+	void Draw(Shader* shader, bool morph = false);
 
 	//Meshes
 	std::vector<Mesh*> meshes;
@@ -42,5 +48,6 @@ private:
 	bool ProcessMaterials(const std::string &file);
 	Transform transform;
 };
+
 
 #endif // !__MODEL_H__

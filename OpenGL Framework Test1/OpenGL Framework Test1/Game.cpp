@@ -66,7 +66,7 @@ void Game::initGame()
 	Camera::mainCamera = camera;
 	//Load in resources
 	m_ravager = new Model();
-	m_ravager->LoadFromFile("./Resources/Objects/Ravager2/", "Ravager");
+	m_ravager->LoadFromFile("./Resources/Objects/Ravager2/", "RavagerCGDance", 4U);
 	m_testArea = new Model();
 	m_testArea->LoadFromFile("./Resources/Objects/TestArea/", "TestArea");
 	
@@ -113,10 +113,10 @@ void Game::initGame()
 	//Set up the test Scene
 
 	auto ravager = new GameObject("Ravager");
-	ravager->addBehaviour(new MeshRenderBehaviour(m_ravager, ShaderManager::getShader(PHONG_SHADER)));
+	ravager->addBehaviour(new MeshRenderBehaviour(m_ravager, ShaderManager::getShader(MORPH_SHADER), true));
 
 	auto cameraPivot = new GameObject("CameraPivot");
-	cameraPivot->localTransform.setPos(glm::vec3(0.f,1.f,0.f));
+	//cameraPivot->localTransform.setPos(glm::vec3(0.f,1.f,0.f));
 	cameraPivot->addBehaviour(new MouseLook(ravager));
 
 	auto cameraObject = new GameObject("Camera");
@@ -146,7 +146,6 @@ void Game::initGame()
 	P_PhysicsBody::P_bodyCount.push_back(new P_PhysicsBody(new Transform(), 1.f, false, BOX, 1.f, 8.f, 8.f, glm::vec3(0, -0.5f, 0), 0, true));
 	P_PhysicsBody::P_bodyCount.push_back(new P_PhysicsBody(new Transform(), 1.f, false, BOX, 1.f, 2.f, 2.f, glm::vec3(0, -0.5f, 5), 0, true));
 	P_PhysicsBody::P_bodyCount.push_back(new P_PhysicsBody(new Transform(), 1.f, false, BOX, 1.f, 8.f, 8.f, glm::vec3(0, -0.5f, 10), 0, true));
-
 
 	m_activeScenes.push_back(scene);
 }
