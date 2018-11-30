@@ -65,8 +65,9 @@ void Game::initGame()
 	camera->setPos(glm::vec3(0.f, 0.f, 3.0f));
 	Camera::mainCamera = camera;
 	//Load in resources
-	m_ravager = new Model();
-	m_ravager->LoadFromFile("./Resources/Objects/Ravager2/", "RavagerCGDance", 4U);
+	m_playerModel = new Model();
+	//m_ravager->LoadFromFile("./Resources/Objects/Ravager2/", "RavagerCGDance1");
+	m_playerModel->LoadFromFile("./Resources/Objects/Logan/", "LoganCGDance", 4U);
 	m_testArea = new Model();
 	m_testArea->LoadFromFile("./Resources/Objects/TestArea/", "TestArea");
 	
@@ -113,7 +114,7 @@ void Game::initGame()
 	//Set up the test Scene
 
 	auto ravager = new GameObject("Ravager");
-	ravager->addBehaviour(new MeshRenderBehaviour(m_ravager, ShaderManager::getShader(MORPH_SHADER), true));
+	ravager->addBehaviour(new MeshRenderBehaviour(m_playerModel, ShaderManager::getShader(MORPH_SHADER), true));
 
 	auto cameraPivot = new GameObject("CameraPivot");
 	//cameraPivot->localTransform.setPos(glm::vec3(0.f,1.f,0.f));
@@ -141,7 +142,7 @@ void Game::initGame()
 
 
 	//TODO: Set up transform class so that a world transform can exist
-	ravagerPhys = new P_PhysicsBody(&ravager->localTransform, 1.f, true, SPHERE, 1.f, 0.f, 0.f, glm::vec3(0, 0.5f, 0));
+	ravagerPhys = new P_PhysicsBody(&ravager->localTransform, 1.f, true, SPHERE, .5f, 0.f, 0.f, glm::vec3(0, 0.5f, 0));
 	P_PhysicsBody::P_bodyCount.push_back(ravagerPhys);
 	P_PhysicsBody::P_bodyCount.push_back(new P_PhysicsBody(new Transform(), 1.f, false, BOX, 1.f, 8.f, 8.f, glm::vec3(0, -0.5f, 0), 0, true));
 	P_PhysicsBody::P_bodyCount.push_back(new P_PhysicsBody(new Transform(), 1.f, false, BOX, 1.f, 2.f, 2.f, glm::vec3(0, -0.5f, 5), 0, true));
@@ -156,7 +157,7 @@ void Game::update()
 
 	//Remove this when done testing. Or use as a jump for testing purposes.
 	if (Input::GetKeyDown(KeyCode::Space)) {
-		ravagerPhys->P_velocity.y = 4.f;
+		ravagerPhys->P_addForce(glm::vec3(0, 4.f / Time::deltaTime, 0));
 	}
 
 
