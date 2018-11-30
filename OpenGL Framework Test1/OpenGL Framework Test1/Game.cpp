@@ -196,18 +196,20 @@ void Game::draw()
 	{
 		glViewport(0, 0, WINDOW_WIDTH, WINDOW_HEIGHT);
 
-		//mainBuffer->Bind();
+		mainBuffer->Bind();
 
 		for (unsigned int i = 0; i < m_activeScenes.size(); ++i) {
 			m_activeScenes[i]->onRender();
 		}
 
-		//mainBuffer->Unbind();
+		mainBuffer->Unbind();
 	}
 
 	//////////////////////////////////////////////////////////////////////////////////////////////
 	/// * Performs Frame buffer stuffs, don't remove pls and thank
-	/*glEnable(GL_BLEND);
+	//*
+	//glEnable(GL_BLEND);
+	glDisable(GL_BLEND);//*/
 	ShaderManager::getPost(UI_POST)->bind();
 	ShaderManager::getPost(UI_POST)->sendUniform("uiTex", 1);
 	ShaderManager::getPost(UI_POST)->unbind();
@@ -216,7 +218,6 @@ void Game::draw()
 								ShaderManager::getBloom(), *ShaderManager::getPost(UI_POST),
 									true, false);
 	uiImage->Unbind(1);
-	glDisable(GL_BLEND);*/
 	/// * Will be commented out in case this branch gets used for Expo
 	//////////////////////////////////////////////////////////////////////////////////////////////
 }
