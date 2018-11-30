@@ -69,7 +69,7 @@ void Game::initGame()
 	//m_ravager->LoadFromFile("./Resources/Objects/Ravager2/", "RavagerCGDance1");
 	m_playerModel->LoadFromFile("./Resources/Objects/Logan/", "LoganCGDance", 4U);
 	m_testArea = new Model();
-	m_testArea->LoadFromFile("./Resources/Objects/TestArea/", "TestArea");
+	m_testArea->LoadFromFile("./Resources/Objects/Expo1/", "ExpoMapB");
 	
 	ShaderManager::loadShaders();
 
@@ -113,12 +113,12 @@ void Game::initGame()
 
 	//Set up the test Scene
 
-	auto ravager = new GameObject("Ravager");
-	ravager->addBehaviour(new MeshRenderBehaviour(m_playerModel, ShaderManager::getShader(MORPH_SHADER), true));
+	auto player = new GameObject("Player");
+	player->addBehaviour(new MeshRenderBehaviour(m_playerModel, ShaderManager::getShader(MORPH_SHADER), true));
 
 	auto cameraPivot = new GameObject("CameraPivot");
-	//cameraPivot->localTransform.setPos(glm::vec3(0.f,1.f,0.f));
-	cameraPivot->addBehaviour(new MouseLook(ravager));
+	cameraPivot->localTransform.setPos(glm::vec3(0.f,1.f,0.f));
+	cameraPivot->addBehaviour(new MouseLook(player));
 
 	auto cameraObject = new GameObject("Camera");
 
@@ -127,26 +127,24 @@ void Game::initGame()
 	camera->setTransform(&cameraObject->worldTransform);
 
 	cameraPivot->addChild(cameraObject);
-	ravager->addChild(cameraPivot);
-	
+	player->addChild(cameraPivot);
+
 
 	auto testArea = new GameObject("TestArea");
 	testArea->addBehaviour(new MeshRenderBehaviour(m_testArea, ShaderManager::getShader(PHONG_SHADER)));
 
 
 	auto scene = new Scene("DemoScene");
-	scene->addChild(ravager);
+	scene->addChild(player);
 	scene->addChild(testArea);
 
 	Camera::mainCameraTransform = &(cameraObject->worldTransform);
 
 
 	//TODO: Set up transform class so that a world transform can exist
-	ravagerPhys = new P_PhysicsBody(&ravager->localTransform, 1.f, true, SPHERE, .5f, 0.f, 0.f, glm::vec3(0, 0.5f, 0));
+	ravagerPhys = new P_PhysicsBody(&player->localTransform, 1.f, true, SPHERE, .5f, 0.f, 0.f, glm::vec3(0, 0.5f, 0));
 	P_PhysicsBody::P_bodyCount.push_back(ravagerPhys);
-	P_PhysicsBody::P_bodyCount.push_back(new P_PhysicsBody(new Transform(), 1.f, false, BOX, 1.f, 8.f, 8.f, glm::vec3(0, -0.5f, 0), 0, true));
-	P_PhysicsBody::P_bodyCount.push_back(new P_PhysicsBody(new Transform(), 1.f, false, BOX, 1.f, 2.f, 2.f, glm::vec3(0, -0.5f, 5), 0, true));
-	P_PhysicsBody::P_bodyCount.push_back(new P_PhysicsBody(new Transform(), 1.f, false, BOX, 1.f, 8.f, 8.f, glm::vec3(0, -0.5f, 10), 0, true));
+	P_PhysicsBody::P_bodyCount.push_back(new P_PhysicsBody(new Transform(), 1.f, false, BOX, 1.f, 100.f, 100.f, glm::vec3(0, -0.5f, 0), 0, true));
 
 	m_activeScenes.push_back(scene);
 }

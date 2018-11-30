@@ -1,0 +1,90 @@
+# Blender MTL File: 'blightmap (1).blend'
+# Material Count: 8
+
+newmtl Material
+Ns 96.078431
+Ka 1.000000 1.000000 1.000000
+Kd 0.640000 0.640000 0.640000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.000000
+d 1.000000
+illum 2
+map_Kd Blighted_Hall.png
+
+newmtl Material.002
+Ns 94.117647
+Ka 1.000000 1.000000 1.000000
+Kd 0.640000 0.640000 0.640000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.000000
+d 1.000000
+illum 2
+map_Kd RockMaterial.png
+
+newmtl blight_material.001
+Ns 96.078431
+Ka 1.000000 1.000000 1.000000
+Kd 0.287059 0.287059 0.287059
+Ks 0.421569 0.421569 0.421569
+Ke 0.000000 0.000000 0.000000
+Ni 1.000000
+d 1.000000
+illum 2
+map_Kd Blighted_Hall.png
+
+newmtl blight_material.001_Blight_Placeholder_texture.png
+Ns 96.078431
+Ka 1.000000 1.000000 1.000000
+Kd 0.287059 0.287059 0.287059
+Ks 0.421569 0.421569 0.421569
+Ke 0.000000 0.000000 0.000000
+Ni 1.000000
+d 1.000000
+illum 2
+map_Kd Blight Placeholder texture.png
+
+newmtl blight_material.001_Blighted_Hall.1.png.001
+Ns 96.078431
+Ka 1.000000 1.000000 1.000000
+Kd 0.287059 0.287059 0.287059
+Ks 0.421569 0.421569 0.421569
+Ke 0.000000 0.000000 0.000000
+Ni 1.000000
+d 1.000000
+illum 2
+map_Kd Blighted_Hall.png
+
+newmtl blight_material.001_NONE
+Ns 96.078431
+Ka 1.000000 1.000000 1.000000
+Kd 0.287059 0.287059 0.287059
+Ks 0.421569 0.421569 0.421569
+Ke 0.000000 0.000000 0.000000
+Ni 1.000000
+d 1.000000
+illum 2
+map_Kd Blight Placeholder texture.png
+
+newmtl blight_material.002
+Ns 96.078431
+Ka 1.000000 1.000000 1.000000
+Kd 0.287059 0.287059 0.287059
+Ks 0.421569 0.421569 0.421569
+Ke 0.000000 0.000000 0.000000
+Ni 1.000000
+d 1.000000
+illum 2
+map_Kd Blighted_Hall.png
+
+newmtl place_holder_material
+Ns 96.078431
+Ka 1.000000 1.000000 1.000000
+Kd 0.640000 0.640000 0.640000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.000000
+d 1.000000
+illum 2
+map_Kd Blight Placeholder texture.png

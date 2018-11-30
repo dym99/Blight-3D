@@ -30,6 +30,7 @@ private:
 	//TODO: Replace resources here with resource loader class
 
 	Model *m_playerModel;
+	Model *m_ravagerModel;
 	Model *m_testArea;
 
 	Shader *m_shader;
