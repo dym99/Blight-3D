@@ -38,7 +38,8 @@ private:
 	///////////////////////
 
 	//Framebuffers
-	FrameBuffer *mainBuffer;
+	FrameBuffer *gBuffer;
+	FrameBuffer *deferredComposite;
 	FrameBuffer *workBuffer1;
 	FrameBuffer *workBuffer2;
 	FrameBuffer *workBuffer3;
@@ -51,7 +52,7 @@ private:
 
 	P_PhysicsBody *ravagerPhys;
 
-	ParticleEffect fogEffect;
+	//ParticleEffect fogEffect;
 };
 
 #endif

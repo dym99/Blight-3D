@@ -26,8 +26,10 @@ Game::~Game()
 	delete uiImage;
 	uiImage = nullptr;
 
-	delete mainBuffer;
-	mainBuffer = nullptr;
+	delete gBuffer;
+	gBuffer = nullptr;
+	delete deferredComposite;
+	deferredComposite = nullptr;
 	delete workBuffer1;
 	workBuffer1 = nullptr;
 	delete workBuffer2;
@@ -48,7 +50,8 @@ void Game::initGame()
 	initGLEW();
 
 	//Initialise Framebuffers
-	mainBuffer = new FrameBuffer(1);
+	gBuffer = new FrameBuffer(3);
+	deferredComposite = new FrameBuffer(1);
 	workBuffer1 = new FrameBuffer(1);
 	workBuffer2 = new FrameBuffer(1);
 	workBuffer3 = new FrameBuffer(1);
@@ -74,11 +77,22 @@ void Game::initGame()
 
 	//Frame Buffers
 #pragma region FrameBuffers
-	mainBuffer->InitDepthTexture(WINDOW_WIDTH, WINDOW_HEIGHT);
-	mainBuffer->InitColorTexture(0, WINDOW_WIDTH, WINDOW_HEIGHT, GL_RGBA8, GL_NEAREST, GL_CLAMP_TO_EDGE);
+	gBuffer->InitDepthTexture(WINDOW_WIDTH, WINDOW_HEIGHT);
+	gBuffer->InitColorTexture(0, WINDOW_WIDTH, WINDOW_HEIGHT, GL_RGBA8, GL_NEAREST, GL_CLAMP_TO_EDGE);		//Flat color (albedo)
+	gBuffer->InitColorTexture(1, WINDOW_WIDTH, WINDOW_HEIGHT, GL_RGB8, GL_NEAREST, GL_CLAMP_TO_EDGE);		//Normals (xyz)
+	gBuffer->InitColorTexture(2, WINDOW_WIDTH, WINDOW_HEIGHT, GL_RGB32F, GL_NEAREST, GL_CLAMP_TO_EDGE);		//View Space Positions (xyz)
 
-	if (!mainBuffer->CheckFBO()) {
-		std::cout << "FBO1 failed to load.\n\n";
+
+	if (!gBuffer->CheckFBO()) {
+		std::cout << "GBuffer failed to load.\n\n";
+		system("pause");
+		exit(0);
+	}
+
+	deferredComposite->InitColorTexture(0, WINDOW_WIDTH, WINDOW_HEIGHT, GL_RGBA8, GL_NEAREST, GL_CLAMP_TO_EDGE);
+
+	if (!deferredComposite->CheckFBO()) {
+		std::cout << "Deferred Composite failed to load.\n\n";
 		system("pause");
 		exit(0);
 	}
@@ -113,7 +127,7 @@ void Game::initGame()
 	//Set up the test Scene
 
 	auto ravager = new GameObject("Ravager");
-	ravager->addBehaviour(new MeshRenderBehaviour(m_ravager, ShaderManager::getShader(PHONG_SHADER)));
+	ravager->addBehaviour(new MeshRenderBehaviour(m_ravager, ShaderManager::getShader(GBUFFER_SHADER)));
 
 	auto cameraPivot = new GameObject("CameraPivot");
 	cameraPivot->localTransform.setPos(glm::vec3(0.f,1.f,0.f));
@@ -130,7 +144,7 @@ void Game::initGame()
 	
 
 	auto testArea = new GameObject("TestArea");
-	testArea->addBehaviour(new MeshRenderBehaviour(m_testArea, ShaderManager::getShader(PHONG_SHADER)));
+	testArea->addBehaviour(new MeshRenderBehaviour(m_testArea, ShaderManager::getShader(GBUFFER_SHADER)));
 
 
 	auto scene = new Scene("DemoScene");
@@ -147,20 +161,19 @@ void Game::initGame()
 	P_PhysicsBody::P_bodyCount.push_back(new P_PhysicsBody(new Transform(), 1.f, false, BOX, 1.f, 2.f, 2.f, glm::vec3(0, -0.5f, 5), 0, true));
 	P_PhysicsBody::P_bodyCount.push_back(new P_PhysicsBody(new Transform(), 1.f, false, BOX, 1.f, 8.f, 8.f, glm::vec3(0, -0.5f, 10), 0, true));
 
-	//Initialize particle effect
-	if (!fogEffect.Init("./Resources/Textures/Fog.png", 1200, 10)) {
-		std::cout << "Particle effect failed to initializie.\n";
-		system("Pause");
-		exit(0);
-	}
-	fogEffect.LerpAlpha = glm::vec2(0.1f, 0.0f);
-	fogEffect.LerpSize = glm::vec2(0.0f, 5.0f);
-	fogEffect.RangeLifetime = glm::vec2(8.0f, 20.0f);
-	fogEffect.RangeVelocity = glm::vec2(0.33f, 0.4f);
-	fogEffect.RangeX = glm::vec2(0.2f, 0.3f);
-	fogEffect.RangeY = glm::vec2(0.2f, 0.3f);
-	fogEffect.RangeZ = glm::vec2(0.2f, 0.3f);
-
+	////Initialize particle effect
+	//if (!fogEffect.Init("./Resources/Textures/Fog.png", 1200, 10)) {
+	//	std::cout << "Particle effect failed to initializie.\n";
+	//	system("Pause");
+	//	exit(0);
+	//}
+	//fogEffect.LerpAlpha = glm::vec2(0.1f, 0.0f);
+	//fogEffect.LerpSize = glm::vec2(0.0f, 5.0f);
+	//fogEffect.RangeLifetime = glm::vec2(8.0f, 20.0f);
+	//fogEffect.RangeVelocity = glm::vec2(0.33f, 0.4f);
+	//fogEffect.RangeX = glm::vec2(0.2f, 0.3f);
+	//fogEffect.RangeY = glm::vec2(0.2f, 0.3f);
+	//fogEffect.RangeZ = glm::vec2(0.2f, 0.3f);
 
 	m_activeScenes.push_back(scene);
 }
@@ -174,15 +187,12 @@ void Game::update()
 		ravagerPhys->P_velocity.y = 4.f;
 	}
 
-	fogEffect.Update(Time::deltaTime);
+	//fogEffect.Update(Time::deltaTime);
 
 	P_PhysicsBody::P_physicsUpdate(Time::deltaTime);
 	for (unsigned int i = 0; i < m_activeScenes.size(); ++i) {
 		m_activeScenes[i]->update();
 	}
-	ShaderManager::getShader(PHONG_SHADER)->bind();
-	ShaderManager::getShader(PHONG_SHADER)->sendUniform("light.position", glm::vec4(glm::vec3(0,0,0),1));
-	Shader::unbind();
 
 	//postProcShaders.at(FOCUS_IN_POST)->Bind();
 	//postProcShaders.at(FOCUS_IN_POST)->SendUniform("uTime", totalGameTime);
@@ -197,7 +207,11 @@ void Game::update()
 void Game::draw()
 {
 	/// Clear Buffers ///
-	mainBuffer->Clear();
+	glClearColor(0.1f, 0.2f, 0.3f, 0.0f);
+	deferredComposite->Clear();
+	
+	glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
+	gBuffer->Clear();
 	workBuffer1->Clear();
 	workBuffer2->Clear();
 
@@ -207,34 +221,71 @@ void Game::draw()
 	{
 		glViewport(0, 0, WINDOW_WIDTH, WINDOW_HEIGHT);
 
-		//mainBuffer->Bind();
+		gBuffer->Bind();
 
 		for (unsigned int i = 0; i < m_activeScenes.size(); ++i) {
 			m_activeScenes[i]->onRender();
 			
-			ShaderManager::getGeom(BILLBOARD_GEOM)->bind();
+			/*ShaderManager::getGeom(BILLBOARD_GEOM)->bind();
 			ShaderManager::getGeom(BILLBOARD_GEOM)->sendUniform("uTex", 0);
 			ShaderManager::getGeom(BILLBOARD_GEOM)->sendUniform("uModel", fogEffect.transform.getModel());
-			//ShaderManager::getGeom(BILLBOARD_GEOM)->sendUniform("uProj", Camera::mainCamera->GetProjection());
-			//ShaderManager::getGeom(BILLBOARD_GEOM)->sendUniform("uView", glm::inverse(*Camera::mainCameraTransform));
 			fogEffect.Render();
-			ShaderManager::getGeom(BILLBOARD_GEOM)->unbind();
+			ShaderManager::getGeom(BILLBOARD_GEOM)->unbind();*/
 		}
 
-		//mainBuffer->Unbind();
+		gBuffer->Unbind();
 	}
+
+#pragma region Buffer Renders
+	//*
+	glViewport(0, WINDOW_HEIGHT / 2, WINDOW_WIDTH / 2, WINDOW_HEIGHT / 2);
+	ShaderManager::getPost(UI_POST)->bind();
+	ShaderManager::getPost(UI_POST)->sendUniform("uTex", 0);
+	ShaderManager::getPost(UI_POST)->sendUniform("uiTex", 1);
+	glActiveTexture(GL_TEXTURE0);
+	glBindTexture(GL_TEXTURE_2D, gBuffer->GetColorHandle(0));
+	uiImage->Bind(1);
+	DrawFullScreenQuad();
+	uiImage->Unbind(1);
+	uiImage->Unbind(0);
+	ShaderManager::getPost(UI_POST)->unbind();
+
+	glViewport(WINDOW_WIDTH/2, WINDOW_HEIGHT / 2, WINDOW_WIDTH / 2, WINDOW_HEIGHT / 2);
+	ShaderManager::getPost(UI_POST)->bind();
+	ShaderManager::getPost(UI_POST)->sendUniform("uTex", 0);
+	ShaderManager::getPost(UI_POST)->sendUniform("uiTex", 1);
+	glActiveTexture(GL_TEXTURE0);
+	glBindTexture(GL_TEXTURE_2D, gBuffer->GetColorHandle(1));
+	uiImage->Bind(1);
+	DrawFullScreenQuad();
+	uiImage->Unbind(1);
+	uiImage->Unbind(0);
+	ShaderManager::getPost(UI_POST)->unbind();
+
+	glViewport(0, 0, WINDOW_WIDTH / 2, WINDOW_HEIGHT / 2);
+	ShaderManager::getPost(UI_POST)->bind();
+	ShaderManager::getPost(UI_POST)->sendUniform("uTex", 0);
+	ShaderManager::getPost(UI_POST)->sendUniform("uiTex", 1);
+	glActiveTexture(GL_TEXTURE0);
+	glBindTexture(GL_TEXTURE_2D, gBuffer->GetColorHandle(2));
+	uiImage->Bind(1);
+	DrawFullScreenQuad();
+	uiImage->Unbind(1);
+	uiImage->Unbind(0);
+	ShaderManager::getPost(UI_POST)->unbind();//*/
+#pragma endregion
 
 	//////////////////////////////////////////////////////////////////////////////////////////////
 	/// * Performs Frame buffer stuffs, don't remove pls and thank
-	glEnable(GL_BLEND);
-	ShaderManager::getPost(UI_POST)->bind();
+	//glEnable(GL_BLEND);
+	/*ShaderManager::getPost(UI_POST)->bind();
 	ShaderManager::getPost(UI_POST)->sendUniform("uiTex", 1);
 	uiImage->Bind(1);
-	ProcessFramebufferStuff(*mainBuffer, *workBuffer1, *workBuffer2, *workBuffer3,
+	ProcessFramebufferStuff(*gBuffer, *workBuffer1, *workBuffer2, *workBuffer3,
 								ShaderManager::getBloom(), *ShaderManager::getPost(UI_POST),
 									true, false);
-	uiImage->Unbind(1);
-	glDisable(GL_BLEND);
+	uiImage->Unbind(1);*/
+	//glDisable(GL_BLEND);
 	/// * Will be commented out in case this branch gets used for Expo
 	//////////////////////////////////////////////////////////////////////////////////////////////
 }

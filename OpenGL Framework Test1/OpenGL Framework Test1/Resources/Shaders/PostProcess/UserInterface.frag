@@ -12,7 +12,5 @@ void main()
 	vec4 source = texture(uTex, TexCoords);
 	vec4 userInterface = texture(uiTex, TexCoords);
 
-    FragColor.rgb = source.rgb;
-    FragColor += userInterface;
-	//FragColor.a = 1.0;
+	FragColor.rgb = mix(source.rgb, userInterface.rgb, userInterface.a);
 }

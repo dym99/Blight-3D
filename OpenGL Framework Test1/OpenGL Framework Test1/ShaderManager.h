@@ -8,6 +8,7 @@
 
 enum Shaders {
 	PHONG_SHADER,
+	GBUFFER_SHADER,
 
 	NUM_SHADERS
 };
