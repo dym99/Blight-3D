@@ -157,8 +157,10 @@
     <ClCompile Include="MeshRenderBehaviour.cpp" />
     <ClCompile Include="Model.cpp" />
     <ClCompile Include="MouseLook.cpp" />
+    <ClCompile Include="ParticleEffect.cpp" />
     <ClCompile Include="P_Collider.cpp" />
     <ClCompile Include="P_PhysicsBody.cpp" />
+    <ClCompile Include="Random.cpp" />
     <ClCompile Include="Scene.cpp" />
     <ClCompile Include="Shader.cpp" />
     <ClCompile Include="ShaderManager.cpp" />
@@ -172,6 +174,7 @@
     <ClInclude Include="Camera.h" />
     <ClInclude Include="CameraBehaviour.h" />
     <ClInclude Include="MathFunc.h" />
+    <ClInclude Include="ParticleEffect.h" />
     <ClInclude Include="P_Collider.h" />
     <ClInclude Include="Display.h" />
     <ClInclude Include="FrameBuffer.h" />
@@ -184,6 +187,7 @@
     <ClInclude Include="Model.h" />
     <ClInclude Include="MouseLook.h" />
     <ClInclude Include="P_PhysicsBody.h" />
+    <ClInclude Include="Random.h" />
     <ClInclude Include="Scene.h" />
     <ClInclude Include="Shader.h" />
     <ClInclude Include="ShaderManager.h" />

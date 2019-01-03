@@ -238,6 +238,11 @@ int Game::run() {
 				m_display->close();
 			}
 		}
+
+		if (Input::GetKeyPress(KeyCode::F5))
+		{
+			ShaderManager::reloadShaders();
+		}
 	}
 	SDL_Quit();
 	return 0;

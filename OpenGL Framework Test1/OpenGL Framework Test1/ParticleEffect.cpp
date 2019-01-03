@@ -1,5 +1,6 @@
 #include "ParticleEffect.h"
 #include "Random.h"
+#include "MathFunc.h"
 
 ParticleEffect::ParticleEffect()
 {
@@ -23,8 +24,8 @@ bool ParticleEffect::Init(const std::string &textureFile, unsigned int maxPartic
 	_MaxParticles = maxParticles;
 	_Rate = rate;
 
-	_Particles.Positions = new vec3[_MaxParticles];
-	_Particles.Velocities = new vec3[_MaxParticles];
+	_Particles.Positions = new glm::vec3[_MaxParticles];
+	_Particles.Velocities = new glm::vec3[_MaxParticles];
 	_Particles.Alpha = new float[_MaxParticles];
 	_Particles.Ages = new float[_MaxParticles];
 	_Particles.Lifetimes = new float[_MaxParticles];
@@ -48,11 +49,11 @@ void ParticleEffect::Update(float elapsed)
 		_Particles.Ages[_NumCurrentParticles]		= 0.0f;
 		_Particles.Lifetimes[_NumCurrentParticles]	= RandomRangef(RangeLifetime.x, RangeLifetime.y);
 		_Particles.Size[_NumCurrentParticles]		= LerpSize.x;
-		_Particles.Positions[_NumCurrentParticles].Set(RandomRangef(RangeX.x, RangeX.y), RandomRangef(RangeY.x, RangeY.y), RandomRangef(RangeZ.x, RangeZ.y));
+		_Particles.Positions[_NumCurrentParticles]  = glm::vec3(RandomRangef(RangeX.x, RangeX.y), RandomRangef(RangeY.x, RangeY.y), RandomRangef(RangeZ.x, RangeZ.y));
 
 		//send the particle in a random direction, with a velocity between our range
-		_Particles.Velocities[_NumCurrentParticles].Set(RandomRangef(-1.0f, 1.0f), RandomRangef(-1.0f, 1.0f), RandomRangef(-1.0f, 1.0f));
-		_Particles.Velocities[_NumCurrentParticles].Normalize();
+		_Particles.Velocities[_NumCurrentParticles] = glm::vec3(RandomRangef(-1.0f, 1.0f), RandomRangef(-1.0f, 1.0f), RandomRangef(-1.0f, 1.0f));
+		_Particles.Velocities[_NumCurrentParticles] = glm::normalize(_Particles.Velocities[_NumCurrentParticles]);
 		_Particles.Velocities[_NumCurrentParticles] *= RandomRangef(RangeVelocity.x, RangeVelocity.y);
 
 		//counters...
@@ -83,8 +84,8 @@ void ParticleEffect::Update(float elapsed)
 
 		float interp = _Particles.Ages[i] / _Particles.Lifetimes[i];
 		
-		_Particles.Alpha[i] = LERP(LerpAlpha.x, LerpAlpha.y, interp);
-		_Particles.Size[i]	= LERP(LerpSize.x, LerpSize.y, interp);
+		_Particles.Alpha[i] = Lerp(LerpAlpha.x, LerpAlpha.y, interp);
+		_Particles.Size[i]	= Lerp(LerpSize.x, LerpSize.y, interp);
 	}
 }
 

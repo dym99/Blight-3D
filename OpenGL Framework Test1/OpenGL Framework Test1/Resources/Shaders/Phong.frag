@@ -27,9 +27,9 @@ in vec3 normal0;
 in vec3 fragPosition;
 
 uniform Light light = Light(
-	vec4(-0.963056028, 0.000000060, -0.0385486856, 0.0),
+	vec4(-0.963056028, 1.500000060, -0.0385486856, 0.0),
 	vec3(0.15, 0.15, 0.15),
-	vec3(0.7, 0.7, 0.7),
+	vec3(0.6, 0.6, 0.2),
 	32.0,
 	1.0,
 	0.1,
@@ -37,9 +37,9 @@ uniform Light light = Light(
 );
 
 uniform Light light2 = Light(
-	vec4(-0.211108208, 0.000000060, 11.6930666, 0.0),
+	vec4(-0.211108208, 1.500000060, 11.6930666, 0.0),
 	vec3(0.15, 0.15, 0.15),
-	vec3(0.7, 0.7, 0.7),
+	vec3(0.2, 0.6, 0.6),
 	32.0,
 	1.0,
 	0.1,
@@ -62,7 +62,7 @@ void calculatePointLight(Light lightyBoi)
 	if (NdotL > 0.0)
 	{
 		//Light affects this surface
-		float attentuation = 1.0 / (lightyBoi.constant + (lightyBoi.linear * dist) + (lightyBoi.quadratic * (dist * dist)));
+		float attentuation = 0.5 / (lightyBoi.constant + (lightyBoi.linear * dist) + (lightyBoi.quadratic * (dist * dist)));
 		
 		//Calculate diffuse
 		FragColor.rgb += lightyBoi.diffuse * NdotL * attentuation;
