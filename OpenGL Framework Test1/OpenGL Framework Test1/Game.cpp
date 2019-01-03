@@ -147,6 +147,20 @@ void Game::initGame()
 	P_PhysicsBody::P_bodyCount.push_back(new P_PhysicsBody(new Transform(), 1.f, false, BOX, 1.f, 2.f, 2.f, glm::vec3(0, -0.5f, 5), 0, true));
 	P_PhysicsBody::P_bodyCount.push_back(new P_PhysicsBody(new Transform(), 1.f, false, BOX, 1.f, 8.f, 8.f, glm::vec3(0, -0.5f, 10), 0, true));
 
+	//Initialize particle effect
+	if (!fogEffect.Init("./Resources/Textures/Fog.png", 1200, 10)) {
+		std::cout << "Particle effect failed to initializie.\n";
+		system("Pause");
+		exit(0);
+	}
+	fogEffect.LerpAlpha = glm::vec2(0.1f, 0.0f);
+	fogEffect.LerpSize = glm::vec2(0.0f, 5.0f);
+	fogEffect.RangeLifetime = glm::vec2(8.0f, 20.0f);
+	fogEffect.RangeVelocity = glm::vec2(0.33f, 0.4f);
+	fogEffect.RangeX = glm::vec2(0.2f, 0.3f);
+	fogEffect.RangeY = glm::vec2(0.2f, 0.3f);
+	fogEffect.RangeZ = glm::vec2(0.2f, 0.3f);
+
 
 	m_activeScenes.push_back(scene);
 }
@@ -160,6 +174,7 @@ void Game::update()
 		ravagerPhys->P_velocity.y = 4.f;
 	}
 
+	fogEffect.Update(Time::deltaTime);
 
 	P_PhysicsBody::P_physicsUpdate(Time::deltaTime);
 	for (unsigned int i = 0; i < m_activeScenes.size(); ++i) {
@@ -197,6 +212,13 @@ void Game::draw()
 		for (unsigned int i = 0; i < m_activeScenes.size(); ++i) {
 			m_activeScenes[i]->onRender();
 			
+			ShaderManager::getGeom(BILLBOARD_GEOM)->bind();
+			ShaderManager::getGeom(BILLBOARD_GEOM)->sendUniform("uTex", 0);
+			ShaderManager::getGeom(BILLBOARD_GEOM)->sendUniform("uModel", fogEffect.transform.getModel());
+			//ShaderManager::getGeom(BILLBOARD_GEOM)->sendUniform("uProj", Camera::mainCamera->GetProjection());
+			//ShaderManager::getGeom(BILLBOARD_GEOM)->sendUniform("uView", glm::inverse(*Camera::mainCameraTransform));
+			fogEffect.Render();
+			ShaderManager::getGeom(BILLBOARD_GEOM)->unbind();
 		}
 
 		//mainBuffer->Unbind();

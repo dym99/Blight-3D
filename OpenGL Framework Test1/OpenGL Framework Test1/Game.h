@@ -8,6 +8,7 @@
 #include "Display.h"
 #include "Utilities.h"
 #include "P_PhysicsBody.h"
+#include "ParticleEffect.h"
 
 class Game {
 public:
@@ -49,6 +50,8 @@ private:
 	std::vector<Scene*> m_activeScenes;
 
 	P_PhysicsBody *ravagerPhys;
+
+	ParticleEffect fogEffect;
 };
 
 #endif

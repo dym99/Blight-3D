@@ -3,6 +3,7 @@
 #include <vector>
 #include <glm/common.hpp>
 #include "Transform.h"
+#include "Texture.h"
 struct ParticleList
 {
 	glm::vec3 *Positions = nullptr;
@@ -24,7 +25,7 @@ public:
 	void Update(float elapsed);
 	void Render();
 
-	Transform transform;
+	Transform transform = Transform();
 
 	glm::vec2 RangeX = glm::vec2(-10.0f, 10.0f);
 	glm::vec2 RangeY = glm::vec2(0.0f, 10.0f);
@@ -36,9 +37,15 @@ public:
 	glm::vec2 LerpSize = glm::vec2(0.0f, 1.0f);
 
 private:
-	ParticleList _Particles;
+	ParticleList m_particles;
+	Texture m_texture;
 
-	float _Rate = 0.0f;
-	unsigned int _MaxParticles = 0;
-	unsigned int _NumCurrentParticles = 0;
+	float m_rate = 0.0f;
+	unsigned int m_maxParticles = 0;
+	unsigned int m_numCurrentParticles = 0;
+
+	GLuint VAO = GL_NONE;
+	GLuint VBO_Position = GL_NONE;
+	GLuint VBO_Size = GL_NONE;
+	GLuint VBO_Alpha = GL_NONE;
 };

@@ -14,7 +14,7 @@ class Shader
 {
 public:
 	Shader();
-	Shader(const std::string &vertFile, const std::string &fragFile);
+	Shader(const std::string &vertFile, const std::string &fragFile, const std::string &geomFile="");
 	~Shader();
 
 	static bool InitDefault();
@@ -22,7 +22,7 @@ public:
 
 	void Reload();
 
-	bool Load(const std::string &vertFile, const std::string &fragFile);
+	bool Load(const std::string &vertFile, const std::string &fragFile, const std::string &geomFile="");
 	bool IsLoaded() const;
 	void Unload();
 	bool LinkProgram();
@@ -43,10 +43,12 @@ public:
 	void sendUniform(const std::string &uniformName, const glm::mat3 &matrix) const;
 	void sendUniform(const std::string &uniformName, const glm::mat4 &matrix) const;
 private:
-	std::string vertShaderFile, fragShaderFile, shaderSettingFile;
+	std::string vertShaderFile, fragShaderFile;
+	std::string geomShaderFile = "";
 
 	GLuint _VertexShader = GL_NONE;
 	GLuint _FragShader = GL_NONE;
+	GLuint _GeomShader = GL_NONE;
 	GLuint _Program = GL_NONE;
 	bool _IsInit = GL_FALSE;
 
