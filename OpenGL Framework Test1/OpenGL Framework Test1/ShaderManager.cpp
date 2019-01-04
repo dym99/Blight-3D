@@ -29,6 +29,11 @@ void ShaderManager::loadShaders()
 	//Post Processing shaders
 	m_postShaders.push_back(new Shader(
 		"./Resources/Shaders/PassThrough.vert",
+		"./Resources/Shaders/PostProcess/DeferredLighting.frag"
+	));
+	
+	m_postShaders.push_back(new Shader(
+		"./Resources/Shaders/PassThrough.vert",
 		"./Resources/Shaders/PostProcess/GreyScalePost.frag"
 	));
 

@@ -20,6 +20,7 @@ enum Geom {
 };
 
 enum PostProcess {
+	DEFERREDLIGHT_POST,
 	GREYSCALE_POST,
 	SEPIA_POST,
 	FOCUS_IN_POST,

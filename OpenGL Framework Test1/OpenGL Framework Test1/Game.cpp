@@ -161,19 +161,19 @@ void Game::initGame()
 	P_PhysicsBody::P_bodyCount.push_back(new P_PhysicsBody(new Transform(), 1.f, false, BOX, 1.f, 2.f, 2.f, glm::vec3(0, -0.5f, 5), 0, true));
 	P_PhysicsBody::P_bodyCount.push_back(new P_PhysicsBody(new Transform(), 1.f, false, BOX, 1.f, 8.f, 8.f, glm::vec3(0, -0.5f, 10), 0, true));
 
-	////Initialize particle effect
-	//if (!fogEffect.Init("./Resources/Textures/Fog.png", 1200, 10)) {
-	//	std::cout << "Particle effect failed to initializie.\n";
-	//	system("Pause");
-	//	exit(0);
-	//}
-	//fogEffect.LerpAlpha = glm::vec2(0.1f, 0.0f);
-	//fogEffect.LerpSize = glm::vec2(0.0f, 5.0f);
-	//fogEffect.RangeLifetime = glm::vec2(8.0f, 20.0f);
-	//fogEffect.RangeVelocity = glm::vec2(0.33f, 0.4f);
-	//fogEffect.RangeX = glm::vec2(0.2f, 0.3f);
-	//fogEffect.RangeY = glm::vec2(0.2f, 0.3f);
-	//fogEffect.RangeZ = glm::vec2(0.2f, 0.3f);
+	//Initialize particle effect
+	if (!fogEffect.Init("./Resources/Textures/Fog.png", 1200, 10)) {
+		std::cout << "Particle effect failed to initializie.\n";
+		system("Pause");
+		exit(0);
+	}
+	fogEffect.LerpAlpha = glm::vec2(0.1f, 0.0f);
+	fogEffect.LerpSize = glm::vec2(0.0f, 5.0f);
+	fogEffect.RangeLifetime = glm::vec2(8.0f, 20.0f);
+	fogEffect.RangeVelocity = glm::vec2(0.33f, 0.4f);
+	fogEffect.RangeX = glm::vec2(0.2f, 0.3f);
+	fogEffect.RangeY = glm::vec2(0.2f, 0.3f);
+	fogEffect.RangeZ = glm::vec2(0.2f, 0.3f);
 
 	m_activeScenes.push_back(scene);
 }
@@ -187,7 +187,11 @@ void Game::update()
 		ravagerPhys->P_velocity.y = 4.f;
 	}
 
-	//fogEffect.Update(Time::deltaTime);
+	if (Input::GetKeyPress(KeyCode::F1)) {
+		displayBuffers = !displayBuffers;
+	}
+
+	fogEffect.Update(Time::deltaTime);
 
 	P_PhysicsBody::P_physicsUpdate(Time::deltaTime);
 	for (unsigned int i = 0; i < m_activeScenes.size(); ++i) {
@@ -225,55 +229,91 @@ void Game::draw()
 
 		for (unsigned int i = 0; i < m_activeScenes.size(); ++i) {
 			m_activeScenes[i]->onRender();
-			
-			/*ShaderManager::getGeom(BILLBOARD_GEOM)->bind();
-			ShaderManager::getGeom(BILLBOARD_GEOM)->sendUniform("uTex", 0);
-			ShaderManager::getGeom(BILLBOARD_GEOM)->sendUniform("uModel", fogEffect.transform.getModel());
-			fogEffect.Render();
-			ShaderManager::getGeom(BILLBOARD_GEOM)->unbind();*/
 		}
 
 		gBuffer->Unbind();
 	}
 
-#pragma region Buffer Renders
-	//*
-	glViewport(0, WINDOW_HEIGHT / 2, WINDOW_WIDTH / 2, WINDOW_HEIGHT / 2);
-	ShaderManager::getPost(UI_POST)->bind();
-	ShaderManager::getPost(UI_POST)->sendUniform("uTex", 0);
-	ShaderManager::getPost(UI_POST)->sendUniform("uiTex", 1);
-	glActiveTexture(GL_TEXTURE0);
-	glBindTexture(GL_TEXTURE_2D, gBuffer->GetColorHandle(0));
-	uiImage->Bind(1);
-	DrawFullScreenQuad();
-	uiImage->Unbind(1);
-	uiImage->Unbind(0);
-	ShaderManager::getPost(UI_POST)->unbind();
 
-	glViewport(WINDOW_WIDTH/2, WINDOW_HEIGHT / 2, WINDOW_WIDTH / 2, WINDOW_HEIGHT / 2);
-	ShaderManager::getPost(UI_POST)->bind();
-	ShaderManager::getPost(UI_POST)->sendUniform("uTex", 0);
-	ShaderManager::getPost(UI_POST)->sendUniform("uiTex", 1);
-	glActiveTexture(GL_TEXTURE0);
-	glBindTexture(GL_TEXTURE_2D, gBuffer->GetColorHandle(1));
-	uiImage->Bind(1);
-	DrawFullScreenQuad();
-	uiImage->Unbind(1);
-	uiImage->Unbind(0);
-	ShaderManager::getPost(UI_POST)->unbind();
-
-	glViewport(0, 0, WINDOW_WIDTH / 2, WINDOW_HEIGHT / 2);
-	ShaderManager::getPost(UI_POST)->bind();
-	ShaderManager::getPost(UI_POST)->sendUniform("uTex", 0);
-	ShaderManager::getPost(UI_POST)->sendUniform("uiTex", 1);
-	glActiveTexture(GL_TEXTURE0);
-	glBindTexture(GL_TEXTURE_2D, gBuffer->GetColorHandle(2));
-	uiImage->Bind(1);
-	DrawFullScreenQuad();
-	uiImage->Unbind(1);
-	uiImage->Unbind(0);
-	ShaderManager::getPost(UI_POST)->unbind();//*/
+	//F1 to toggle displaying of buffers
+	if (!displayBuffers) {
+#pragma region Normal Render
+		ShaderManager::getPost(DEFERREDLIGHT_POST)->bind();
+		ShaderManager::getPost(DEFERREDLIGHT_POST)->sendUniform("uScene", 0);			//Albedo color
+		glActiveTexture(GL_TEXTURE0);
+		glBindTexture(GL_TEXTURE_2D, gBuffer->GetColorHandle(0));
+		ShaderManager::getPost(DEFERREDLIGHT_POST)->sendUniform("uNormalMap", 1);		//Normals
+		glActiveTexture(GL_TEXTURE0 + 1);
+		glBindTexture(GL_TEXTURE_2D, gBuffer->GetColorHandle(1));
+		ShaderManager::getPost(DEFERREDLIGHT_POST)->sendUniform("uPositionMap", 2);		//Frag positions
+		glActiveTexture(GL_TEXTURE0 + 2);
+		glBindTexture(GL_TEXTURE_2D, gBuffer->GetColorHandle(2));
+		DrawFullScreenQuad();
+		uiImage->Unbind(2);
+		uiImage->Unbind(1);
+		uiImage->Unbind(0);
+		ShaderManager::getPost(DEFERREDLIGHT_POST)->unbind();
 #pragma endregion
+	}
+	else {
+#pragma region Buffer Renders
+		//*
+		glViewport(0, WINDOW_HEIGHT / 2, WINDOW_WIDTH / 2, WINDOW_HEIGHT / 2);					///Top Left
+		ShaderManager::getPost(UI_POST)->bind();
+		ShaderManager::getPost(UI_POST)->sendUniform("uTex", 0);
+		ShaderManager::getPost(UI_POST)->sendUniform("uiTex", 1);
+		glActiveTexture(GL_TEXTURE0);
+		glBindTexture(GL_TEXTURE_2D, gBuffer->GetColorHandle(0));			//Albedo Color
+		uiImage->Bind(1);
+		DrawFullScreenQuad();
+		uiImage->Unbind(1);
+		uiImage->Unbind(0);													//Unbind isn't static so I'm just using an existing texture to access unbind
+		ShaderManager::getPost(UI_POST)->unbind();
+
+		glViewport(WINDOW_WIDTH / 2, WINDOW_HEIGHT / 2, WINDOW_WIDTH / 2, WINDOW_HEIGHT / 2);	///Top Right
+		ShaderManager::getPost(UI_POST)->bind();
+		ShaderManager::getPost(UI_POST)->sendUniform("uTex", 0);
+		ShaderManager::getPost(UI_POST)->sendUniform("uiTex", 1);
+		glActiveTexture(GL_TEXTURE0);
+		glBindTexture(GL_TEXTURE_2D, gBuffer->GetColorHandle(1));			//Normals
+		uiImage->Bind(1);
+		DrawFullScreenQuad();
+		uiImage->Unbind(1);
+		uiImage->Unbind(0);
+		ShaderManager::getPost(UI_POST)->unbind();
+
+		glViewport(0, 0, WINDOW_WIDTH / 2, WINDOW_HEIGHT / 2);									///Bottom Left
+		ShaderManager::getPost(UI_POST)->bind();
+		ShaderManager::getPost(UI_POST)->sendUniform("uTex", 0);
+		ShaderManager::getPost(UI_POST)->sendUniform("uiTex", 1);
+		glActiveTexture(GL_TEXTURE0);
+		glBindTexture(GL_TEXTURE_2D, gBuffer->GetColorHandle(2));			//Frag Positions 
+		uiImage->Bind(1);
+		DrawFullScreenQuad();
+		uiImage->Unbind(1);
+		uiImage->Unbind(0);
+		ShaderManager::getPost(UI_POST)->unbind();
+
+		glViewport(WINDOW_WIDTH / 2, 0, WINDOW_WIDTH / 2, WINDOW_HEIGHT / 2);					///Bottom Right
+		ShaderManager::getPost(DEFERREDLIGHT_POST)->bind();
+		ShaderManager::getPost(DEFERREDLIGHT_POST)->sendUniform("uScene", 0);			//Albedo color
+		glActiveTexture(GL_TEXTURE0);
+		glBindTexture(GL_TEXTURE_2D, gBuffer->GetColorHandle(0));
+		ShaderManager::getPost(DEFERREDLIGHT_POST)->sendUniform("uNormalMap", 1);		//Normals
+		glActiveTexture(GL_TEXTURE0 + 1);
+		glBindTexture(GL_TEXTURE_2D, gBuffer->GetColorHandle(1));
+		ShaderManager::getPost(DEFERREDLIGHT_POST)->sendUniform("uPositionMap", 2);		//Frag positions
+		glActiveTexture(GL_TEXTURE0 + 2);
+		glBindTexture(GL_TEXTURE_2D, gBuffer->GetColorHandle(2));
+		DrawFullScreenQuad();
+		uiImage->Unbind(2);	
+		uiImage->Unbind(1);
+		uiImage->Unbind(0);
+		ShaderManager::getPost(DEFERREDLIGHT_POST)->unbind();
+
+		//*/
+#pragma endregion
+	}
 
 	//////////////////////////////////////////////////////////////////////////////////////////////
 	/// * Performs Frame buffer stuffs, don't remove pls and thank

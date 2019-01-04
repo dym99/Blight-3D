@@ -35,6 +35,8 @@ private:
 
 	Shader *m_shader;
 
+	bool displayBuffers = false;
+
 	///////////////////////
 
 	//Framebuffers
@@ -52,7 +54,7 @@ private:
 
 	P_PhysicsBody *ravagerPhys;
 
-	//ParticleEffect fogEffect;
+	ParticleEffect fogEffect;
 };
 
 #endif
