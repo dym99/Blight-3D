@@ -1,9 +1,11 @@
-#pragma once
+#ifndef __PARTICLEEFFECT_H__
+#define __PARTICLEEFFECT_H__
 
 #include <vector>
 #include <glm/common.hpp>
 #include "Transform.h"
 #include "Texture.h"
+
 struct ParticleList
 {
 	glm::vec3 *Positions = nullptr;
@@ -49,3 +51,5 @@ private:
 	GLuint VBO_Size = GL_NONE;
 	GLuint VBO_Alpha = GL_NONE;
 };
+
+#endif

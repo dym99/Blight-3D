@@ -75,6 +75,8 @@ void Game::initGame()
 	
 	ShaderManager::loadShaders();
 
+	ParticleManager::loadParticles();
+
 	//Frame Buffers
 #pragma region FrameBuffers
 	gBuffer->InitDepthTexture(WINDOW_WIDTH, WINDOW_HEIGHT);
@@ -89,6 +91,7 @@ void Game::initGame()
 		exit(0);
 	}
 
+	deferredComposite->InitDepthTexture(WINDOW_WIDTH, WINDOW_HEIGHT);
 	deferredComposite->InitColorTexture(0, WINDOW_WIDTH, WINDOW_HEIGHT, GL_RGBA8, GL_NEAREST, GL_CLAMP_TO_EDGE);
 
 	if (!deferredComposite->CheckFBO()) {
@@ -161,20 +164,6 @@ void Game::initGame()
 	P_PhysicsBody::P_bodyCount.push_back(new P_PhysicsBody(new Transform(), 1.f, false, BOX, 1.f, 2.f, 2.f, glm::vec3(0, -0.5f, 5), 0, true));
 	P_PhysicsBody::P_bodyCount.push_back(new P_PhysicsBody(new Transform(), 1.f, false, BOX, 1.f, 8.f, 8.f, glm::vec3(0, -0.5f, 10), 0, true));
 
-	//Initialize particle effect
-	if (!fogEffect.Init("./Resources/Textures/Fog.png", 1200, 10)) {
-		std::cout << "Particle effect failed to initializie.\n";
-		system("Pause");
-		exit(0);
-	}
-	fogEffect.LerpAlpha = glm::vec2(0.1f, 0.0f);
-	fogEffect.LerpSize = glm::vec2(0.0f, 5.0f);
-	fogEffect.RangeLifetime = glm::vec2(8.0f, 20.0f);
-	fogEffect.RangeVelocity = glm::vec2(0.33f, 0.4f);
-	fogEffect.RangeX = glm::vec2(0.2f, 0.3f);
-	fogEffect.RangeY = glm::vec2(0.2f, 0.3f);
-	fogEffect.RangeZ = glm::vec2(0.2f, 0.3f);
-
 	m_activeScenes.push_back(scene);
 }
 
@@ -191,40 +180,32 @@ void Game::update()
 		displayBuffers = !displayBuffers;
 	}
 
-	fogEffect.Update(Time::deltaTime);
+	ParticleManager::update(Time::deltaTime);
 
 	P_PhysicsBody::P_physicsUpdate(Time::deltaTime);
 	for (unsigned int i = 0; i < m_activeScenes.size(); ++i) {
 		m_activeScenes[i]->update();
 	}
 
-	//postProcShaders.at(FOCUS_IN_POST)->Bind();
-	//postProcShaders.at(FOCUS_IN_POST)->SendUniform("uTime", totalGameTime);
-	//postProcShaders.at(RAINBOW_POST)->Bind();
-	//postProcShaders.at(RAINBOW_POST)->SendUniform("uTime", totalGameTime);
-
 	Shader::unbind();
 	Input::ResetKeys();
-	//lights[0]->GetTransform()->SetPos(glm::vec3(glm::sin(updateTimer->GetTimeCurrent() / 1000.f) * 5.0f, 1.0f, 1.3f));
 }
 
 void Game::draw()
 {
 	/// Clear Buffers ///
-	glClearColor(0.1f, 0.2f, 0.3f, 0.0f);
+	glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 	deferredComposite->Clear();
-	
-	glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
 	gBuffer->Clear();
 	workBuffer1->Clear();
 	workBuffer2->Clear();
+	workBuffer3->Clear();
 
 	ShaderManager::update(*Camera::mainCamera);
 
 	//Camera 1
 	{
 		glViewport(0, 0, WINDOW_WIDTH, WINDOW_HEIGHT);
-
 		gBuffer->Bind();
 
 		for (unsigned int i = 0; i < m_activeScenes.size(); ++i) {
@@ -234,81 +215,69 @@ void Game::draw()
 		gBuffer->Unbind();
 	}
 
+	//Copies depth texture from gbuffer to deferred composite
+	
 
 	//F1 to toggle displaying of buffers
 	if (!displayBuffers) {
 #pragma region Normal Render
+		deferredComposite->Bind();
 		ShaderManager::getPost(DEFERREDLIGHT_POST)->bind();
 		ShaderManager::getPost(DEFERREDLIGHT_POST)->sendUniform("uScene", 0);			//Albedo color
-		glActiveTexture(GL_TEXTURE0);
-		glBindTexture(GL_TEXTURE_2D, gBuffer->GetColorHandle(0));
 		ShaderManager::getPost(DEFERREDLIGHT_POST)->sendUniform("uNormalMap", 1);		//Normals
-		glActiveTexture(GL_TEXTURE0 + 1);
-		glBindTexture(GL_TEXTURE_2D, gBuffer->GetColorHandle(1));
 		ShaderManager::getPost(DEFERREDLIGHT_POST)->sendUniform("uPositionMap", 2);		//Frag positions
-		glActiveTexture(GL_TEXTURE0 + 2);
-		glBindTexture(GL_TEXTURE_2D, gBuffer->GetColorHandle(2));
+		gBuffer->bindTex(0, 0);
+		gBuffer->bindTex(1, 1);
+		gBuffer->bindTex(2, 2);
 		DrawFullScreenQuad();
-		uiImage->Unbind(2);
-		uiImage->Unbind(1);
-		uiImage->Unbind(0);
+		Texture::Unbind(2);
+		Texture::Unbind(1);
+		Texture::Unbind(0);
 		ShaderManager::getPost(DEFERREDLIGHT_POST)->unbind();
+
+		deferredComposite->Unbind();
+		
 #pragma endregion
 	}
 	else {
 #pragma region Buffer Renders
 		//*
 		glViewport(0, WINDOW_HEIGHT / 2, WINDOW_WIDTH / 2, WINDOW_HEIGHT / 2);					///Top Left
-		ShaderManager::getPost(UI_POST)->bind();
-		ShaderManager::getPost(UI_POST)->sendUniform("uTex", 0);
-		ShaderManager::getPost(UI_POST)->sendUniform("uiTex", 1);
-		glActiveTexture(GL_TEXTURE0);
-		glBindTexture(GL_TEXTURE_2D, gBuffer->GetColorHandle(0));			//Albedo Color
-		uiImage->Bind(1);
+		ShaderManager::getPost(PASSTHROUGH_POST)->bind();
+		ShaderManager::getPost(PASSTHROUGH_POST)->sendUniform("uTex", 0);
+		gBuffer->bindTex(0, 0);		//Albedo Color
 		DrawFullScreenQuad();
-		uiImage->Unbind(1);
-		uiImage->Unbind(0);													//Unbind isn't static so I'm just using an existing texture to access unbind
-		ShaderManager::getPost(UI_POST)->unbind();
+		Texture::Unbind(0);
+		ShaderManager::getPost(PASSTHROUGH_POST)->unbind();
 
 		glViewport(WINDOW_WIDTH / 2, WINDOW_HEIGHT / 2, WINDOW_WIDTH / 2, WINDOW_HEIGHT / 2);	///Top Right
-		ShaderManager::getPost(UI_POST)->bind();
-		ShaderManager::getPost(UI_POST)->sendUniform("uTex", 0);
-		ShaderManager::getPost(UI_POST)->sendUniform("uiTex", 1);
-		glActiveTexture(GL_TEXTURE0);
-		glBindTexture(GL_TEXTURE_2D, gBuffer->GetColorHandle(1));			//Normals
-		uiImage->Bind(1);
+		ShaderManager::getPost(PASSTHROUGH_POST)->bind();
+		ShaderManager::getPost(PASSTHROUGH_POST)->sendUniform("uTex", 0);
+		gBuffer->bindTex(0, 1);			//Normals
 		DrawFullScreenQuad();
-		uiImage->Unbind(1);
-		uiImage->Unbind(0);
-		ShaderManager::getPost(UI_POST)->unbind();
+		Texture::Unbind(0);
+		ShaderManager::getPost(PASSTHROUGH_POST)->unbind();
 
 		glViewport(0, 0, WINDOW_WIDTH / 2, WINDOW_HEIGHT / 2);									///Bottom Left
-		ShaderManager::getPost(UI_POST)->bind();
-		ShaderManager::getPost(UI_POST)->sendUniform("uTex", 0);
-		ShaderManager::getPost(UI_POST)->sendUniform("uiTex", 1);
-		glActiveTexture(GL_TEXTURE0);
-		glBindTexture(GL_TEXTURE_2D, gBuffer->GetColorHandle(2));			//Frag Positions 
-		uiImage->Bind(1);
+		ShaderManager::getPost(PASSTHROUGH_POST)->bind();
+		ShaderManager::getPost(PASSTHROUGH_POST)->sendUniform("uTex", 0);
+		gBuffer->bindTex(0, 2);		//Frag Positions 
 		DrawFullScreenQuad();
-		uiImage->Unbind(1);
-		uiImage->Unbind(0);
-		ShaderManager::getPost(UI_POST)->unbind();
+		Texture::Unbind(0);
+		ShaderManager::getPost(PASSTHROUGH_POST)->unbind();
 
 		glViewport(WINDOW_WIDTH / 2, 0, WINDOW_WIDTH / 2, WINDOW_HEIGHT / 2);					///Bottom Right
 		ShaderManager::getPost(DEFERREDLIGHT_POST)->bind();
 		ShaderManager::getPost(DEFERREDLIGHT_POST)->sendUniform("uScene", 0);			//Albedo color
-		glActiveTexture(GL_TEXTURE0);
-		glBindTexture(GL_TEXTURE_2D, gBuffer->GetColorHandle(0));
 		ShaderManager::getPost(DEFERREDLIGHT_POST)->sendUniform("uNormalMap", 1);		//Normals
-		glActiveTexture(GL_TEXTURE0 + 1);
-		glBindTexture(GL_TEXTURE_2D, gBuffer->GetColorHandle(1));
 		ShaderManager::getPost(DEFERREDLIGHT_POST)->sendUniform("uPositionMap", 2);		//Frag positions
-		glActiveTexture(GL_TEXTURE0 + 2);
-		glBindTexture(GL_TEXTURE_2D, gBuffer->GetColorHandle(2));
+		gBuffer->bindTex(0, 0);
+		gBuffer->bindTex(1, 1);
+		gBuffer->bindTex(2, 2);
 		DrawFullScreenQuad();
-		uiImage->Unbind(2);	
-		uiImage->Unbind(1);
-		uiImage->Unbind(0);
+		Texture::Unbind(2);
+		Texture::Unbind(1);
+		Texture::Unbind(0);
 		ShaderManager::getPost(DEFERREDLIGHT_POST)->unbind();
 
 		//*/
@@ -318,16 +287,28 @@ void Game::draw()
 	//////////////////////////////////////////////////////////////////////////////////////////////
 	/// * Performs Frame buffer stuffs, don't remove pls and thank
 	//glEnable(GL_BLEND);
-	/*ShaderManager::getPost(UI_POST)->bind();
+	//*
+	ShaderManager::getPost(UI_POST)->bind();
 	ShaderManager::getPost(UI_POST)->sendUniform("uiTex", 1);
 	uiImage->Bind(1);
-	ProcessFramebufferStuff(*gBuffer, *workBuffer1, *workBuffer2, *workBuffer3,
+	ProcessFramebufferStuff(*deferredComposite, *workBuffer1, *workBuffer2, *workBuffer3,
 								ShaderManager::getBloom(), *ShaderManager::getPost(UI_POST),
 									true, false);
-	uiImage->Unbind(1);*/
+	uiImage->Unbind(1);//*/
 	//glDisable(GL_BLEND);
 	/// * Will be commented out in case this branch gets used for Expo
 	//////////////////////////////////////////////////////////////////////////////////////////////
+
+	//Render the particle emitters
+	if (!displayBuffers)
+	{
+		gBuffer->copyTo(GL_NONE, GL_DEPTH_BUFFER_BIT, WINDOW_WIDTH, WINDOW_HEIGHT);
+		ShaderManager::getGeom(BILLBOARD_GEOM)->bind();
+		ShaderManager::getGeom(BILLBOARD_GEOM)->sendUniform("uTex", 0);
+		ShaderManager::getGeom(BILLBOARD_GEOM)->sendUniform("uModel", ParticleManager::getParticle(SMOKEBOMB_PARTICLE)->transform.getModel());
+		ParticleManager::render(SMOKEBOMB_PARTICLE);
+		ShaderManager::getGeom(BILLBOARD_GEOM)->unbind();
+	}
 }
 	
 int Game::run() {

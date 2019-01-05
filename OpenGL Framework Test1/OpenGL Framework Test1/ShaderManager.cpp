@@ -67,6 +67,11 @@ void ShaderManager::loadShaders()
 		"./Resources/Shaders/PostProcess/UserInterface.frag"
 	));
 
+	m_postShaders.push_back(new Shader(
+		"./Resources/Shaders/PassThrough.vert",
+		"./Resources/Shaders/PostProcess/PassThrough.frag"
+	));
+
 	//Bloom components
 	m_bloomComponents.push_back(new Shader(
 		"./Resources/Shaders/PassThrough.vert",
@@ -126,6 +131,9 @@ void ShaderManager::update(Camera & _camera)
 	for (unsigned int i = 0; i < m_shaders.size(); i++) {
 		m_shaders[i]->update(_camera);
 	}
+
+	//Have no idea why I need to bind this one, but the view and projection matrices
+	//kept coming up as completely empty when I was debugging it
 	for (unsigned int i = 0; i < m_geomShaders.size(); i++) {
 		m_geomShaders[i]->bind();
 		m_geomShaders[i]->update(_camera);

@@ -1,5 +1,4 @@
 #include "ParticleEffect.h"
-#include "Random.h"
 #include "MathFunc.h"
 
 #define BUFFER_OFFSET(i) ((char *) 0 + (i))

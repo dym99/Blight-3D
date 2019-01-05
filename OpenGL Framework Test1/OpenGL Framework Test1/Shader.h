@@ -1,4 +1,6 @@
-#pragma once
+#ifndef __SHADER_H__
+#define __SHADER_H__
+
 #include <string>
 #include <utility>
 #include <glm/glm.hpp>
@@ -64,3 +66,5 @@ private:
 
 	GLint GetUniformLocation(const std::string &uniformName) const;
 };
+
+#endif

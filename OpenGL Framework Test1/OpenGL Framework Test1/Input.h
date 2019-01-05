@@ -1,4 +1,5 @@
-#pragma once
+#ifndef __INPUT_H__
+#define __INPUT_H__
 
 /*
 	Brought to you by the Game Programming club!
@@ -183,3 +184,5 @@ public:
 	static char keyWasPressed[256];		// Keep track of keys that were pressed
 	static char keyHandledFlag[256];	// Keep track of keys that have been previously processed
 };
+
+#endif

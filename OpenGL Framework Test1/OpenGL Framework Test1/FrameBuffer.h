@@ -1,5 +1,6 @@
 #ifndef __FRAME_BUFFER_H__
 #define __FRAME_BUFFER_H__
+
 #include <GL/glew.h>
 
 class FrameBuffer {
@@ -26,10 +27,43 @@ public:
 	void Bind();
 	void Unbind();
 
-	//Move to buffer
-	void MoveToBackBuffer(int windowWidth, int windowHeight);
-				
+	/*
+	//Sends the color texture to openGL
+	*- This is the texture unit you're binding to
+	*- This is the color buffer index, be careful not to go out of bounds
+	*/
+	void bindTex(GLuint textureUnit, unsigned int colorIndex);
+	
+	/*
+	//Sends the depth texture to openGL
+	*- This is the texture unit you're binding to
+	*/
+	void bindTex(GLuint textureUnit);
+
+	/*
+	//Copies a buffer to another FBO
+	*- This is the buffer you're copying to, set to GL_NONE to copy from back buffer
+	*- This is the buffer mask you're copying (GL_DEPTH_BUFFER_BIT or GL_COLOR_BUFFER_BIT)
+	*- This is the width of the window
+	*- This is the height of the window
+	*- This is the bottom left corner x of where you're copying
+	*- This is the bottom left corner y of where you're copying
+	*/
+	void copyTo(GLuint FBODraw, GLbitfield mask, int windowWidth, int windowHeight);
+			
+	/*
+	//Copies a buffer from another FBO
+	*- This is the buffer you're copying from, set to GL_NONE to copy from back buffer
+	*- This is the buffer mask you're copying (GL_DEPTH_BUFFER_BIT or GL_COLOR_BUFFER_BIT)
+	*- This is the width of the window
+	*- This is the height of the window
+	*- This is the bottom left corner x of where you're copying
+	*- This is the bottom left corner y of where you're copying
+	*/
+	void copyFrom(GLuint FBORead, GLbitfield mask, int windowWidth, int windowHeight);
+
 	//Getters
+	GLuint getFBO() const;
 	GLuint GetDepthHandle() const;
 	GLuint GetColorHandle(unsigned int index) const;
 

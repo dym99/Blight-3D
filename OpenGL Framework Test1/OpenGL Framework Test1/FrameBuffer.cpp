@@ -118,16 +118,45 @@ void FrameBuffer::Unbind()
 	glBindFramebuffer(GL_FRAMEBUFFER, GL_NONE);
 }
 
-void FrameBuffer::MoveToBackBuffer(int windowWidth, int windowHeight)
+void FrameBuffer::bindTex(GLuint textureUnit, unsigned int colorIndex)
+{
+	glActiveTexture(GL_TEXTURE0+textureUnit);
+	glBindTexture(GL_TEXTURE_2D, GetColorHandle(colorIndex));
+}
+
+void FrameBuffer::bindTex(GLuint textureUnit)
+{
+	glActiveTexture(GL_TEXTURE0 + textureUnit);
+	glBindTexture(GL_TEXTURE_2D, GetDepthHandle());
+}
+
+void FrameBuffer::copyTo(GLuint FBODraw, GLbitfield mask, int windowWidth, int windowHeight)
 {
 	glBindFramebuffer(GL_READ_FRAMEBUFFER, FBO);
-	glBindFramebuffer(GL_DRAW_FRAMEBUFFER, GL_NONE);
+	glBindFramebuffer(GL_DRAW_FRAMEBUFFER, FBODraw);
 
-	glBlitFramebuffer(0, 0, windowWidth, windowHeight, 0, 0, windowWidth, 
-						windowHeight, GL_COLOR_BUFFER_BIT, GL_NEAREST);
+	glBlitFramebuffer(0, 0, windowWidth, windowHeight, 0, 0, windowWidth,
+						windowHeight, mask, GL_NEAREST);
+
 	glBindFramebuffer(GL_FRAMEBUFFER, GL_NONE);
-
 	glBindFramebuffer(GL_READ_FRAMEBUFFER, GL_NONE);
+}
+
+void FrameBuffer::copyFrom(GLuint FBORead, GLbitfield mask, int windowWidth, int windowHeight)
+{
+	glBindFramebuffer(GL_READ_FRAMEBUFFER, FBORead);
+	glBindFramebuffer(GL_DRAW_FRAMEBUFFER, FBO);
+
+	glBlitFramebuffer(0, 0, windowWidth, windowHeight, 0, 0, windowWidth,
+						windowHeight, mask, GL_NEAREST);
+
+	glBindFramebuffer(GL_FRAMEBUFFER, GL_NONE);
+	glBindFramebuffer(GL_READ_FRAMEBUFFER, GL_NONE);
+}
+
+GLuint FrameBuffer::getFBO() const
+{
+	return FBO;
 }
 
 GLuint FrameBuffer::GetDepthHandle() const

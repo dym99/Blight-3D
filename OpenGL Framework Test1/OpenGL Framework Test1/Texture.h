@@ -15,8 +15,8 @@ public:
 
 	void Bind(int unit);
 	void Bind();
-	void Unbind(int unit);
-	void Unbind();
+	static void Unbind(int unit);
+	static void Unbind();
 		
 	//Helper functions
 	inline GLuint GetTextureHandle() { return m_texture; }

@@ -76,7 +76,7 @@
     <ClCompile Include="ParticleEffect.cpp">
       <Filter>Source Files\Effects\Particles</Filter>
     </ClCompile>
-    <ClCompile Include="Random.cpp">
+    <ClCompile Include="ParticleManager.cpp">
       <Filter>Source Files\Effects\Particles</Filter>
     </ClCompile>
   </ItemGroup>
@@ -144,9 +144,6 @@
     <ClInclude Include="Transform.h">
       <Filter>Source Files\Maths</Filter>
     </ClInclude>
-    <ClInclude Include="MathFunc.h">
-      <Filter>Source Files\Maths</Filter>
-    </ClInclude>
     <ClInclude Include="Shader.h">
       <Filter>Source Files\Effects\Shaders</Filter>
     </ClInclude>
@@ -156,7 +153,10 @@
     <ClInclude Include="ParticleEffect.h">
       <Filter>Source Files\Effects\Particles</Filter>
     </ClInclude>
-    <ClInclude Include="Random.h">
+    <ClInclude Include="MathFunc.h">
+      <Filter>Source Files\Maths</Filter>
+    </ClInclude>
+    <ClInclude Include="ParticleManager.h">
       <Filter>Source Files\Effects\Particles</Filter>
     </ClInclude>
   </ItemGroup>
