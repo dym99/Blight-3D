@@ -172,3 +172,23 @@ void ParticleEffect::Render()
 	glDisable(GL_BLEND);
 	m_texture.Unbind(0);
 }
+
+void ParticleEffect::setRate(float rate)
+{
+	m_rate = rate;
+}
+
+float ParticleEffect::getRate()
+{
+	return m_rate;
+}
+
+unsigned int ParticleEffect::getCurrent()
+{
+	return m_numCurrentParticles;
+}
+
+unsigned int ParticleEffect::getMax()
+{
+	return m_maxParticles;
+}

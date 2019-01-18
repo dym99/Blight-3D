@@ -27,6 +27,12 @@ public:
 	void Update(float elapsed);
 	void Render();
 
+	void setRate(float rate);
+	float getRate();
+	unsigned int getCurrent();
+	unsigned int getMax();
+
+	//Public variables
 	Transform transform = Transform();
 
 	glm::vec2 RangeX = glm::vec2(-10.0f, 10.0f);

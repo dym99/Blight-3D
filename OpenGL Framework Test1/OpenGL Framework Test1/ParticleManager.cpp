@@ -7,14 +7,14 @@ void ParticleManager::loadParticles()
 {
 	m_particleEffects.push_back(new ParticleEffect());
 	//Initialize particle effect
-	if (!m_particleEffects[0]->Init("./Resources/Textures/Fog.png", 1200, 10)) {
+	if (!m_particleEffects[0]->Init("./Resources/Textures/Fog.png", 600, 10)) {
 		std::cout << "Particle effect failed to initializie.\n";
 		system("Pause");
 		exit(0);
 	}
 	m_particleEffects[0]->LerpAlpha = glm::vec2(0.1f, 0.0f);
 	m_particleEffects[0]->LerpSize = glm::vec2(0.0f, 5.0f);
-	m_particleEffects[0]->RangeLifetime = glm::vec2(8.0f, 20.0f);
+	m_particleEffects[0]->RangeLifetime = glm::vec2(8.0f, 10.0f);
 	m_particleEffects[0]->RangeVelocity = glm::vec2(0.33f, 0.4f);
 	m_particleEffects[0]->RangeX = glm::vec2(0.2f, 0.3f);
 	m_particleEffects[0]->RangeY = glm::vec2(0.2f, 0.3f);

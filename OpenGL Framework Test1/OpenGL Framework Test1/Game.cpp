@@ -332,6 +332,11 @@ int Game::run() {
 				m_display->close();
 			}
 		}
+		
+		if (ParticleManager::getParticle(SMOKEBOMB_PARTICLE)->getCurrent() == ParticleManager::getParticle(SMOKEBOMB_PARTICLE)->getMax())
+		{
+			ParticleManager::getParticle(SMOKEBOMB_PARTICLE)->setRate(0.f);
+		}
 
 		if (Input::GetKeyPress(KeyCode::F5))
 		{
