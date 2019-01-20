@@ -32,6 +32,7 @@ private:
 
 	Model *m_ravager;
 	Model *m_testArea;
+	Model *m_brazier;
 
 	Shader *m_shader;
 

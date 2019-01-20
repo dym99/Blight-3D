@@ -38,6 +38,9 @@ public:
 	glm::vec2 RangeX = glm::vec2(-10.0f, 10.0f);
 	glm::vec2 RangeY = glm::vec2(0.0f, 10.0f);
 	glm::vec2 RangeZ = glm::vec2(-10.0f, 10.0f);
+	glm::vec2 RangeVelocityX = glm::vec2(-1.f, 1.f);
+	glm::vec2 RangeVelocityY = glm::vec2(-1.f, 1.f);
+	glm::vec2 RangeVelocityZ = glm::vec2(-1.f, 1.f);
 	glm::vec2 RangeVelocity = glm::vec2(0.1f, 1.0f);
 	glm::vec2 RangeLifetime = glm::vec2(7.0f, 9.5f);
 	//Lerp variables are dynamic based on lifetime of particle

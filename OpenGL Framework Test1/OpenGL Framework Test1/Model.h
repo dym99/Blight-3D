@@ -36,6 +36,8 @@ public:
 	std::vector<glm::vec3> normalData;
 	std::vector<MeshFace> faceData;
 	
+	glm::vec3 colorTint = glm::vec3(1.f, 1.f, 1.f);
+
 	bool firstObj = false;
 	bool hasUVs = false;
 

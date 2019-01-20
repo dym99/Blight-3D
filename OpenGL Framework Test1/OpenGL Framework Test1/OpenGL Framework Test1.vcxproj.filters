@@ -79,6 +79,9 @@
     <ClCompile Include="ParticleManager.cpp">
       <Filter>Source Files\Effects\Particles</Filter>
     </ClCompile>
+    <ClCompile Include="ParticleRenderBehaviour.cpp">
+      <Filter>Source Files\Behaviours\Graphics</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Behaviour.h">
@@ -158,6 +161,9 @@
     </ClInclude>
     <ClInclude Include="ParticleManager.h">
       <Filter>Source Files\Effects\Particles</Filter>
+    </ClInclude>
+    <ClInclude Include="ParticleRenderBehaviour.h">
+      <Filter>Source Files\Behaviours\Graphics</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

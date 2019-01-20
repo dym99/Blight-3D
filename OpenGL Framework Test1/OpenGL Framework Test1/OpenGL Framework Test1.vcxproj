@@ -159,6 +159,7 @@
     <ClCompile Include="MouseLook.cpp" />
     <ClCompile Include="ParticleEffect.cpp" />
     <ClCompile Include="ParticleManager.cpp" />
+    <ClCompile Include="ParticleRenderBehaviour.cpp" />
     <ClCompile Include="P_Collider.cpp" />
     <ClCompile Include="P_PhysicsBody.cpp" />
     <ClCompile Include="Scene.cpp" />
@@ -176,6 +177,7 @@
     <ClInclude Include="MathFunc.h" />
     <ClInclude Include="ParticleEffect.h" />
     <ClInclude Include="ParticleManager.h" />
+    <ClInclude Include="ParticleRenderBehaviour.h" />
     <ClInclude Include="P_Collider.h" />
     <ClInclude Include="Display.h" />
     <ClInclude Include="FrameBuffer.h" />

@@ -42,7 +42,7 @@ void MeshRenderBehaviour::render()
 		m_shader->bind();
 		m_shader->update(*Camera::mainCamera);
 		m_shader->sendUniform("uModel", m_parentObject->worldTransform);
-
+		m_shader->sendUniform("colorTint", m_model->colorTint);
 		m_model->Draw(m_shader);
 	//}
 }

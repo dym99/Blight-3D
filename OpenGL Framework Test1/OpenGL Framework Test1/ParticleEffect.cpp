@@ -105,7 +105,7 @@ void ParticleEffect::Update(float elapsed)
 		m_particles.Positions[m_numCurrentParticles]  = glm::vec3(RandomRangef(RangeX.x, RangeX.y), RandomRangef(RangeY.x, RangeY.y), RandomRangef(RangeZ.x, RangeZ.y));
 
 		//send the particle in a random direction, with a velocity between our range
-		m_particles.Velocities[m_numCurrentParticles] = glm::vec3(RandomRangef(-1.0f, 1.0f), RandomRangef(-1.0f, 1.0f), RandomRangef(-1.0f, 1.0f));
+		m_particles.Velocities[m_numCurrentParticles] = glm::vec3(RandomRangef(RangeVelocityX.x, RangeVelocityX.y), RandomRangef(RangeVelocityY.x, RangeVelocityY.y), RandomRangef(RangeVelocityZ.x, RangeVelocityZ.y));
 		m_particles.Velocities[m_numCurrentParticles] = glm::normalize(m_particles.Velocities[m_numCurrentParticles]);
 		m_particles.Velocities[m_numCurrentParticles] *= RandomRangef(RangeVelocity.x, RangeVelocity.y);
 

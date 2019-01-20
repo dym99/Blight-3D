@@ -22,7 +22,6 @@ Game::~Game()
 	}
 	m_activeScenes.clear();
 
-	uiImage->Unload();
 	delete uiImage;
 	uiImage = nullptr;
 
@@ -70,8 +69,11 @@ void Game::initGame()
 	//Load in resources
 	m_ravager = new Model();
 	m_ravager->LoadFromFile("./Resources/Objects/Ravager2/", "Ravager");
+	m_ravager->colorTint = glm::vec3(1.f, 1.f, 1.f);
 	m_testArea = new Model();
 	m_testArea->LoadFromFile("./Resources/Objects/TestArea/", "TestArea");
+	m_brazier = new Model();
+	m_brazier->LoadFromFile("./Resources/Objects/Brazier/", "brazier");
 	
 	ShaderManager::loadShaders();
 
@@ -145,12 +147,18 @@ void Game::initGame()
 	cameraPivot->addChild(cameraObject);
 	ravager->addChild(cameraPivot);
 	
-
+	auto brazier = new GameObject("brazier");
+	brazier->addBehaviour(new MeshRenderBehaviour(m_brazier, ShaderManager::getShader(GBUFFER_SHADER)));
+	brazier->localTransform.setPos(glm::vec3(3.f, 0.5f, 3.f));
+	brazier->localTransform.setScale(glm::vec3(0.5f, 0.5f, 0.5f));
+	
+	
 	auto testArea = new GameObject("TestArea");
 	testArea->addBehaviour(new MeshRenderBehaviour(m_testArea, ShaderManager::getShader(GBUFFER_SHADER)));
 
 
 	auto scene = new Scene("DemoScene");
+	scene->addChild(brazier);
 	scene->addChild(ravager);
 	scene->addChild(testArea);
 
@@ -163,6 +171,8 @@ void Game::initGame()
 	P_PhysicsBody::P_bodyCount.push_back(new P_PhysicsBody(new Transform(), 1.f, false, BOX, 1.f, 8.f, 8.f, glm::vec3(0, -0.5f, 0), 0, true));
 	P_PhysicsBody::P_bodyCount.push_back(new P_PhysicsBody(new Transform(), 1.f, false, BOX, 1.f, 2.f, 2.f, glm::vec3(0, -0.5f, 5), 0, true));
 	P_PhysicsBody::P_bodyCount.push_back(new P_PhysicsBody(new Transform(), 1.f, false, BOX, 1.f, 8.f, 8.f, glm::vec3(0, -0.5f, 10), 0, true));
+
+	
 
 	m_activeScenes.push_back(scene);
 }
@@ -305,9 +315,15 @@ void Game::draw()
 		gBuffer->copyTo(GL_NONE, GL_DEPTH_BUFFER_BIT, WINDOW_WIDTH, WINDOW_HEIGHT);
 		ShaderManager::getGeom(BILLBOARD_GEOM)->bind();
 		ShaderManager::getGeom(BILLBOARD_GEOM)->sendUniform("uTex", 0);
-		ShaderManager::getGeom(BILLBOARD_GEOM)->sendUniform("uModel", ParticleManager::getParticle(SMOKEBOMB_PARTICLE)->transform.getModel());
-		ParticleManager::render(SMOKEBOMB_PARTICLE);
+		//ShaderManager::getGeom(BILLBOARD_GEOM)->sendUniform("uModel", ParticleManager::getParticle(SMOKEBOMB_PARTICLE)->transform.getModel());
+		//ParticleManager::render(SMOKEBOMB_PARTICLE);
+		ShaderManager::getGeom(BILLBOARD_GEOM)->sendUniform("uModel", ParticleManager::getParticle(FIRE_PARTICLE)->transform.getModel());
+		ParticleManager::render(FIRE_PARTICLE);
+		ShaderManager::getGeom(BILLBOARD_GEOM)->sendUniform("uModel", ParticleManager::getParticle(FIREPT2_PARTICLE)->transform.getModel());
+		ParticleManager::render(FIREPT2_PARTICLE);
 		ShaderManager::getGeom(BILLBOARD_GEOM)->unbind();
+
+
 	}
 }
 	
