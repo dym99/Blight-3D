@@ -22,10 +22,6 @@ Game::~Game()
 	}
 	m_activeScenes.clear();
 
-	uiImage->Unload();
-	delete uiImage;
-	uiImage = nullptr;
-
 	delete mainBuffer;
 	mainBuffer = nullptr;
 	delete workBuffer1;
@@ -52,9 +48,6 @@ void Game::initGame()
 	workBuffer1 = new FrameBuffer(1);
 	workBuffer2 = new FrameBuffer(1);
 	workBuffer3 = new FrameBuffer(1);
-
-	uiImage = new Texture();
-	uiImage->Load("./Resources/Textures/UIpost.png");
 
 	//Initializes the screen quad
 	InitFullScreenQuad();
@@ -204,16 +197,9 @@ void Game::draw()
 
 	//////////////////////////////////////////////////////////////////////////////////////////////
 	/// * Performs Frame buffer stuffs, don't remove pls and thank
-	/*glEnable(GL_BLEND);
-	ShaderManager::getPost(UI_POST)->bind();
-	ShaderManager::getPost(UI_POST)->sendUniform("uiTex", 1);
-	ShaderManager::getPost(UI_POST)->unbind();
-	uiImage->Bind(1);
-	ProcessFramebufferStuff(*mainBuffer, *workBuffer1, *workBuffer2, *workBuffer3,
-								ShaderManager::getBloom(), *ShaderManager::getPost(UI_POST),
-									true, false);
-	uiImage->Unbind(1);
-	glDisable(GL_BLEND);*/
+	/*ProcessFramebufferStuff(*mainBuffer, *workBuffer1, *workBuffer2, *workBuffer3,
+								ShaderManager::getBloom(), *ShaderManager::getPost(FOCUS_IN_POST),
+									true, false);*/
 	/// * Will be commented out in case this branch gets used for Expo
 	//////////////////////////////////////////////////////////////////////////////////////////////
 }
@@ -261,8 +247,6 @@ void Game::initGLEW() {
 
 	glEnable(GL_CULL_FACE);
 	glCullFace(GL_BACK);
-
-	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
 	glEnable(GL_MULTISAMPLE);
 }
