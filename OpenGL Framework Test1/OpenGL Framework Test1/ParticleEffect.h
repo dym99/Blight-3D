@@ -1,12 +1,15 @@
-#pragma once
+#ifndef __PARTICLEEFFECT_H__
+#define __PARTICLEEFFECT_H__
 
 #include <vector>
-#include "MiniMath\Core.h"
+#include <glm/common.hpp>
+#include "Transform.h"
+#include "Texture.h"
 
 struct ParticleList
 {
-	vec3 *Positions = nullptr;
-	vec3 *Velocities = nullptr;
+	glm::vec3 *Positions = nullptr;
+	glm::vec3 *Velocities = nullptr;
 	float *Size = nullptr;
 	float *Alpha = nullptr;
 	float *Ages = nullptr;
@@ -24,21 +27,38 @@ public:
 	void Update(float elapsed);
 	void Render();
 
-	mat4 Transform;
+	void setRate(float rate);
+	float getRate();
+	unsigned int getCurrent();
+	unsigned int getMax();
 
-	vec2 RangeX = vec2(-10.0f, 10.0f);
-	vec2 RangeY = vec2(0.0f, 10.0f);
-	vec2 RangeZ = vec2(-10.0f, 10.0f);
-	vec2 RangeVelocity = vec2(0.1f, 1.0f);
-	vec2 RangeLifetime = vec2(7.0f, 9.5f);
+	//Public variables
+	Transform transform = Transform();
+
+	glm::vec2 RangeX = glm::vec2(-10.0f, 10.0f);
+	glm::vec2 RangeY = glm::vec2(0.0f, 10.0f);
+	glm::vec2 RangeZ = glm::vec2(-10.0f, 10.0f);
+	glm::vec2 RangeVelocityX = glm::vec2(-1.f, 1.f);
+	glm::vec2 RangeVelocityY = glm::vec2(-1.f, 1.f);
+	glm::vec2 RangeVelocityZ = glm::vec2(-1.f, 1.f);
+	glm::vec2 RangeVelocity = glm::vec2(0.1f, 1.0f);
+	glm::vec2 RangeLifetime = glm::vec2(7.0f, 9.5f);
 	//Lerp variables are dynamic based on lifetime of particle
-	vec2 LerpAlpha = vec2(0.5f, 0.0f);
-	vec2 LerpSize = vec2(0.0f, 1.0f);
+	glm::vec2 LerpAlpha = glm::vec2(0.5f, 0.0f);
+	glm::vec2 LerpSize = glm::vec2(0.0f, 1.0f);
 
 private:
-	ParticleList _Particles;
+	ParticleList m_particles;
+	Texture m_texture;
 
-	float _Rate = 0.0f;
-	unsigned int _MaxParticles = 0;
-	unsigned int _NumCurrentParticles = 0;
+	float m_rate = 0.0f;
+	unsigned int m_maxParticles = 0;
+	unsigned int m_numCurrentParticles = 0;
+
+	GLuint VAO = GL_NONE;
+	GLuint VBO_Position = GL_NONE;
+	GLuint VBO_Size = GL_NONE;
+	GLuint VBO_Alpha = GL_NONE;
 };
+
+#endif

@@ -68,10 +68,19 @@
       <Filter>Source Files\Maths\Math Functions</Filter>
     </ClCompile>
     <ClCompile Include="Shader.cpp">
-      <Filter>Source Files\Shaders</Filter>
+      <Filter>Source Files\Effects\Shaders</Filter>
     </ClCompile>
     <ClCompile Include="ShaderManager.cpp">
-      <Filter>Source Files\Shaders</Filter>
+      <Filter>Source Files\Effects\Shaders</Filter>
+    </ClCompile>
+    <ClCompile Include="ParticleEffect.cpp">
+      <Filter>Source Files\Effects\Particles</Filter>
+    </ClCompile>
+    <ClCompile Include="ParticleManager.cpp">
+      <Filter>Source Files\Effects\Particles</Filter>
+    </ClCompile>
+    <ClCompile Include="ParticleRenderBehaviour.cpp">
+      <Filter>Source Files\Behaviours\Graphics</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -138,14 +147,23 @@
     <ClInclude Include="Transform.h">
       <Filter>Source Files\Maths</Filter>
     </ClInclude>
+    <ClInclude Include="Shader.h">
+      <Filter>Source Files\Effects\Shaders</Filter>
+    </ClInclude>
+    <ClInclude Include="ShaderManager.h">
+      <Filter>Source Files\Effects\Shaders</Filter>
+    </ClInclude>
+    <ClInclude Include="ParticleEffect.h">
+      <Filter>Source Files\Effects\Particles</Filter>
+    </ClInclude>
     <ClInclude Include="MathFunc.h">
       <Filter>Source Files\Maths</Filter>
     </ClInclude>
-    <ClInclude Include="Shader.h">
-      <Filter>Source Files\Shaders</Filter>
+    <ClInclude Include="ParticleManager.h">
+      <Filter>Source Files\Effects\Particles</Filter>
     </ClInclude>
-    <ClInclude Include="ShaderManager.h">
-      <Filter>Source Files\Shaders</Filter>
+    <ClInclude Include="ParticleRenderBehaviour.h">
+      <Filter>Source Files\Behaviours\Graphics</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -155,9 +173,6 @@
     </Filter>
     <Filter Include="Source Files\Display">
       <UniqueIdentifier>{e34fc625-2cab-495c-a9cd-d2d7564d2b6b}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Source Files\Shaders">
-      <UniqueIdentifier>{a3143ccc-6e1c-4f6b-8a7c-e20ed10a5e91}</UniqueIdentifier>
     </Filter>
     <Filter Include="Source Files\Loaders">
       <UniqueIdentifier>{b7bcd7e0-7392-4afa-9d51-422bbc3df44a}</UniqueIdentifier>
@@ -194,6 +209,15 @@
     </Filter>
     <Filter Include="Source Files\Behaviours\Test">
       <UniqueIdentifier>{8656335d-9751-46d7-8a75-f58e535fb758}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Effects">
+      <UniqueIdentifier>{499e1374-4ef9-4979-92b5-e3953cfae022}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Effects\Shaders">
+      <UniqueIdentifier>{a3143ccc-6e1c-4f6b-8a7c-e20ed10a5e91}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Effects\Particles">
+      <UniqueIdentifier>{70bd2cd7-9789-4347-b073-bb93ac079a71}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
 </Project>

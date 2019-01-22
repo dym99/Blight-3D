@@ -13,8 +13,10 @@ public:
 	bool Load(const std::string &file);
 	void Unload();
 
+	void Bind(int unit);
 	void Bind();
-	void Unbind();
+	static void Unbind(int unit);
+	static void Unbind();
 		
 	//Helper functions
 	inline GLuint GetTextureHandle() { return m_texture; }

@@ -23,13 +23,11 @@ struct Light {
 };
 
 in vec2 TexCoords;
-in vec3 normal0;
-in vec3 fragPosition;
 
 uniform Light light = Light(
-	vec4(-0.963056028, 1.500000060, -0.0385486856, 0.0),
+	vec4(3.0, 0.5, 3.0, 0.0),
 	vec3(0.15, 0.15, 0.15),
-	vec3(0.6, 0.6, 0.2),
+	vec3(0.6, 0.3, 0.1),
 	32.0,
 	1.0,
 	0.1,
@@ -46,9 +44,13 @@ uniform Light light2 = Light(
 	0.01
 );
 
+uniform sampler2D uScene;
+uniform sampler2D uNormalMap;
+uniform sampler2D uPositionMap;
+
 uniform Material material;
 
-void calculatePointLight(Light lightyBoi)
+void calculatePointLight(Light lightyBoi, vec3 fragPosition, vec3 normal0)
 {
 	//Account for interpolation
 	vec3 normal = normalize(normal0);
@@ -80,10 +82,13 @@ void calculatePointLight(Light lightyBoi)
 
 void main() 
 {
-	vec4 textureColor = texture(material.diffuseTex, TexCoords);
+	vec4 textureColor = texture(uScene, TexCoords);
+    vec3 normal0 = texture(uNormalMap, TexCoords).xyz * 2.0 - 1.0;
+
+    vec3 fragPosition = texture(uPositionMap, TexCoords).xyz;
 	FragColor.rgb = textureColor.rgb * light.ambience;
 	FragColor.a = textureColor.a;
 
-	calculatePointLight(light2);
-	calculatePointLight(light);
+	calculatePointLight(light2, fragPosition, normal0);
+	calculatePointLight(light, fragPosition, normal0);
 }

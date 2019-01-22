@@ -12,9 +12,9 @@ Shader::Shader()
 {
 }
 
-Shader::Shader(const std::string & vertFile, const std::string & fragFile)
+Shader::Shader(const std::string & vertFile, const std::string & fragFile, const std::string & geomFile)
 {
-	Load(vertFile, fragFile);
+	Load(vertFile, fragFile, geomFile);
 }
 
 Shader::~Shader()
@@ -56,15 +56,24 @@ void Shader::SetDefault()
 
 void Shader::Reload()
 {
-	Load(vertShaderFile, fragShaderFile);
+	Load(vertShaderFile, fragShaderFile, geomShaderFile);
 }
 
-bool Shader::Load(const std::string & vertFile, const std::string & fragFile)
+bool Shader::Load(const std::string & vertFile, const std::string & fragFile, const std::string & geomFile)
 {
 	vertShaderFile = vertFile;
 	fragShaderFile = fragFile;
+	if (geomFile != "")
+	{
+		geomShaderFile = geomFile;
+	}
+
 	_VertexShader = glCreateShader(GL_VERTEX_SHADER);
 	_FragShader = glCreateShader(GL_FRAGMENT_SHADER);
+	if (geomFile != "") {
+		_GeomShader = glCreateShader(GL_GEOMETRY_SHADER);
+	}
+
 	_Program = glCreateProgram();
 
 	std::string source = ReadFile(vertFile);
@@ -74,6 +83,12 @@ bool Shader::Load(const std::string & vertFile, const std::string & fragFile)
 	source = ReadFile(fragFile);
 	temp = static_cast<const GLchar*>(source.c_str());
 	glShaderSource(_FragShader, 1, &temp, NULL);
+
+	if (geomFile != "") {
+		source = ReadFile(geomFile);
+		temp = static_cast<const GLchar*>(source.c_str());
+		glShaderSource(_GeomShader, 1, &temp, NULL);
+	}
 
 	if (!CompileShader(_VertexShader))
 	{
@@ -91,9 +106,22 @@ bool Shader::Load(const std::string & vertFile, const std::string & fragFile)
 		SetDefault();
 		return false;
 	}
+	if (geomFile != "") {
+		if (!CompileShader(_GeomShader))
+		{
+			std::cout << "Geometry Shader failed to compile.\n";
+			OutputShaderLog(_GeomShader);
+			Unload();
+			SetDefault();
+			return false;
+		}
+	}
 
 	glAttachShader(_Program, _VertexShader);
 	glAttachShader(_Program, _FragShader);
+	if (geomFile != "") {
+		glAttachShader(_Program, _GeomShader);
+	}
 
 	if (!LinkProgram())
 	{
@@ -126,6 +154,13 @@ void Shader::Unload()
 		glDeleteShader(_FragShader);
 		_FragShader = GL_NONE;
 	}
+	if (_GeomShader != GL_NONE)
+	{
+		glDetachShader(_Program, _GeomShader);
+		glDeleteShader(_GeomShader);
+		_GeomShader = GL_NONE;
+	}
+
 	if (_Program != GL_NONE && _Program != _ProgramDefault)
 	{
 		glDeleteProgram(_Program);

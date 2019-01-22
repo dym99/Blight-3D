@@ -8,6 +8,7 @@
 #include "Display.h"
 #include "Utilities.h"
 #include "P_PhysicsBody.h"
+#include "ParticleManager.h"
 
 class Game {
 public:
@@ -31,16 +32,23 @@ private:
 
 	Model *m_ravager;
 	Model *m_testArea;
+	Model *m_brazier;
 
 	Shader *m_shader;
+
+	bool displayBuffers = false;
 
 	///////////////////////
 
 	//Framebuffers
-	FrameBuffer *mainBuffer;
+	FrameBuffer *gBuffer;
+	FrameBuffer *deferredComposite;
 	FrameBuffer *workBuffer1;
 	FrameBuffer *workBuffer2;
 	FrameBuffer *workBuffer3;
+
+	//Texture
+	Texture *uiImage;
 
 	std::vector<Scene>  m_scenes;
 	std::vector<Scene*> m_activeScenes;
