@@ -82,6 +82,9 @@
     <ClCompile Include="ParticleRenderBehaviour.cpp">
       <Filter>Source Files\Behaviours\Graphics</Filter>
     </ClCompile>
+    <ClCompile Include="AudioPlayer.cpp">
+      <Filter>Source Files\Handlers</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Behaviour.h">
@@ -164,6 +167,9 @@
     </ClInclude>
     <ClInclude Include="ParticleRenderBehaviour.h">
       <Filter>Source Files\Behaviours\Graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="AudioPlayer.h">
+      <Filter>Source Files\Handlers</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

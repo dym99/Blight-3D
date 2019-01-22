@@ -9,6 +9,7 @@
 #include "TestRotateBehaviour.h"
 #include "MouseLook.h"
 #include "CameraBehaviour.h"
+#include "AudioPlayer.h"
 
 #include "Input.h"
 Game::Game()
@@ -60,6 +61,10 @@ void Game::initGame()
 
 	//Initializes the screen quad
 	InitFullScreenQuad();
+
+	//Initializes the audio player and sets it up
+	AudioPlayer::init(100, FMOD_INIT_NORMAL);
+	AudioPlayer::set3DSettings(1.0f, 1.0f);
 
 	//Initialise Camera
 	auto camera = new Camera();
@@ -172,7 +177,12 @@ void Game::initGame()
 	P_PhysicsBody::P_bodyCount.push_back(new P_PhysicsBody(new Transform(), 1.f, false, BOX, 1.f, 2.f, 2.f, glm::vec3(0, -0.5f, 5), 0, true));
 	P_PhysicsBody::P_bodyCount.push_back(new P_PhysicsBody(new Transform(), 1.f, false, BOX, 1.f, 8.f, 8.f, glm::vec3(0, -0.5f, 10), 0, true));
 
-	
+
+	//Load audio track for drum loop
+	AudioPlayer::loadAudio(*new AudioTrack("drumloop", FMOD_3D, AudioType::EFFECT, { 0.f, 0.f, 0.f }, { 0.f, 0.f, 0.f }, true, 0.1f, 5000.f), "drumloop");
+	//Play drum loop
+	AudioPlayer::playTrack("drumloop");
+	AudioPlayer::setVolume("drumloop", 0.01f);
 
 	m_activeScenes.push_back(scene);
 }
@@ -191,6 +201,8 @@ void Game::update()
 	}
 
 	ParticleManager::update(Time::deltaTime);
+
+	AudioPlayer::update(Time::deltaTime);
 
 	P_PhysicsBody::P_physicsUpdate(Time::deltaTime);
 	for (unsigned int i = 0; i < m_activeScenes.size(); ++i) {
@@ -349,16 +361,20 @@ int Game::run() {
 			}
 		}
 		
-		if (ParticleManager::getParticle(SMOKEBOMB_PARTICLE)->getCurrent() == ParticleManager::getParticle(SMOKEBOMB_PARTICLE)->getMax())
+		//Example for stopping the particles, etc, could even be based on time passed
+		/*if (ParticleManager::getParticle(SMOKEBOMB_PARTICLE)->getCurrent() == ParticleManager::getParticle(SMOKEBOMB_PARTICLE)->getMax())
 		{
 			ParticleManager::getParticle(SMOKEBOMB_PARTICLE)->setRate(0.f);
-		}
+		}*/
 
 		if (Input::GetKeyPress(KeyCode::F5))
 		{
 			ShaderManager::reloadShaders();
 		}
 	}
+
+	//Closes and cleans up after the audioplayer system
+	AudioPlayer::close();
 	SDL_Quit();
 	return 0;
 }
