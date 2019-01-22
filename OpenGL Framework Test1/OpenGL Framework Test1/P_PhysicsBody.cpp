@@ -3,6 +3,7 @@
 #define VEC3I glm::vec3(1, 0, 0)
 #define VEC3J glm::vec3(0, 1, 0)
 #define VEC3K glm::vec3(0, 0, 1)
+#define frictionScalar 10.f
 
 
 std::vector<P_PhysicsBody*> P_PhysicsBody::P_bodyCount{};
@@ -16,11 +17,12 @@ P_PhysicsBody::P_PhysicsBody()
 	P_velocity = VEC3ZERO;
 }
 
-P_PhysicsBody::P_PhysicsBody(Transform * _transform, float _mass, bool _gravity, P_Collider_Type _type, float _h, float _w, float _d, glm::vec3 _offset, float _bounciness, bool _kinematic)
+P_PhysicsBody::P_PhysicsBody(Transform * _transform, float _mass, bool _gravity, P_Collider_Type _type, float _h, float _w, float _d, glm::vec3 _offset, float _bounciness, float _friction, bool _kinematic)
 {
 	P_transform = _transform;
 	P_position = _transform->getPos();
 	P_bounciness = _bounciness;
+	P_friction = _friction;
 	P_mass = _mass;
 	P_useGravity = _gravity;
 	P_collider = new P_Collider(_type, _h, _w, _d);
@@ -224,7 +226,7 @@ void P_PhysicsBody::P_physicsUpdate(float dt)
 						continue;
 
 					P_CollisionData colData = P_checkBounds(i, o);
-					if (colData.collide)
+					if (colData.didCollide)
 					{
 						P_PhysicsBody* kinematicBody = nullptr;
 						P_PhysicsBody* otherBody = nullptr;
@@ -247,7 +249,7 @@ void P_PhysicsBody::P_physicsUpdate(float dt)
 							float v_length = glm::length(colData.direction);
 
 							//Offset body by depth in other
-							if (!isAnyOf(0.f, colData.depth, v_length))
+							if (!anyOfIs(0.f, colData.depth, v_length))
 							{
 								otherBody->P_position += (colData.depth * (colData.direction / v_length)) * 1.0000001f;
 
@@ -255,8 +257,12 @@ void P_PhysicsBody::P_physicsUpdate(float dt)
 								float normalSize = glm::length(colData.normal);
 									normal = colData.normal / normalSize;
 
-								//Adjust velocity
-								otherBody->P_velocity = otherBody->P_velocity - (1.f + otherBody->P_bounciness) * ((glm::dot(otherBody->P_velocity, colData.normal) / (normalSize * normalSize)) * colData.normal);
+									//Adjust velocity
+									glm::vec3 withNorm = ((glm::dot(otherBody->P_velocity, colData.normal) / (normalSize * normalSize)) * colData.normal);
+									glm::vec3 perpNorm = otherBody->P_velocity - withNorm;
+									perpNorm = (1.f - (otherBody->P_friction + kinematicBody->P_friction) / 2 * frictionScalar * dt) * perpNorm;
+									std::cout << perpNorm.x << ',' << (1.f - (otherBody->P_friction + kinematicBody->P_friction) / 2 * frictionScalar * dt) << std::endl;
+									otherBody->P_velocity = (withNorm + perpNorm) - withNorm * (1.f + otherBody->P_bounciness);
 							}
 							otherBody->P_transform->setPos(otherBody->P_position);
 						}
@@ -268,7 +274,7 @@ void P_PhysicsBody::P_physicsUpdate(float dt)
 							float v_length = glm::length(colData.direction);
 
 							//Offset body by depth in other
-							if (!isAnyOf(0.f, colData.depth, v_length))
+							if (!anyOfIs(0.f, colData.depth, v_length))
 							{
 								glm::vec3 displaceAmount = ((colData.depth * (colData.direction / v_length)) * 1.0000001f) / 2.f;
 								body1->P_position += displaceAmount;
@@ -480,12 +486,12 @@ float P_PhysicsBody::findClosestOnCube(float current, float size)
 
 P_CollisionData::P_CollisionData()
 {
-	collide = false;
+	didCollide = false;
 }
 
 P_CollisionData::P_CollisionData(float _depth, glm::vec3 _direction, glm::vec3 _normal)
 {
-	collide = true;
+	didCollide = true;
 	depth = _depth;
 	direction = _direction;
 	normal = _normal;
