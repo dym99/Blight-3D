@@ -8,7 +8,7 @@
 class ParticleRenderBehaviour : public Behaviour 
 {
 public:
-	ParticleRenderBehaviour(ParticleEffect* _oarticle, Shader* _shader);
+	ParticleRenderBehaviour(ParticleEffect* _particle, Shader* _shader);
 	~ParticleRenderBehaviour();
 
 	void start() override;

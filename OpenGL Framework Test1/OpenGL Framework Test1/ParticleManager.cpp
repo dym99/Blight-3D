@@ -47,7 +47,7 @@ void ParticleManager::loadParticles()
 		exit(0);
 	}
 	m_particleEffects[2]->LerpAlpha = glm::vec2(0.3f, 0.0f);
-	m_particleEffects[2]->LerpSize = glm::vec2(0.0f, 0.3f);
+	m_particleEffects[2]->LerpSize = glm::vec2(0.0f, 0.2f);
 	m_particleEffects[2]->RangeLifetime = glm::vec2(0.0f, 2.0f);
 	m_particleEffects[2]->RangeVelocity = glm::vec2(0.0f, 0.1f);
 	m_particleEffects[2]->RangeVelocityX = glm::vec2(0.0f, 0.1f);

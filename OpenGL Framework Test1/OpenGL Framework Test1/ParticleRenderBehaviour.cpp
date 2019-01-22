@@ -1,6 +1,6 @@
 #include "ParticleRenderBehaviour.h"
 
-ParticleRenderBehaviour::ParticleRenderBehaviour(ParticleEffect * _oarticle, Shader * _shader)
+ParticleRenderBehaviour::ParticleRenderBehaviour(ParticleEffect * _particle, Shader * _shader)
 {
 }
 
