@@ -17,7 +17,7 @@ P_PhysicsBody::P_PhysicsBody()
 	P_velocity = VEC3ZERO;
 }
 
-P_PhysicsBody::P_PhysicsBody(Transform * _transform, float _mass, bool _gravity, P_Collider_Type _type, float _h, float _w, float _d, glm::vec3 _offset, float _bounciness, float _friction, bool _kinematic)
+P_PhysicsBody::P_PhysicsBody(Transform * _transform, float _mass, bool _gravity, P_Collider_Type _type, float _h, float _w, float _d, glm::vec3 _offset, float _bounciness, float _friction, bool _kinematic, bool _trigger, P_FlagType _flag)
 {
 	P_transform = _transform;
 	P_position = _transform->getPos();
@@ -29,6 +29,8 @@ P_PhysicsBody::P_PhysicsBody(Transform * _transform, float _mass, bool _gravity,
 	P_collider->setOffset(_offset);
 	P_isKinematic = _kinematic;
 	startPos = _transform->getPos();
+	P_isTrigger = _trigger;
+	P_flags.push_back(_flag);
 
 	P_bodyCount.push_back(this);
 	P_netForce = VEC3ZERO;
@@ -44,6 +46,7 @@ P_PhysicsBody::P_PhysicsBody(Transform * _transform, float _mass, bool _gravity,
 	P_useGravity = _gravity;
 	P_isKinematic = _kinematic;
 	startPos = _transform->getPos();
+	P_flags.push_back(F_DEFAULT);
 
 	P_bodyCount.push_back(this);
 	P_netForce = VEC3ZERO;
@@ -193,6 +196,8 @@ void P_PhysicsBody::P_physicsUpdate(float dt)
 	{
 		const int numBodies = P_bodyCount.size();
 		for (int i = 0; i < numBodies; i++)
+			P_bodyCount[i]->P_triggered = false;
+		for (int i = 0; i < numBodies; i++)
 		{
 			P_PhysicsBody* body1 = P_bodyCount[i];
 
@@ -213,7 +218,6 @@ void P_PhysicsBody::P_physicsUpdate(float dt)
 				body1->P_transform->setPos(body1->P_position);
 			}
 
-
 			// TODO: Add Tunneling check.
 
 			//Check collisions
@@ -228,33 +232,45 @@ void P_PhysicsBody::P_physicsUpdate(float dt)
 					P_CollisionData colData = P_checkBounds(i, o);
 					if (colData.didCollide)
 					{
-						P_PhysicsBody* kinematicBody = nullptr;
-						P_PhysicsBody* otherBody = nullptr;
+						body1->P_triggered = true;
+						body2->P_triggered = true;
 
-						//Collision has occurred; the bodies react.
-						if (body1->P_isKinematic)
-						{
-							kinematicBody = body1;
-							otherBody = body2;
-						}
-						else if (body2->P_isKinematic)
-						{
-							kinematicBody = body2;
-							otherBody = body1;
-						}
+						/*COLLISION HAS BEEN DETECTED*/
+						/*
+							Here we reach a fork in the road
+							If either of the involved objects are a trigger,
+							or if one is flagged with a flag that the other ignores,
+							then we entirely skip this step.
+						*/
 
-						if (body1->P_isKinematic || body2->P_isKinematic)
+						if (!(body1->P_isTrigger == true || body2->P_isTrigger == true))
 						{
-							//A dynamic and kinematic body have collided, one must react.
-							float v_length = glm::length(colData.direction);
+							P_PhysicsBody* kinematicBody = nullptr;
+							P_PhysicsBody* otherBody = nullptr;
 
-							//Offset body by depth in other
-							if (!anyOfIs(0.f, colData.depth, v_length))
+							if (body1->P_isKinematic)
 							{
-								otherBody->P_position += (colData.depth * (colData.direction / v_length)) * 1.0000001f;
+								kinematicBody = body1;
+								otherBody = body2;
+							}
+							else if (body2->P_isKinematic)
+							{
+								kinematicBody = body2;
+								otherBody = body1;
+							}
 
-								glm::vec3 normal;
-								float normalSize = glm::length(colData.normal);
+							if (body1->P_isKinematic || body2->P_isKinematic)
+							{
+								//A dynamic and kinematic body have collided, one must react.
+								float v_length = glm::length(colData.direction);
+
+								//Offset body by depth in other
+								if (!anyOfIs(0.f, colData.depth, v_length))
+								{
+									otherBody->P_position += (colData.depth * (colData.direction / v_length)) * 1.0000001f;
+
+									glm::vec3 normal;
+									float normalSize = glm::length(colData.normal);
 									normal = colData.normal / normalSize;
 
 									//Adjust velocity
@@ -263,43 +279,44 @@ void P_PhysicsBody::P_physicsUpdate(float dt)
 									perpNorm = (1.f - (otherBody->P_friction + kinematicBody->P_friction) / 2 * frictionScalar * dt) * perpNorm;
 									std::cout << perpNorm.x << ',' << (1.f - (otherBody->P_friction + kinematicBody->P_friction) / 2 * frictionScalar * dt) << std::endl;
 									otherBody->P_velocity = (withNorm + perpNorm) - withNorm * (1.f + otherBody->P_bounciness);
+								}
+								otherBody->P_transform->setPos(otherBody->P_position);
 							}
-							otherBody->P_transform->setPos(otherBody->P_position);
-						}
-						else
-						{
-
-							//THIS DOES NOT TAKE MASS INTO ACCOUNT
-
-							float v_length = glm::length(colData.direction);
-
-							//Offset body by depth in other
-							if (!anyOfIs(0.f, colData.depth, v_length))
+							else
 							{
-								glm::vec3 displaceAmount = ((colData.depth * (colData.direction / v_length)) * 1.0000001f) / 2.f;
-								body1->P_position += displaceAmount;
-								body2->P_position -= displaceAmount;
 
-								glm::vec3 normal;
-								float normalSize = glm::length(colData.normal);
-								normal = colData.normal / normalSize;
+								//THIS DOES NOT TAKE MASS INTO ACCOUNT
 
-								//Adjust velocity and acceleration so that it stops moving
-								glm::vec3 v1 = ((glm::dot(body1->P_velocity, colData.normal) / (normalSize * normalSize)) * colData.normal);
-								glm::vec3 v2 = ((glm::dot(body2->P_velocity, colData.normal) / (normalSize * normalSize)) * colData.normal);
+								float v_length = glm::length(colData.direction);
 
-								body1->P_velocity -= v1;
-								body1->P_velocity += v2;
+								//Offset body by depth in other
+								if (!anyOfIs(0.f, colData.depth, v_length))
+								{
+									glm::vec3 displaceAmount = ((colData.depth * (colData.direction / v_length)) * 1.0000001f) / 2.f;
+									body1->P_position += displaceAmount;
+									body2->P_position -= displaceAmount;
 
-								body2->P_velocity -= v2;
-								body2->P_velocity += v1;
+									glm::vec3 normal;
+									float normalSize = glm::length(colData.normal);
+									normal = colData.normal / normalSize;
+
+									//Adjust velocity and acceleration so that it stops moving
+									glm::vec3 v1 = ((glm::dot(body1->P_velocity, colData.normal) / (normalSize * normalSize)) * colData.normal);
+									glm::vec3 v2 = ((glm::dot(body2->P_velocity, colData.normal) / (normalSize * normalSize)) * colData.normal);
+
+									body1->P_velocity -= v1;
+									body1->P_velocity += v2;
+
+									body2->P_velocity -= v2;
+									body2->P_velocity += v1;
+								}
+								body1->P_transform->setPos(body1->P_position);
+								body2->P_transform->setPos(body2->P_position);
+
+								//Two dynamic bodies have collided, both must react
+								//float massRatio = body1->getMass() / body2->getMass();
+
 							}
-							body1->P_transform->setPos(body1->P_position);
-							body2->P_transform->setPos(body2->P_position);
-
-							//Two dynamic bodies have collided, both must react
-							//float massRatio = body1->getMass() / body2->getMass();
-
 						}
 					}
 
