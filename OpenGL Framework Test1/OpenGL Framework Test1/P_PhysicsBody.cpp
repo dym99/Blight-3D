@@ -277,7 +277,7 @@ void P_PhysicsBody::P_physicsUpdate(float dt)
 									glm::vec3 withNorm = ((glm::dot(otherBody->P_velocity, colData.normal) / (normalSize * normalSize)) * colData.normal);
 									glm::vec3 perpNorm = otherBody->P_velocity - withNorm;
 									perpNorm = (1.f - (otherBody->P_friction + kinematicBody->P_friction) / 2 * frictionScalar * dt) * perpNorm;
-									std::cout << perpNorm.x << ',' << (1.f - (otherBody->P_friction + kinematicBody->P_friction) / 2 * frictionScalar * dt) << std::endl;
+									//std::cout << perpNorm.x << ',' << (1.f - (otherBody->P_friction + kinematicBody->P_friction) / 2 * frictionScalar * dt) << std::endl;
 									otherBody->P_velocity = (withNorm + perpNorm) - withNorm * (1.f + otherBody->P_bounciness);
 								}
 								otherBody->P_transform->setPos(otherBody->P_position);
