@@ -22,7 +22,7 @@
     <VCProjectVersion>15.0</VCProjectVersion>
     <ProjectGuid>{66933C17-0F2C-41EF-BABE-E8CE788DE6AA}</ProjectGuid>
     <RootNamespace>OpenGLFrameworkTest1</RootNamespace>
-    <WindowsTargetPlatformVersion>10.0.17134.0</WindowsTargetPlatformVersion>
+    <WindowsTargetPlatformVersion>10.0.17763.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
@@ -150,6 +150,7 @@
     <ClCompile Include="FrameBuffer.cpp" />
     <ClCompile Include="Game.cpp" />
     <ClCompile Include="GameObject.cpp" />
+    <ClCompile Include="IModel.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="Input.cpp" />
     <ClCompile Include="Material.cpp" />
@@ -161,6 +162,7 @@
     <ClCompile Include="ParticleEffect.cpp" />
     <ClCompile Include="ParticleManager.cpp" />
     <ClCompile Include="ParticleRenderBehaviour.cpp" />
+    <ClCompile Include="PlayerController.cpp" />
     <ClCompile Include="P_Collider.cpp" />
     <ClCompile Include="P_PhysicsBody.cpp" />
     <ClCompile Include="Scene.cpp" />
@@ -176,10 +178,12 @@
     <ClInclude Include="Behaviour.h" />
     <ClInclude Include="Camera.h" />
     <ClInclude Include="CameraBehaviour.h" />
+    <ClInclude Include="IModel.h" />
     <ClInclude Include="MathFunc.h" />
     <ClInclude Include="ParticleEffect.h" />
     <ClInclude Include="ParticleManager.h" />
     <ClInclude Include="ParticleRenderBehaviour.h" />
+    <ClInclude Include="PlayerController.h" />
     <ClInclude Include="P_Collider.h" />
     <ClInclude Include="Display.h" />
     <ClInclude Include="FrameBuffer.h" />

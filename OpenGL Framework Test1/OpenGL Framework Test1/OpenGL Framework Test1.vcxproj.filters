@@ -52,9 +52,6 @@
     <ClCompile Include="Material.cpp">
       <Filter>Source Files\Loaders</Filter>
     </ClCompile>
-    <ClCompile Include="main.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="Input.cpp">
       <Filter>Source Files\Handlers</Filter>
     </ClCompile>
@@ -84,6 +81,15 @@
     </ClCompile>
     <ClCompile Include="AudioPlayer.cpp">
       <Filter>Source Files\Handlers</Filter>
+    </ClCompile>
+    <ClCompile Include="PlayerController.cpp">
+      <Filter>Source Files\Behaviours\Player</Filter>
+    </ClCompile>
+    <ClCompile Include="main.cpp">
+      <Filter>Source Files\Loaders</Filter>
+    </ClCompile>
+    <ClCompile Include="IModel.cpp">
+      <Filter>Source Files\Loaders</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -171,6 +177,12 @@
     <ClInclude Include="AudioPlayer.h">
       <Filter>Source Files\Handlers</Filter>
     </ClInclude>
+    <ClInclude Include="PlayerController.h">
+      <Filter>Source Files\Behaviours\Player</Filter>
+    </ClInclude>
+    <ClInclude Include="IModel.h">
+      <Filter>Source Files\Loaders</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Source Files">
@@ -224,6 +236,9 @@
     </Filter>
     <Filter Include="Source Files\Effects\Particles">
       <UniqueIdentifier>{70bd2cd7-9789-4347-b073-bb93ac079a71}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Behaviours\Player">
+      <UniqueIdentifier>{a0e2dcfb-c35f-46ea-ba7b-9167c00811e1}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
 </Project>

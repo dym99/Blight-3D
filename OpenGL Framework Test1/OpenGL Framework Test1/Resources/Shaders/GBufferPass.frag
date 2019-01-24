@@ -1,6 +1,6 @@
 #version 420
 
-uniform sampler2D uTex;
+layout (binding=0) uniform sampler2D uTex;
 uniform vec3 colorTint;
 
 in vec2 TexCoords;

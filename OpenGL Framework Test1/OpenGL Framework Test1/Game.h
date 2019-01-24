@@ -9,6 +9,7 @@
 #include "Utilities.h"
 #include "P_PhysicsBody.h"
 #include "ParticleManager.h"
+#include "IModel.h"
 
 class Game {
 public:
@@ -53,7 +54,15 @@ private:
 	std::vector<Scene>  m_scenes;
 	std::vector<Scene*> m_activeScenes;
 
-	P_PhysicsBody *ravagerPhys;
+	P_PhysicsBody *playerPhys;
+
+	IModel m_ravagerModel;
+	Texture m_ravagerAlbedo;
+
+
+	IModel m_logunModel;
+	Texture m_logunAlbedo;
+	//Texture TexEmmisive;
 };
 
 #endif

@@ -8,6 +8,7 @@
 #include "MeshRenderBehaviour.h"
 #include "TestRotateBehaviour.h"
 #include "MouseLook.h"
+#include "PlayerController.h"
 #include "CameraBehaviour.h"
 #include "AudioPlayer.h"
 
@@ -80,6 +81,18 @@ void Game::initGame()
 	m_brazier = new Model();
 	m_brazier->LoadFromFile("./Resources/Objects/Brazier/", "brazier");
 	
+	m_ravagerModel.loadFromFile("Ravager.imdl", "Resources/Objects/Ravager/");
+
+	m_logunModel.loadFromFile("Logun.imdl", "Resources/Objects/Logun/");
+
+	m_ravagerAlbedo = Texture("diffuseTex");
+	m_ravagerAlbedo.Load("Resources/Objects/Ravager/albedo.png");
+	m_ravagerModel.setAlbedo(&m_ravagerAlbedo);
+
+	m_logunAlbedo = Texture("diffuseTex");
+	m_logunAlbedo.Load("Resources/Objects/Logun/albedo.png");
+	m_logunModel.setAlbedo(&m_logunAlbedo);
+
 	ShaderManager::loadShaders();
 
 	ParticleManager::loadParticles();
@@ -136,12 +149,23 @@ void Game::initGame()
 
 	//Set up the test Scene
 
+	auto player = new GameObject("Player");
+	playerPhys = new P_PhysicsBody(&player->localTransform, 1.f, true, SPHERE, 0.8f, 0.f, 0.f, glm::vec3(0, 0.8f, 0));
+	player->addBehaviour(new MeshRenderBehaviour(&m_logunModel, ShaderManager::getShader(GBUFFER_SHADER)));
+
 	auto ravager = new GameObject("Ravager");
-	ravager->addBehaviour(new MeshRenderBehaviour(m_ravager, ShaderManager::getShader(GBUFFER_SHADER)));
+	ravager->addBehaviour(new MeshRenderBehaviour(&m_ravagerModel, ShaderManager::getShader(GBUFFER_SHADER)));
+	ravager->localTransform.setPos(glm::vec3(0.f,0.f,10.f));
+	ravager->localTransform.setRot(glm::vec3(0.f, float(M_PI), 0.f));
 
 	auto cameraPivot = new GameObject("CameraPivot");
 	cameraPivot->localTransform.setPos(glm::vec3(0.f,1.f,0.f));
-	cameraPivot->addBehaviour(new MouseLook(ravager));
+
+	{
+		auto mLook = new MouseLook(player, playerPhys);
+		cameraPivot->addBehaviour(mLook);
+		cameraPivot->addBehaviour(new PlayerController(player, playerPhys, mLook));
+	}
 
 	auto cameraObject = new GameObject("Camera");
 
@@ -150,7 +174,7 @@ void Game::initGame()
 	camera->setTransform(&cameraObject->worldTransform);
 
 	cameraPivot->addChild(cameraObject);
-	ravager->addChild(cameraPivot);
+	player->addChild(cameraPivot);
 	
 	auto brazier = new GameObject("brazier");
 	brazier->addBehaviour(new MeshRenderBehaviour(m_brazier, ShaderManager::getShader(GBUFFER_SHADER)));
@@ -164,6 +188,7 @@ void Game::initGame()
 
 	auto scene = new Scene("DemoScene");
 	scene->addChild(brazier);
+	scene->addChild(player);
 	scene->addChild(ravager);
 	scene->addChild(testArea);
 
@@ -171,18 +196,16 @@ void Game::initGame()
 
 
 	//TODO: Set up transform class so that a world transform can exist
-	ravagerPhys = new P_PhysicsBody(&ravager->localTransform, 1.f, true, SPHERE, 1.f, 0.f, 0.f, glm::vec3(0, 0.5f, 0));
-	P_PhysicsBody::P_bodyCount.push_back(ravagerPhys);
-	P_PhysicsBody::P_bodyCount.push_back(new P_PhysicsBody(new Transform(), 1.f, false, BOX, 1.f, 8.f, 8.f, glm::vec3(0, -0.5f, 0), 0, true));
-	P_PhysicsBody::P_bodyCount.push_back(new P_PhysicsBody(new Transform(), 1.f, false, BOX, 1.f, 2.f, 2.f, glm::vec3(0, -0.5f, 5), 0, true));
-	P_PhysicsBody::P_bodyCount.push_back(new P_PhysicsBody(new Transform(), 1.f, false, BOX, 1.f, 8.f, 8.f, glm::vec3(0, -0.5f, 10), 0, true));
-
+	P_PhysicsBody::P_bodyCount.push_back(playerPhys);
+	P_PhysicsBody::P_bodyCount.push_back(new P_PhysicsBody(new Transform(), 1.f, false, BOX, 1.f, 8.f, 8.f, glm::vec3(0, -0.5f, 0), 0, 0.8f, true));
+	P_PhysicsBody::P_bodyCount.push_back(new P_PhysicsBody(new Transform(), 1.f, false, BOX, 1.f, 2.f, 2.f, glm::vec3(0, -0.5f, 5), 0, 0.5f, true));
+	P_PhysicsBody::P_bodyCount.push_back(new P_PhysicsBody(new Transform(), 1.f, false, BOX, 1.f, 8.f, 8.f, glm::vec3(0, -0.5f, 10), 0, 0.5f, true));
 
 	//Load audio track for drum loop
-	AudioPlayer::loadAudio(*new AudioTrack("drumloop", FMOD_3D, AudioType::EFFECT, { 0.f, 0.f, 0.f }, { 0.f, 0.f, 0.f }, true, 0.1f, 5000.f), "drumloop");
+	AudioPlayer::loadAudio(*new AudioTrack("Ambiance", FMOD_3D, AudioType::EFFECT, { 0.f, 0.f, 0.f }, { 0.f, 0.f, 0.f }, true, 0.1f, 5000.f), "Ambiance");
 	//Play drum loop
-	AudioPlayer::playTrack("drumloop");
-	AudioPlayer::setVolume("drumloop", 0.01f);
+	AudioPlayer::playTrack("Ambiance");
+	AudioPlayer::setVolume("Ambiance", 0.08f);
 
 	m_activeScenes.push_back(scene);
 }
@@ -193,7 +216,7 @@ void Game::update()
 
 	//Remove this when done testing. Or use as a jump for testing purposes.
 	if (Input::GetKeyDown(KeyCode::Space)) {
-		ravagerPhys->P_velocity.y = 4.f;
+		playerPhys->P_velocity.y = 4.f;
 	}
 
 	if (Input::GetKeyPress(KeyCode::F1)) {
@@ -233,6 +256,7 @@ void Game::draw()
 		for (unsigned int i = 0; i < m_activeScenes.size(); ++i) {
 			m_activeScenes[i]->onRender();
 		}
+
 
 		gBuffer->Unbind();
 	}

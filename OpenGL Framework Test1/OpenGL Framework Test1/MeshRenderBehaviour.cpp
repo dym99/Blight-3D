@@ -8,6 +8,21 @@ MeshRenderBehaviour::MeshRenderBehaviour(Model * _model, Shader* _shader, const 
 	m_model = _model;
 	m_shader = _shader;
 
+	m_IMDL = false;
+
+	m_transparent = _transparent;
+
+
+	m_active = true;
+}
+
+MeshRenderBehaviour::MeshRenderBehaviour(IModel * _model, Shader* _shader, const bool& _transparent)
+{
+	//Set the model and shader handles.
+	m_iModel = _model;
+	m_shader = _shader;
+
+	m_IMDL = true;
 
 	m_transparent = _transparent;
 
@@ -42,8 +57,11 @@ void MeshRenderBehaviour::render()
 		m_shader->bind();
 		m_shader->update(*Camera::mainCamera);
 		m_shader->sendUniform("uModel", m_parentObject->worldTransform);
-		m_shader->sendUniform("colorTint", m_model->colorTint);
-		m_model->Draw(m_shader);
+		//m_shader->sendUniform("colorTint", m_model->colorTint);
+		if (m_IMDL)
+			m_iModel->draw(m_shader);
+		else
+			m_model->Draw(m_shader);
 	//}
 }
 
