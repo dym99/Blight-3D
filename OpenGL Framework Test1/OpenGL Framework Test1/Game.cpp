@@ -219,7 +219,7 @@ void Game::update()
 		playerPhys->P_velocity.y = 4.f;
 	}
 
-	if (Input::GetKeyPress(KeyCode::F1)) {
+	if (Input::GetKeyDown(KeyCode::F1)) {
 		displayBuffers = !displayBuffers;
 	}
 

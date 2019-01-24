@@ -54,14 +54,16 @@ void MeshRenderBehaviour::render()
 {
 	//Only render here if opaque.
 	//if (!m_transparent) {
-		m_shader->bind();
-		m_shader->update(*Camera::mainCamera);
-		m_shader->sendUniform("uModel", m_parentObject->worldTransform);
-		//m_shader->sendUniform("colorTint", m_model->colorTint);
-		if (m_IMDL)
-			m_iModel->draw(m_shader);
-		else
+	m_shader->bind();
+	m_shader->update(*Camera::mainCamera);
+	m_shader->sendUniform("uModel", m_parentObject->worldTransform);
+	if (m_IMDL) {
+		m_shader->sendUniform("colorTint", glm::vec4(1,1,1,1));
+		m_iModel->draw(m_shader);
+	} else {
+			m_shader->sendUniform("colorTint", m_model->colorTint);
 			m_model->Draw(m_shader);
+		}
 	//}
 }
 
