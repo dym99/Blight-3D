@@ -151,6 +151,7 @@
     <ClCompile Include="Game.cpp" />
     <ClCompile Include="GameObject.cpp" />
     <ClCompile Include="IModel.cpp" />
+    <ClCompile Include="ISkeleton.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="Input.cpp" />
     <ClCompile Include="Material.cpp" />
@@ -179,6 +180,7 @@
     <ClInclude Include="Camera.h" />
     <ClInclude Include="CameraBehaviour.h" />
     <ClInclude Include="IModel.h" />
+    <ClInclude Include="ISkeleton.h" />
     <ClInclude Include="MathFunc.h" />
     <ClInclude Include="ParticleEffect.h" />
     <ClInclude Include="ParticleManager.h" />

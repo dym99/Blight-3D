@@ -91,6 +91,9 @@
     <ClCompile Include="IModel.cpp">
       <Filter>Source Files\Loaders</Filter>
     </ClCompile>
+    <ClCompile Include="ISkeleton.cpp">
+      <Filter>Source Files\Loaders</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Behaviour.h">
@@ -183,6 +186,9 @@
     <ClInclude Include="IModel.h">
       <Filter>Source Files\Loaders</Filter>
     </ClInclude>
+    <ClInclude Include="ISkeleton.h">
+      <Filter>Source Files\Loaders</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Source Files">
@@ -239,6 +245,9 @@
     </Filter>
     <Filter Include="Source Files\Behaviours\Player">
       <UniqueIdentifier>{a0e2dcfb-c35f-46ea-ba7b-9167c00811e1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Temp Stuff">
+      <UniqueIdentifier>{510282a8-2c0a-47f7-a5eb-53ec00d7af56}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
 </Project>

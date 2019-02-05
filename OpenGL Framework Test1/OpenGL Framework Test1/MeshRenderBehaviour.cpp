@@ -36,7 +36,7 @@ MeshRenderBehaviour::~MeshRenderBehaviour()
 	//Do not delete m_model here, as it is a shared resource, and will be deleted elsewhere.
 	m_model = nullptr;
 
-	//Reset tranparency variable to avoid any potential graphical errors.
+	//Reset transparency variable to avoid any potential graphical errors.
 	m_transparent = false;
 }
 
@@ -54,6 +54,11 @@ void MeshRenderBehaviour::render()
 {
 	//Only render here if opaque.
 	//if (!m_transparent) {
+
+	//
+	//	Temporary way to make render behaviour support both Model and IModel class.
+	//
+
 	m_shader->bind();
 	m_shader->update(*Camera::mainCamera);
 	m_shader->sendUniform("uModel", m_parentObject->worldTransform);

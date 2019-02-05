@@ -6,6 +6,9 @@
 #include <map>
 #include "Texture.h"
 
+
+#pragma region enums
+
 enum VBOType {
 	VBO_POS,
 	VBO_TEX,
@@ -29,6 +32,12 @@ enum TexTypes {
 	NUM_TEX_TYPES
 };
 
+#pragma endregion
+
+//Simple IMDL Loader
+//
+// Skipped Tangent/Bitangent stuff for now
+//
 class IModel
 {
 public:
@@ -39,6 +48,8 @@ public:
 	void loadFromFile(const std::string& _name, const std::string& _path="Resources/Objects/");
 	void draw(Shader *shader);
 
+	//TODO: just assume textures are named albedo.png, normals.png, spec.png (etc.) unless specifed.
+	//Right now, you have to specify.
 	void setAlbedo(Texture* _tex);
 
 private:
@@ -56,8 +67,8 @@ private:
 
 	unsigned int m_numVertices;
 
-	//Map of all previously loaded files,
-	//in order to prevent loading the same model twice.
+	////Map of all previously loaded files,
+	////in order to prevent loading the same model twice.
 	//static std::map<const std::string&,IModel*> m_paths;
 };
 

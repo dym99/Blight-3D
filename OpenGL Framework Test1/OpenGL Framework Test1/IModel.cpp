@@ -1,10 +1,9 @@
-
 //Tell microsoft to shut up
 #define _CRT_SECURE_NO_WARNINGS
 
 #include "IModel.h"
 
-//IMDL as 32-bit little-endian integer
+//IMDL Header macros
 #define IMDL_HEADER 0x4c444d49U
 #define V_1_0 0x0100
 
