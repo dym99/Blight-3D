@@ -33,8 +33,6 @@ public:
 
 	static ParticleEffect* getParticle(int index);
 
-
-
 private:
 	static std::vector<ParticleEffect*> m_particleEffects;
 

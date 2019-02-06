@@ -15,7 +15,7 @@ public:
 	ISkeleton(const std::string& _name);
 	~ISkeleton();
 
-	//References to bones in orger of group indeces (for sending to OpenGL)
+	//References to bones in order of group indices (for sending to OpenGL)
 	std::vector<glm::mat4> m_bones;
 };
 

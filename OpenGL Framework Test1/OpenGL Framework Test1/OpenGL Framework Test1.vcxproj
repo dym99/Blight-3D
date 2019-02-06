@@ -144,6 +144,7 @@
   <ItemGroup>
     <ClCompile Include="AudioPlayer.cpp" />
     <ClCompile Include="Behaviour.cpp" />
+    <ClCompile Include="BVH.cpp" />
     <ClCompile Include="Camera.cpp" />
     <ClCompile Include="CameraBehaviour.cpp" />
     <ClCompile Include="Display.cpp" />
@@ -177,6 +178,7 @@
   <ItemGroup>
     <ClInclude Include="AudioPlayer.h" />
     <ClInclude Include="Behaviour.h" />
+    <ClInclude Include="BVH.h" />
     <ClInclude Include="Camera.h" />
     <ClInclude Include="CameraBehaviour.h" />
     <ClInclude Include="IModel.h" />

@@ -2,8 +2,8 @@
 #include <iostream>
 
 
-#include "P_PhysicsBody.h"
 
+#include "P_PhysicsBody.h"
 #include "ShaderManager.h"
 #include "MeshRenderBehaviour.h"
 #include "TestRotateBehaviour.h"
@@ -206,6 +206,12 @@ void Game::initGame()
 	//Play drum loop
 	AudioPlayer::playTrack("Ambiance");
 	AudioPlayer::setVolume("Ambiance", 0.08f);
+
+	logunSkeleton.load("./Resources/Objects/Logun/Logun.bvh");
+	logunIdle.load("./Resources/Objects/Logun/L_Idle_1.bvh");
+	
+	ravagerSkeleton.load("./Resources/Objects/Ravager/Ravager.bvh");
+	ravagerIdle.load("./Resources/Objects/Ravager/R_Idle_1.bvh");
 
 	m_activeScenes.push_back(scene);
 }

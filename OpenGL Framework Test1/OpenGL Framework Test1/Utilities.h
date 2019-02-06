@@ -6,6 +6,8 @@
 #include "Shader.h"
 #include "FrameBuffer.h"
 #include <vector>
+#include <algorithm>
+#include <string>
 
 #define WINDOW_WIDTH			1280
 #define WINDOW_HEIGHT			720
@@ -38,4 +40,6 @@ void ProcessPostProc(FrameBuffer& _buffer, Shader& shader);
 
 void ProcessFramebufferStuff(FrameBuffer& _main, FrameBuffer& _work1, FrameBuffer& _work2, FrameBuffer& _work3,
 								std::vector<Shader*>& bloomComponents, Shader& postProcShader, bool postProc, bool hasBloom);
+
+std::string trim(std::string &str);
 #endif // !__UTILITIES_H__

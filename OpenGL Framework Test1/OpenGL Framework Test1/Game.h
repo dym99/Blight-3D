@@ -10,6 +10,7 @@
 #include "P_PhysicsBody.h"
 #include "ParticleManager.h"
 #include "IModel.h"
+#include "BVH.h"
 
 class Game {
 public:
@@ -27,6 +28,7 @@ public:
 	int run();
 
 private:
+
 	Display *m_display;
 
 	//TODO: Replace resources here with resource loader class
@@ -58,10 +60,14 @@ private:
 
 	IModel m_ravagerModel;
 	Texture m_ravagerAlbedo;
+	BVH ravagerSkeleton;
+	BVH ravagerIdle;
 
 
 	IModel m_logunModel;
 	Texture m_logunAlbedo;
+	BVH logunSkeleton;
+	BVH logunIdle;
 	//Texture TexEmmisive;
 };
 

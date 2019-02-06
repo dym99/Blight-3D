@@ -94,6 +94,9 @@
     <ClCompile Include="ISkeleton.cpp">
       <Filter>Source Files\Loaders</Filter>
     </ClCompile>
+    <ClCompile Include="BVH.cpp">
+      <Filter>Source Files\Loaders</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Behaviour.h">
@@ -187,6 +190,9 @@
       <Filter>Source Files\Loaders</Filter>
     </ClInclude>
     <ClInclude Include="ISkeleton.h">
+      <Filter>Source Files\Loaders</Filter>
+    </ClInclude>
+    <ClInclude Include="BVH.h">
       <Filter>Source Files\Loaders</Filter>
     </ClInclude>
   </ItemGroup>
