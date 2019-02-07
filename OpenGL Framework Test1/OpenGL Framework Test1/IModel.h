@@ -57,6 +57,8 @@ public:
 	void sendBones();
 	void calculateBindBones(int index);
 
+	std::vector<glm::mat4> getBindBones() { return m_bindBones; }
+
 	void draw(Shader *shader);
 
 	//TODO: just assume textures are named albedo.png, normals.png, spec.png (etc.) unless specifed.

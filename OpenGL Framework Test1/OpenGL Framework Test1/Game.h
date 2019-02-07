@@ -11,6 +11,7 @@
 #include "ParticleManager.h"
 #include "IModel.h"
 #include "BVH.h"
+#include "UniformBuffer.h"
 
 class Game {
 public:
@@ -60,14 +61,11 @@ private:
 
 	IModel m_ravagerModel;
 	Texture m_ravagerAlbedo;
-	BVH ravagerBind;
-	BVH ravagerIdle;
-
+	UniformBuffer m_UBO_RBones;
 
 	IModel m_logunModel;
 	Texture m_logunAlbedo;
-	BVH logunBind;
-	BVH logunIdle;
+	UniformBuffer m_UBO_LBones;
 	//Texture TexEmmisive;
 };
 

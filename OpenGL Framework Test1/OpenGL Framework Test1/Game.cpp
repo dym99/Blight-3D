@@ -87,6 +87,14 @@ void Game::initGame()
 	m_ravagerModel.loadBindMatrices();
 	m_ravagerModel.loadAnimMatrices(0);
 	m_ravagerModel.calculateBindBones(0);
+	m_UBO_RBones.allocateMemory(sizeof(glm::mat4) * 255);
+	m_UBO_RBones.bind(1);
+	
+	std::vector<glm::mat4> testVec = m_ravagerModel.getBindBones();
+	for (int i = 0; i < testVec.size(); i++)
+	{
+		m_UBO_RBones.sendMatrix(testVec[i], i * sizeof(glm::mat4));
+	}
 
 	m_logunModel.loadFromFile("Logun.imdl", "Resources/Objects/Logun/");
 	m_logunModel.loadBindSkeleton("./Resources/Objects/Logun/Logun.bvh");
@@ -94,6 +102,16 @@ void Game::initGame()
 	m_logunModel.loadBindMatrices();
 	m_logunModel.loadAnimMatrices(0);
 	m_logunModel.calculateBindBones(0);
+	//m_UBO_LBones.allocateMemory(sizeof(glm::mat4) * 255);
+	//m_UBO_LBones.bind(1);
+	//testVec.clear();
+	//testVec.resize(0);
+	//testVec = m_logunModel.getBindBones();
+	//for (int i = 0; i < testVec.size(); ++i)
+	//{
+	//	m_UBO_LBones.sendMatrix(testVec[i], i * sizeof(glm::mat4));
+	//}
+
 
 	m_ravagerAlbedo = Texture("diffuseTex");
 	m_ravagerAlbedo.Load("Resources/Objects/Ravager/albedo.png");
@@ -161,7 +179,7 @@ void Game::initGame()
 
 	auto player = new GameObject("Player");
 	playerPhys = new P_PhysicsBody(&player->localTransform, 1.f, true, SPHERE, 0.8f, 0.f, 0.f, glm::vec3(0, 0.8f, 0));
-	player->addBehaviour(new MeshRenderBehaviour(&m_logunModel, ShaderManager::getShader(GBUFFER_SHADER)));
+	player->addBehaviour(new MeshRenderBehaviour(&m_logunModel, ShaderManager::getShader(SKINNED_GBUFFER_SHADER)));
 
 	auto ravager = new GameObject("Ravager");
 	ravager->addBehaviour(new MeshRenderBehaviour(&m_ravagerModel, ShaderManager::getShader(GBUFFER_SHADER)));
@@ -266,7 +284,6 @@ void Game::draw()
 		for (unsigned int i = 0; i < m_activeScenes.size(); ++i) {
 			m_activeScenes[i]->onRender();
 		}
-
 
 		gBuffer->Unbind();
 	}

@@ -91,6 +91,8 @@ void IModel::loadAnimations(const std::string & fileName)
 
 void IModel::loadFromFile(const std::string& _name, const std::string& _path) {
 	std::string filename = _path + _name;
+	m_name = _name.c_str();
+	m_path = _path.c_str();
 
 	//Check if the file is already loaded and use existing models.
 	//std::map<const std::string&, IModel*>::iterator it;
