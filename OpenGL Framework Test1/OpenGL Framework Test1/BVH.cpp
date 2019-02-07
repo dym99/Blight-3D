@@ -204,6 +204,18 @@ void BVH::load(const std::string & filename)
 	}
 }
 
+void BVH::loadTransforms(const JOINT * joint, unsigned frame, bool _nextFrame)
+{
+	std::vector<glm::mat4>* vector = _nextFrame ? &nextFrame : &currentFrame;
+
+	vector->push_back(joint->matrix);
+
+	for (auto child : joint->children)
+	{
+		loadTransforms(joint, frame, _nextFrame);
+	}
+}
+
 
 /**
 			Calculates JOINT's local transformation matrix for

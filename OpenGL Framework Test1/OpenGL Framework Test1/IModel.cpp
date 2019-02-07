@@ -66,8 +66,27 @@ IModel::IModel(const IModel& _other) {
 	}
 }
 
-IModel::~IModel() {
+IModel::~IModel()
+{
+	for (auto anim : m_animations)
+	{
+		if (anim != nullptr)
+		{
+			delete anim;
+			anim = nullptr;
+		}
+	}
+}
 
+void IModel::loadBindSkeleton(const std::string & fileName)
+{
+	m_bindSkeleton.load(fileName);
+}
+
+void IModel::loadAnimations(const std::string & fileName)
+{
+	m_animations.push_back(new BVH);
+	m_animations[m_animations.size() - 1]->load(fileName);
 }
 
 void IModel::loadFromFile(const std::string& _name, const std::string& _path) {
@@ -324,6 +343,39 @@ void IModel::loadFromFile(const std::string& _name, const std::string& _path) {
 
 	//Close the file when done.
 	fclose(file);
+}
+
+void IModel::loadBindMatrices()
+{
+	m_bindSkeleton.moveTo(0);
+	m_bindSkeleton.loadTransforms(m_bindSkeleton.getRootJoint(), 0);
+	m_bindSkeleton.loadTransforms(m_bindSkeleton.getRootJoint(), 0, true);
+
+	m_bindBones.resize(m_bindSkeleton.getCurrentFrame().size());
+}
+
+void IModel::loadAnimMatrices(int index)
+{
+	m_animations[index]->moveTo(0);
+	m_animations[index]->loadTransforms(m_animations[index]->getRootJoint(), 0);
+	m_animations[index]->loadTransforms(m_animations[index]->getRootJoint(), 0, true);
+}
+
+void IModel::update(float dt)
+{
+}
+
+void IModel::sendBones()
+{
+
+}
+
+void IModel::calculateBindBones(int index)
+{
+	for (int i = 0; i < m_bindSkeleton.getCurrentFrame().size(); ++i)
+	{
+		m_bindBones[i] = glm::inverse(m_bindSkeleton.getCurrentFrame()[i]) * m_animations[index]->getCurrentFrame()[i];
+	}
 }
 
 void IModel::draw(Shader * shader) {

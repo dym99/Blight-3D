@@ -69,6 +69,7 @@ public:
 
 	//Loading
 	void load(const std::string& filename);
+	void loadTransforms(const JOINT* joint, unsigned frame, bool _nextFrame = false);
 
 	/** Loads motion data from a frame into local matrices */
 	static void moveJoint(JOINT* joint, MOTION* motionData, int frame_starts_index);
@@ -76,9 +77,14 @@ public:
 
 	const JOINT* getRootJoint() const { return rootJoint; }
 	unsigned getNumFrames() const { return motionData.num_frames; }
+	std::vector<glm::mat4> getCurrentFrame() const { return currentFrame; }
+	std::vector<glm::mat4> getNextFrame() const { return nextFrame; }
 private:
 	JOINT* rootJoint;
 	MOTION motionData;
+
+	std::vector<glm::mat4> currentFrame;
+	std::vector<glm::mat4> nextFrame;
 };
 
 #endif // !__BVH_H__

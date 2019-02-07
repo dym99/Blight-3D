@@ -5,6 +5,8 @@
 #include <string>
 #include <map>
 #include "Texture.h"
+#include "BVH.h"
+#include "MathFunc.h"
 
 
 #pragma region enums
@@ -45,7 +47,16 @@ public:
 	IModel(const IModel&);
 	~IModel();
 
+	void loadBindSkeleton(const std::string& fileName);
+	void loadAnimations(const std::string& fileName);
 	void loadFromFile(const std::string& _name, const std::string& _path="Resources/Objects/");
+	void loadBindMatrices();
+	void loadAnimMatrices(int index);
+	void update(float dt);
+
+	void sendBones();
+	void calculateBindBones(int index);
+
 	void draw(Shader *shader);
 
 	//TODO: just assume textures are named albedo.png, normals.png, spec.png (etc.) unless specifed.
@@ -66,6 +77,14 @@ private:
 	const char* m_name;
 
 	unsigned int m_numVertices;
+
+	std::vector<glm::mat4> m_bindBones;
+
+	BVH m_bindSkeleton;
+	std::vector<BVH*> m_animations;
+
+	float m_percentNextFrame = 0.f;
+	int m_currentFrame = 0;
 
 	////Map of all previously loaded files,
 	////in order to prevent loading the same model twice.

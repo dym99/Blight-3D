@@ -60,13 +60,13 @@ private:
 
 	IModel m_ravagerModel;
 	Texture m_ravagerAlbedo;
-	BVH ravagerSkeleton;
+	BVH ravagerBind;
 	BVH ravagerIdle;
 
 
 	IModel m_logunModel;
 	Texture m_logunAlbedo;
-	BVH logunSkeleton;
+	BVH logunBind;
 	BVH logunIdle;
 	//Texture TexEmmisive;
 };

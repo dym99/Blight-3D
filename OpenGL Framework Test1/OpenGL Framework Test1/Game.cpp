@@ -82,8 +82,18 @@ void Game::initGame()
 	m_brazier->LoadFromFile("./Resources/Objects/Brazier/", "brazier");
 	
 	m_ravagerModel.loadFromFile("Ravager.imdl", "Resources/Objects/Ravager/");
+	m_ravagerModel.loadBindSkeleton("./Resources/Objects/Ravager/Ravager.bvh");
+	m_ravagerModel.loadAnimations("./Resources/Objects/Ravager/R_Idle_1.bvh");
+	m_ravagerModel.loadBindMatrices();
+	m_ravagerModel.loadAnimMatrices(0);
+	m_ravagerModel.calculateBindBones(0);
 
 	m_logunModel.loadFromFile("Logun.imdl", "Resources/Objects/Logun/");
+	m_logunModel.loadBindSkeleton("./Resources/Objects/Logun/Logun.bvh");
+	m_logunModel.loadAnimations("./Resources/Objects/Logun/L_Idle_1.bvh");
+	m_logunModel.loadBindMatrices();
+	m_logunModel.loadAnimMatrices(0);
+	m_logunModel.calculateBindBones(0);
 
 	m_ravagerAlbedo = Texture("diffuseTex");
 	m_ravagerAlbedo.Load("Resources/Objects/Ravager/albedo.png");
@@ -206,12 +216,6 @@ void Game::initGame()
 	//Play drum loop
 	AudioPlayer::playTrack("Ambiance");
 	AudioPlayer::setVolume("Ambiance", 0.08f);
-
-	logunSkeleton.load("./Resources/Objects/Logun/Logun.bvh");
-	logunIdle.load("./Resources/Objects/Logun/L_Idle_1.bvh");
-	
-	ravagerSkeleton.load("./Resources/Objects/Ravager/Ravager.bvh");
-	ravagerIdle.load("./Resources/Objects/Ravager/R_Idle_1.bvh");
 
 	m_activeScenes.push_back(scene);
 }
