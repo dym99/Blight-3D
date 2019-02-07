@@ -210,9 +210,9 @@ void BVH::loadTransforms(const JOINT * joint, unsigned frame, bool _nextFrame)
 
 	vector->push_back(joint->matrix);
 
-	for (auto child : joint->children)
+	for (auto& child : joint->children)
 	{
-		loadTransforms(joint, frame, _nextFrame);
+		loadTransforms(child, frame, _nextFrame);
 	}
 }
 

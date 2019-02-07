@@ -90,7 +90,7 @@ void Game::initGame()
 
 	m_logunModel.loadFromFile("Logun.imdl", "Resources/Objects/Logun/");
 	m_logunModel.loadBindSkeleton("./Resources/Objects/Logun/Logun.bvh");
-	m_logunModel.loadAnimations("./Resources/Objects/Logun/L_Idle_1.bvh");
+	m_logunModel.loadAnimations("./Resources/Objects/Logun/L_Idle.bvh");
 	m_logunModel.loadBindMatrices();
 	m_logunModel.loadAnimMatrices(0);
 	m_logunModel.calculateBindBones(0);
