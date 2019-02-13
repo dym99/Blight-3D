@@ -95,7 +95,7 @@ void Game::initGame()
 	m_leftRoom = new Model();
 	m_leftRoom->LoadFromFile("./Resources/Objects/MainLevel/", "RoomLeft");
 	m_rightRoom = new Model();
-	m_rightRoom->LoadFromFile("./Resources/Objects/MainLevel/", "RoomRight2");
+	m_rightRoom->LoadFromFile("./Resources/Objects/MainLevel/", "RoomRight");
 	m_topRoom1 = new Model();
 	m_topRoom1->LoadFromFile("./Resources/Objects/MainLevel/", "RoomTop2");
 	m_topRoom2 = new Model();
