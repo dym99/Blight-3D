@@ -85,6 +85,21 @@
     <ClCompile Include="AudioPlayer.cpp">
       <Filter>Source Files\Handlers</Filter>
     </ClCompile>
+    <ClCompile Include="UI.cpp">
+      <Filter>Source Files\GUI</Filter>
+    </ClCompile>
+    <ClCompile Include="include\imgui\imgui.cpp">
+      <Filter>Source Files\GUI\ImGUI</Filter>
+    </ClCompile>
+    <ClCompile Include="include\imgui\imgui_demo.cpp">
+      <Filter>Source Files\GUI\ImGUI</Filter>
+    </ClCompile>
+    <ClCompile Include="include\imgui\imgui_draw.cpp">
+      <Filter>Source Files\GUI\ImGUI</Filter>
+    </ClCompile>
+    <ClCompile Include="include\imgui\imgui_impl.cpp">
+      <Filter>Source Files\GUI\ImGUI</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Behaviour.h">
@@ -171,6 +186,27 @@
     <ClInclude Include="AudioPlayer.h">
       <Filter>Source Files\Handlers</Filter>
     </ClInclude>
+    <ClInclude Include="UI.h">
+      <Filter>Source Files\GUI</Filter>
+    </ClInclude>
+    <ClInclude Include="include\imgui\imgui.h">
+      <Filter>Source Files\GUI\ImGUI</Filter>
+    </ClInclude>
+    <ClInclude Include="include\imgui\imgui_impl.h">
+      <Filter>Source Files\GUI\ImGUI</Filter>
+    </ClInclude>
+    <ClInclude Include="include\imgui\imgui_internal.h">
+      <Filter>Source Files\GUI\ImGUI</Filter>
+    </ClInclude>
+    <ClInclude Include="include\imgui\stb_rect_pack.h">
+      <Filter>Source Files\GUI\ImGUI</Filter>
+    </ClInclude>
+    <ClInclude Include="include\imgui\stb_textedit.h">
+      <Filter>Source Files\GUI\ImGUI</Filter>
+    </ClInclude>
+    <ClInclude Include="include\imgui\stb_truetype.h">
+      <Filter>Source Files\GUI\ImGUI</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Source Files">
@@ -224,6 +260,12 @@
     </Filter>
     <Filter Include="Source Files\Effects\Particles">
       <UniqueIdentifier>{70bd2cd7-9789-4347-b073-bb93ac079a71}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\GUI">
+      <UniqueIdentifier>{0393910b-7679-4113-bc8e-77948b2cc0f0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\GUI\ImGUI">
+      <UniqueIdentifier>{82e52776-c7b3-4395-ba19-ec683960f99b}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
 </Project>

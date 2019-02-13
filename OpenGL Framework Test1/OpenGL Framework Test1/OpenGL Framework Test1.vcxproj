@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup Label="ProjectConfigurations">
     <ProjectConfiguration Include="Debug|Win32">
@@ -150,6 +150,10 @@
     <ClCompile Include="FrameBuffer.cpp" />
     <ClCompile Include="Game.cpp" />
     <ClCompile Include="GameObject.cpp" />
+    <ClCompile Include="include\imgui\imgui.cpp" />
+    <ClCompile Include="include\imgui\imgui_demo.cpp" />
+    <ClCompile Include="include\imgui\imgui_draw.cpp" />
+    <ClCompile Include="include\imgui\imgui_impl.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="Input.cpp" />
     <ClCompile Include="Material.cpp" />
@@ -168,6 +172,7 @@
     <ClCompile Include="ShaderManager.cpp" />
     <ClCompile Include="TestRotateBehaviour.cpp" />
     <ClCompile Include="Texture.cpp" />
+    <ClCompile Include="UI.cpp" />
     <ClCompile Include="Utilities.cpp" />
     <ClCompile Include="Utils.cpp" />
   </ItemGroup>
@@ -176,6 +181,12 @@
     <ClInclude Include="Behaviour.h" />
     <ClInclude Include="Camera.h" />
     <ClInclude Include="CameraBehaviour.h" />
+    <ClInclude Include="include\imgui\imgui.h" />
+    <ClInclude Include="include\imgui\imgui_impl.h" />
+    <ClInclude Include="include\imgui\imgui_internal.h" />
+    <ClInclude Include="include\imgui\stb_rect_pack.h" />
+    <ClInclude Include="include\imgui\stb_textedit.h" />
+    <ClInclude Include="include\imgui\stb_truetype.h" />
     <ClInclude Include="MathFunc.h" />
     <ClInclude Include="ParticleEffect.h" />
     <ClInclude Include="ParticleManager.h" />
@@ -198,6 +209,7 @@
     <ClInclude Include="TestRotateBehaviour.h" />
     <ClInclude Include="Texture.h" />
     <ClInclude Include="Transform.h" />
+    <ClInclude Include="UI.h" />
     <ClInclude Include="Utilities.h" />
     <ClInclude Include="Utils.h" />
   </ItemGroup>

@@ -12,6 +12,11 @@
 #include "AudioPlayer.h"
 
 #include "Input.h"
+
+#ifndef _DEBUG
+#define _DEBUG 0
+#endif
+
 Game::Game()
 {
 }
@@ -49,6 +54,8 @@ void Game::initGame()
 	///Initialise GLEW
 	initGLEW();
 
+	UI::InitImGUI();
+
 	//Initialise Framebuffers
 	gBuffer = new FrameBuffer(3);
 	deferredComposite = new FrameBuffer(1);
@@ -57,7 +64,7 @@ void Game::initGame()
 	workBuffer3 = new FrameBuffer(1);
 
 	uiImage = new Texture();
-	uiImage->Load("./Resources/Textures/UIpost.png");
+	uiImage->load("./Resources/Textures/UIpost.png");
 
 	//Initializes the screen quad
 	InitFullScreenQuad();
@@ -70,7 +77,9 @@ void Game::initGame()
 	auto camera = new Camera();
 	camera->Perspective(70.f, 16.f/9.f, 0.001f, 1000.f);
 	camera->setPos(glm::vec3(0.f, 0.f, 3.0f));
+
 	Camera::mainCamera = camera;
+
 	//Load in resources
 	m_ravager = new Model();
 	m_ravager->LoadFromFile("./Resources/Objects/Ravager2/", "Ravager");
@@ -79,6 +88,18 @@ void Game::initGame()
 	m_testArea->LoadFromFile("./Resources/Objects/TestArea/", "TestArea");
 	m_brazier = new Model();
 	m_brazier->LoadFromFile("./Resources/Objects/Brazier/", "brazier");
+	m_bottomRoom = new Model();
+	m_bottomRoom->LoadFromFile("./Resources/Objects/MainLevel/", "RoomBottom");
+	m_grove = new Model();
+	m_grove->LoadFromFile("./Resources/Objects/MainLevel/", "RoomCenterDetailed");
+	m_leftRoom = new Model();
+	m_leftRoom->LoadFromFile("./Resources/Objects/MainLevel/", "RoomLeft");
+	m_rightRoom = new Model();
+	m_rightRoom->LoadFromFile("./Resources/Objects/MainLevel/", "RoomRight2");
+	m_topRoom1 = new Model();
+	m_topRoom1->LoadFromFile("./Resources/Objects/MainLevel/", "RoomTop2");
+	m_topRoom2 = new Model();
+	m_topRoom2->LoadFromFile("./Resources/Objects/MainLevel/", "RoomTop1");
 	
 	ShaderManager::loadShaders();
 
@@ -138,6 +159,8 @@ void Game::initGame()
 
 	auto ravager = new GameObject("Ravager");
 	ravager->addBehaviour(new MeshRenderBehaviour(m_ravager, ShaderManager::getShader(GBUFFER_SHADER)));
+	if (_DEBUG)
+		ravager->localTransform.setPos(glm::vec3(0.f, 25.f, 0.f));
 
 	auto cameraPivot = new GameObject("CameraPivot");
 	cameraPivot->localTransform.setPos(glm::vec3(0.f,1.f,0.f));
@@ -158,17 +181,36 @@ void Game::initGame()
 	brazier->localTransform.setScale(glm::vec3(0.5f, 0.5f, 0.5f));
 	
 	
-	auto testArea = new GameObject("TestArea");
-	testArea->addBehaviour(new MeshRenderBehaviour(m_testArea, ShaderManager::getShader(GBUFFER_SHADER)));
+	auto bottomRoom = new GameObject("BottomRoom");
+	bottomRoom->addBehaviour(new MeshRenderBehaviour(m_bottomRoom, ShaderManager::getShader(GBUFFER_SHADER)));
+
+	auto grove = new GameObject("Grove");
+	grove->addBehaviour(new MeshRenderBehaviour(m_grove, ShaderManager::getShader(GBUFFER_SHADER)));
+
+	auto leftRoom = new GameObject("LeftRoom");
+	leftRoom->addBehaviour(new MeshRenderBehaviour(m_leftRoom, ShaderManager::getShader(GBUFFER_SHADER)));
+
+	auto rightRoom = new GameObject("RightRoom");
+	rightRoom->addBehaviour(new MeshRenderBehaviour(m_rightRoom, ShaderManager::getShader(GBUFFER_SHADER)));
+
+	auto topRoom1 = new GameObject("TopRoom1");
+	topRoom1->addBehaviour(new MeshRenderBehaviour(m_topRoom1, ShaderManager::getShader(GBUFFER_SHADER)));
+
+	auto topRoom2 = new GameObject("TopRoom2");
+	topRoom2->addBehaviour(new MeshRenderBehaviour(m_topRoom2, ShaderManager::getShader(GBUFFER_SHADER)));
 
 
 	auto scene = new Scene("DemoScene");
 	scene->addChild(brazier);
 	scene->addChild(ravager);
-	scene->addChild(testArea);
+	scene->addChild(bottomRoom);
+	scene->addChild(grove);
+	scene->addChild(leftRoom);
+	scene->addChild(rightRoom);
+	scene->addChild(topRoom1);
+	scene->addChild(topRoom2);
 
 	Camera::mainCameraTransform = &(cameraObject->worldTransform);
-
 
 	//TODO: Set up transform class so that a world transform can exist
 	ravagerPhys = new P_PhysicsBody(&ravager->localTransform, 1.f, true, SPHERE, 1.f, 0.f, 0.f, glm::vec3(0, 0.5f, 0));
@@ -176,6 +218,14 @@ void Game::initGame()
 	P_PhysicsBody::P_bodyCount.push_back(new P_PhysicsBody(new Transform(), 1.f, false, BOX, 1.f, 8.f, 8.f, glm::vec3(0, -0.5f, 0), 0, 0, true));
 	P_PhysicsBody::P_bodyCount.push_back(new P_PhysicsBody(new Transform(), 1.f, false, BOX, 1.f, 2.f, 2.f, glm::vec3(0, -0.5f, 5), 0, 0, true));
 	P_PhysicsBody::P_bodyCount.push_back(new P_PhysicsBody(new Transform(), 1.f, false, BOX, 1.f, 8.f, 8.f, glm::vec3(0, -0.5f, 10), 0, 0, true));
+	if (_DEBUG)
+		P_PhysicsBody::P_bodyCount.push_back(new P_PhysicsBody(new Transform(), 1.f, false, BOX, 1.f, 500.f, 500.f, glm::vec3(0, 20.f, 0), 0, 0, true));
+
+
+#pragma region Level Physics Bodies
+
+
+#pragma endregion
 
 
 	//Load audio track for ambiance
@@ -198,6 +248,10 @@ void Game::update()
 
 	if (Input::GetKeyPress(KeyCode::F1)) {
 		displayBuffers = !displayBuffers;
+	}
+
+	if (Input::GetKeyDown(KeyCode::F4)) {
+		guiEnabled = !guiEnabled;
 	}
 
 	ParticleManager::update(Time::deltaTime);
@@ -239,6 +293,7 @@ void Game::draw()
 
 	//Copies depth texture from gbuffer to deferred composite
 	
+	GUI();
 
 	//F1 to toggle displaying of buffers
 	if (!displayBuffers) {
@@ -252,9 +307,9 @@ void Game::draw()
 		gBuffer->bindTex(1, 1);
 		gBuffer->bindTex(2, 2);
 		DrawFullScreenQuad();
-		Texture::Unbind(2);
-		Texture::Unbind(1);
-		Texture::Unbind(0);
+		Texture::unbind(2);
+		Texture::unbind(1);
+		Texture::unbind(0);
 		ShaderManager::getPost(DEFERREDLIGHT_POST)->unbind();
 
 		deferredComposite->Unbind();
@@ -269,7 +324,7 @@ void Game::draw()
 		ShaderManager::getPost(PASSTHROUGH_POST)->sendUniform("uTex", 0);
 		gBuffer->bindTex(0, 0);		//Albedo Color
 		DrawFullScreenQuad();
-		Texture::Unbind(0);
+		Texture::unbind(0);
 		ShaderManager::getPost(PASSTHROUGH_POST)->unbind();
 
 		glViewport(WINDOW_WIDTH / 2, WINDOW_HEIGHT / 2, WINDOW_WIDTH / 2, WINDOW_HEIGHT / 2);	///Top Right
@@ -277,7 +332,7 @@ void Game::draw()
 		ShaderManager::getPost(PASSTHROUGH_POST)->sendUniform("uTex", 0);
 		gBuffer->bindTex(0, 1);			//Normals
 		DrawFullScreenQuad();
-		Texture::Unbind(0);
+		Texture::unbind(0);
 		ShaderManager::getPost(PASSTHROUGH_POST)->unbind();
 
 		glViewport(0, 0, WINDOW_WIDTH / 2, WINDOW_HEIGHT / 2);									///Bottom Left
@@ -285,7 +340,7 @@ void Game::draw()
 		ShaderManager::getPost(PASSTHROUGH_POST)->sendUniform("uTex", 0);
 		gBuffer->bindTex(0, 2);		//Frag Positions 
 		DrawFullScreenQuad();
-		Texture::Unbind(0);
+		Texture::unbind(0);
 		ShaderManager::getPost(PASSTHROUGH_POST)->unbind();
 
 		glViewport(WINDOW_WIDTH / 2, 0, WINDOW_WIDTH / 2, WINDOW_HEIGHT / 2);					///Bottom Right
@@ -297,9 +352,9 @@ void Game::draw()
 		gBuffer->bindTex(1, 1);
 		gBuffer->bindTex(2, 2);
 		DrawFullScreenQuad();
-		Texture::Unbind(2);
-		Texture::Unbind(1);
-		Texture::Unbind(0);
+		Texture::unbind(2);
+		Texture::unbind(1);
+		Texture::unbind(0);
 		ShaderManager::getPost(DEFERREDLIGHT_POST)->unbind();
 
 		//*/
@@ -312,11 +367,11 @@ void Game::draw()
 	//*
 	ShaderManager::getPost(UI_POST)->bind();
 	ShaderManager::getPost(UI_POST)->sendUniform("uiTex", 1);
-	uiImage->Bind(1);
+	uiImage->bind(1);
 	ProcessFramebufferStuff(*deferredComposite, *workBuffer1, *workBuffer2, *workBuffer3,
-								ShaderManager::getBloom(), *ShaderManager::getPost(UI_POST),
+								ShaderManager::getBloom(), *ShaderManager::getPost(PASSTHROUGH_POST),
 									true, false);
-	uiImage->Unbind(1);//*/
+	uiImage->unbind(1);//*/
 	//glDisable(GL_BLEND);
 	/// * Will be commented out in case this branch gets used for Expo
 	//////////////////////////////////////////////////////////////////////////////////////////////
@@ -337,6 +392,16 @@ void Game::draw()
 
 
 	}
+}
+
+void Game::GUI()
+{
+	UI::Start(WINDOW_WIDTH, WINDOW_HEIGHT);
+
+	ImGui::SliderFloat3("Ravager Position", &ravagerPhys->getTransform().getPos()[0], -5.f, 5.f);
+
+
+	UI::End();
 }
 	
 int Game::run() {

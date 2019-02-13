@@ -9,6 +9,7 @@
 #include "Utilities.h"
 #include "P_PhysicsBody.h"
 #include "ParticleManager.h"
+#include "UI.h"
 
 class Game {
 public:
@@ -20,8 +21,10 @@ public:
 	void initGLEW();
 	void initSDL();
 
+
 	void update();
 	void draw();
+	void GUI();
 
 	int run();
 
@@ -33,6 +36,12 @@ private:
 	Model *m_ravager;
 	Model *m_testArea;
 	Model *m_brazier;
+	Model *m_bottomRoom;
+	Model *m_grove;
+	Model *m_leftRoom;
+	Model *m_rightRoom;
+	Model *m_topRoom1;
+	Model *m_topRoom2;
 
 	Shader *m_shader;
 
@@ -54,6 +63,8 @@ private:
 	std::vector<Scene*> m_activeScenes;
 
 	P_PhysicsBody *ravagerPhys;
+
+	bool guiEnabled = false;
 };
 
 #endif

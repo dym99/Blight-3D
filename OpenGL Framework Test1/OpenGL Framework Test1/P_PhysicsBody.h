@@ -83,6 +83,7 @@ public:
 	float getFriction() { return P_friction; }
 	P_Collider* getCollider() { return P_collider; }
 	void setTransform(Transform* _transform) { P_transform = _transform; P_position = _transform->getPos(); }
+	inline Transform& getTransform() { return *P_transform; }
 	//Only call after physics update
 	bool get_triggered() { return P_triggered; }
 

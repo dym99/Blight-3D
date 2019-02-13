@@ -10,10 +10,42 @@ Texture::Texture(const std::string &_type)
 
 Texture::~Texture()
 {
-	Unload();
+	unload();
 }
 
-bool Texture::Load(const std::string & file)
+void Texture::createTexture(int w, int h, GLenum target, GLenum filtering, GLenum edgeBehaviour, GLenum internalFormat, GLenum textureFormat, GLenum dataType, void * newDataPtr)
+{
+	GLenum error = 0;
+
+	// Not necessary to enable GL_TEXTURE_* in modern context.
+	//	glEnable(m_pTarget);
+	//	error = glGetError();
+
+	unload();
+
+	glGenTextures(1, &m_texture);
+	glBindTexture(target, m_texture);
+	error = glGetError();
+
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, filtering);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, filtering);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, edgeBehaviour);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, edgeBehaviour);
+	error = glGetError();
+
+	glTexImage2D(GL_TEXTURE_2D, 0, internalFormat, w, h, 0, textureFormat, dataType, newDataPtr);
+	error = glGetError();
+
+	if (error != 0)
+	{
+		//SAT_DEBUG_LOG_ERROR("[Texture.cpp : createTexture] Error when creating texture. ");
+	}
+
+	glBindTexture(GL_TEXTURE_2D, 0);
+}
+
+
+bool Texture::load(const std::string & file)
 {
 	m_texture = SOIL_load_OGL_texture(file.c_str(), SOIL_LOAD_AUTO, SOIL_CREATE_NEW_ID, SOIL_FLAG_MIPMAPS | SOIL_FLAG_INVERT_Y | SOIL_FLAG_COMPRESS_TO_DXT);
 
@@ -35,7 +67,7 @@ bool Texture::Load(const std::string & file)
 	return true;
 }
 
-void Texture::Unload()
+void Texture::unload()
 {
 	if (m_texture != 0) 
 	{
@@ -45,26 +77,26 @@ void Texture::Unload()
 	}
 }
 
-void Texture::Bind(int unit)
+void Texture::bind(int unit)
 {
 	glActiveTexture(GL_TEXTURE0 + unit);
 	glBindTexture(GL_TEXTURE_2D, m_texture);
 	glActiveTexture(GL_TEXTURE0);
 }
 
-void Texture::Bind()
+void Texture::bind()
 {
 	glBindTexture(GL_TEXTURE_2D, m_texture);
 }
 
-void Texture::Unbind(int unit)
+void Texture::unbind(int unit)
 {
 	glActiveTexture(GL_TEXTURE0 + unit);
 	glBindTexture(GL_TEXTURE_2D, GL_NONE);
 	glActiveTexture(GL_TEXTURE0);
 }
 
-void Texture::Unbind()
+void Texture::unbind()
 {
 	glBindTexture(GL_TEXTURE_2D, 0);
 }

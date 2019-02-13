@@ -43,7 +43,7 @@ ParticleEffect::~ParticleEffect()
 
 bool ParticleEffect::Init(const std::string &textureFile, unsigned int maxParticles, unsigned int rate)
 {
-	if (!m_texture.Load(textureFile)) {
+	if (!m_texture.load(textureFile)) {
 		return false;
 	}
 
@@ -160,7 +160,7 @@ void ParticleEffect::Render()
 		return;
 	}
 
-	m_texture.Bind(0);
+	m_texture.bind(0);
 	glEnable(GL_BLEND);
 	glDepthMask(GL_FALSE);
 
@@ -170,7 +170,7 @@ void ParticleEffect::Render()
 
 	glDepthMask(GL_TRUE);
 	glDisable(GL_BLEND);
-	m_texture.Unbind(0);
+	m_texture.unbind(0);
 }
 
 void ParticleEffect::setRate(float rate)

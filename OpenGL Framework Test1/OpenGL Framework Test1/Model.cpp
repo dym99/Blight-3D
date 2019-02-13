@@ -221,7 +221,7 @@ bool Model::ProcessMaterials(const std::string & file)
 
 			materials[matIndex-1]->textures.push_back(new Texture("diffuseTex"));
 			materials[matIndex-1]->texIndex++;
-			materials[matIndex-1]->textures[materials[matIndex-1]->texIndex - 1]->Load(path + temp);
+			materials[matIndex-1]->textures[materials[matIndex-1]->texIndex - 1]->load(path + temp);
 		}
 		else if (std::strstr(inputString, "map_Bump") != nullptr) {
 			//This line has a normal map
@@ -233,7 +233,7 @@ bool Model::ProcessMaterials(const std::string & file)
 
 			materials[matIndex - 1]->textures.push_back(new Texture("normalTex"));
 			materials[matIndex - 1]->texIndex++;
-			materials[matIndex - 1]->textures[materials[matIndex - 1]->texIndex - 1]->Load(path + temp);
+			materials[matIndex - 1]->textures[materials[matIndex - 1]->texIndex - 1]->load(path + temp);
 		}
 		else if (std::strstr(inputString, "map_Ks") != nullptr) {
 			//This line has specular map
@@ -245,7 +245,7 @@ bool Model::ProcessMaterials(const std::string & file)
 
 			materials[matIndex-1]->textures.push_back(new Texture("specularTex"));
 			materials[matIndex-1]->texIndex++;
-			materials[matIndex-1]->textures[materials[matIndex-1]->texIndex - 1]->Load(path + temp);
+			materials[matIndex-1]->textures[materials[matIndex-1]->texIndex - 1]->load(path + temp);
 		}
 		else if (std::strstr(inputString, "illum") != nullptr) {
 			//This line has illumination info on it

@@ -167,7 +167,7 @@ void Mesh::Draw(Shader * shader)
 		//Sets the correct texture unit to active
 		glActiveTexture(GL_TEXTURE0 + i);
 
-		std::string name = material.textures[i]->GetType();
+		std::string name = material.textures[i]->getType();
 		if (name == "diffuseTex") {
 			diffuseNr++;
 		}
@@ -186,7 +186,7 @@ void Mesh::Draw(Shader * shader)
 		}
 
 		shader->sendUniform(("material." + name).c_str(), i);
-		glBindTexture(GL_TEXTURE_2D, material.textures[i]->GetTextureHandle());
+		glBindTexture(GL_TEXTURE_2D, material.textures[i]->getID());
 	}
 	glActiveTexture(GL_TEXTURE0);
 
