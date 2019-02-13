@@ -1,5 +1,6 @@
 #include "P_PhysicsBody.h"
 #include "GL/glew.h"
+#include "GameObject.h"
 #define VEC3I glm::vec3(1, 0, 0)
 #define VEC3J glm::vec3(0, 1, 0)
 #define VEC3K glm::vec3(0, 0, 1)
@@ -15,12 +16,16 @@ P_PhysicsBody::P_PhysicsBody()
 	P_netForce = VEC3ZERO;
 	P_acceleration = VEC3ZERO;
 	P_velocity = VEC3ZERO;
+	P_name = "Default Body";
 }
 
-P_PhysicsBody::P_PhysicsBody(Transform * _transform, float _mass, bool _gravity, P_Collider_Type _type, float _h, float _w, float _d, glm::vec3 _offset, float _bounciness, float _friction, bool _kinematic, bool _trigger, P_FlagType _flag)
+P_PhysicsBody::P_PhysicsBody(GameObject * _gameObject, float _mass, bool _gravity, P_Collider_Type _type, float _h, float _w, float _d, glm::vec3 _offset, float _bounciness, float _friction, bool _kinematic, bool _trigger, std::string _name, P_FlagType _flag)
 {
-	P_transform = _transform;
-	P_position = _transform->getPos();
+	P_gameObject = _gameObject;
+	if (!_gameObject->getParent())
+		P_position = _gameObject->localTransform.getPos();
+	else
+		P_position = (glm::vec3)(_gameObject->getParent()->worldTransform * glm::vec4(_gameObject->localTransform.getPos(), 1.0f));
 	P_bounciness = _bounciness;
 	P_friction = _friction;
 	P_mass = _mass;
@@ -28,8 +33,9 @@ P_PhysicsBody::P_PhysicsBody(Transform * _transform, float _mass, bool _gravity,
 	P_collider = new P_Collider(_type, _h, _w, _d);
 	P_collider->setOffset(_offset);
 	P_isKinematic = _kinematic;
-	startPos = _transform->getPos();
+	startPos = P_position;
 	P_isTrigger = _trigger;
+	P_name = _name;
 	P_flags.push_back(_flag);
 
 	P_bodyCount.push_back(this);
@@ -38,15 +44,19 @@ P_PhysicsBody::P_PhysicsBody(Transform * _transform, float _mass, bool _gravity,
 	P_velocity = VEC3ZERO;
 }
 
-P_PhysicsBody::P_PhysicsBody(Transform * _transform, float _mass, bool _gravity, bool _kinematic)
+P_PhysicsBody::P_PhysicsBody(GameObject * _gameObject, float _mass, bool _gravity, bool _kinematic)
 {
-	P_transform = _transform;
-	P_position = _transform->getPos();
+	P_gameObject = _gameObject;
+	if (!_gameObject->getParent())
+		P_position = _gameObject->localTransform.getPos();
+	else
+		P_position = (glm::vec3)(_gameObject->getParent()->worldTransform * glm::vec4(_gameObject->localTransform.getPos(), 1.0f));
 	P_mass = _mass;
 	P_useGravity = _gravity;
 	P_isKinematic = _kinematic;
-	startPos = _transform->getPos();
+	startPos = P_position;
 	P_flags.push_back(F_DEFAULT);
+	P_name = "Default Name";
 
 	P_bodyCount.push_back(this);
 	P_netForce = VEC3ZERO;
@@ -64,18 +74,32 @@ P_PhysicsBody::~P_PhysicsBody()
 			break;
 		}
 	}
-
-	delete P_collider;
-	delete P_transform;
+	
+	if(P_collider != nullptr)
+		delete P_collider;
 }
 
 
 P_CollisionData P_PhysicsBody::P_checkBounds(int i, int o)
 {
 	//Compare bounding sphere
-	float radii = P_bodyCount[i]->P_collider->getMaxSize() + P_bodyCount[o]->P_collider->getMaxSize();
-	glm::vec3 vectorBetween((P_bodyCount[i]->P_transform->getPos() + P_bodyCount[i]->P_collider->getOffset()) -
-							(P_bodyCount[o]->P_transform->getPos() + P_bodyCount[o]->P_collider->getOffset()));
+	float radii = P_bodyCount[i]->P_collider->getMaxSize() + P_bodyCount[o]->P_collider->getMaxSize(); 
+
+	glm::vec3 posi, poso;
+
+	if (!P_bodyCount[i]->getGameObject()->getParent())
+		posi = P_bodyCount[i]->getGameObject()->localTransform.getPos();
+	else
+		posi = (glm::vec3)(P_bodyCount[i]->P_gameObject->getParent()->worldTransform * glm::vec4(P_bodyCount[i]->P_gameObject->localTransform.getPos(), 1.0f));
+
+	if (!P_bodyCount[o]->getGameObject()->getParent())
+		poso = P_bodyCount[o]->getGameObject()->localTransform.getPos();
+	else
+		poso = (glm::vec3)(P_bodyCount[o]->P_gameObject->getParent()->worldTransform * glm::vec4(P_bodyCount[o]->P_gameObject->localTransform.getPos(), 1.0f));
+
+
+	glm::vec3 vectorBetween(posi + P_bodyCount[i]->P_collider->getOffset() -
+							poso + P_bodyCount[o]->P_collider->getOffset());
 
 	float distanceSQ = (vectorBetween.x * vectorBetween.x + vectorBetween.y * vectorBetween.y + vectorBetween.z * vectorBetween.z);
 
@@ -109,7 +133,8 @@ P_CollisionData P_PhysicsBody::P_checkCollision(int i, int o)
 
 
 	std::vector<glm::vec3> pointsToTest{};
-	glm::mat3 totalRot = genRotMatrix(body1->P_transform->getRot());
+	//glm::mat3 totalRot = genRotMatrix(body1->P_gameObject->localTransform);
+	glm::mat3 totalRot = body1->P_gameObject->worldTransform;
 
 	if (body1->P_collider->getType() == CAPSULE)
 	{
@@ -196,13 +221,26 @@ void P_PhysicsBody::P_physicsUpdate(float dt)
 	{
 		const int numBodies = P_bodyCount.size();
 		for (int i = 0; i < numBodies; i++)
-			P_bodyCount[i]->P_triggered = false;
-		for (int i = 0; i < numBodies; i++)
 		{
+			if (P_bodyCount[i] == nullptr)
+			{
+				P_bodyCount.erase(P_bodyCount.begin() + i);
+				i--;
+				continue;
+			}
+
+			P_bodyCount[i]->P_triggered = false;
+			if (P_bodyCount[i]->P_trackNames)
+			{
+				P_bodyCount[i]->P_triggeredNames.clear();
+			}
 			P_PhysicsBody* body1 = P_bodyCount[i];
 
 			//Update internal position to current position
-			body1->P_position = body1->P_transform->getPos();
+			if (body1->getGameObject()->getParent())
+				body1->P_position = body1->P_gameObject->getParent()->worldTransform * glm::vec4(body1->P_gameObject->localTransform.getPos(), 1.0f);
+			else
+				body1->P_position = body1->P_gameObject->localTransform.getPos();
 
 			if (!body1->P_isKinematic)
 			{
@@ -215,7 +253,10 @@ void P_PhysicsBody::P_physicsUpdate(float dt)
 				body1->P_position += body1->P_velocity * dt;
 
 				//Update current position
-				body1->P_transform->setPos(body1->P_position);
+				if (body1->getGameObject()->getParent())
+					body1->P_gameObject->localTransform.setPos(body1->P_position - (glm::vec3)(body1->getGameObject()->getParent()->worldTransform * glm::vec4(VEC3ZERO, 1.0f)));
+				else
+					body1->P_gameObject->localTransform.setPos(body1->P_position);
 			}
 
 			// TODO: Add Tunneling check.
@@ -224,9 +265,16 @@ void P_PhysicsBody::P_physicsUpdate(float dt)
 			if (numBodies > 1)
 				for (int o = 0; o < numBodies; o++)
 				{
+					if (P_bodyCount[o] == nullptr)
+					{
+						P_bodyCount.erase(P_bodyCount.begin() + o);
+						o--;
+						continue;
+					}
+
 					P_PhysicsBody* body2 = P_bodyCount[o];
 					//Two kinematic bodies would not react to one another, thus do not calculate for them.
-					if ((body1->P_isKinematic && body2->P_isKinematic) || i == o)
+					if ((body1->P_isKinematic && body2->P_isKinematic) || i == o || body1 == body2)
 						continue;
 
 					P_CollisionData colData = P_checkBounds(i, o);
@@ -234,6 +282,11 @@ void P_PhysicsBody::P_physicsUpdate(float dt)
 					{
 						body1->P_triggered = true;
 						body2->P_triggered = true;
+
+						if (body1->P_trackNames)
+							body1->P_triggeredNames.push_back(body2->P_name);
+						if (body2->P_trackNames)
+							body2->P_triggeredNames.push_back(body2->P_name);
 
 						/*COLLISION HAS BEEN DETECTED*/
 						/*
@@ -280,7 +333,10 @@ void P_PhysicsBody::P_physicsUpdate(float dt)
 									//std::cout << perpNorm.x << ',' << (1.f - (otherBody->P_friction + kinematicBody->P_friction) / 2 * frictionScalar * dt) << std::endl;
 									otherBody->P_velocity = (withNorm + perpNorm) - withNorm * (1.f + otherBody->P_bounciness);
 								}
-								otherBody->P_transform->setPos(otherBody->P_position);
+								if (body1->getGameObject()->getParent())
+									otherBody->P_gameObject->localTransform.setPos(otherBody->P_position - (glm::vec3)(otherBody->getGameObject()->getParent()->worldTransform * glm::vec4(VEC3ZERO, 1.0f)));
+								else
+									otherBody->P_gameObject->localTransform.setPos(otherBody->P_position);
 							}
 							else
 							{
@@ -310,8 +366,15 @@ void P_PhysicsBody::P_physicsUpdate(float dt)
 									body2->P_velocity -= v2;
 									body2->P_velocity += v1;
 								}
-								body1->P_transform->setPos(body1->P_position);
-								body2->P_transform->setPos(body2->P_position);
+								if (body1->getGameObject()->getParent())
+									body1->P_gameObject->localTransform.setPos(body1->P_position - (glm::vec3)(body1->getGameObject()->getParent()->worldTransform * glm::vec4(VEC3ZERO, 1.0f)));
+								else
+									body1->P_gameObject->localTransform.setPos(body1->P_position);
+
+								if (body1->getGameObject()->getParent())
+									body2->P_gameObject->localTransform.setPos(body2->P_position - (glm::vec3)(body2->getGameObject()->getParent()->worldTransform * glm::vec4(VEC3ZERO, 1.0f)));
+								else
+									body2->P_gameObject->localTransform.setPos(body2->P_position);
 
 								//Two dynamic bodies have collided, both must react
 								//float massRatio = body1->getMass() / body2->getMass();

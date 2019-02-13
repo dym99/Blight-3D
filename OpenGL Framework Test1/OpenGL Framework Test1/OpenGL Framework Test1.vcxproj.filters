@@ -1,9 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
-    <ClCompile Include="Behaviour.cpp">
-      <Filter>Source Files\Behaviours</Filter>
-    </ClCompile>
     <ClCompile Include="Camera.cpp">
       <Filter>Source Files\Game</Filter>
     </ClCompile>
@@ -85,11 +82,20 @@
     <ClCompile Include="AudioPlayer.cpp">
       <Filter>Source Files\Handlers</Filter>
     </ClCompile>
+    <ClCompile Include="PlayerController.cpp">
+      <Filter>Source Files\Behaviours\Player</Filter>
+    </ClCompile>
+    <ClCompile Include="Behaviour.cpp">
+      <Filter>Source Files\Behaviours</Filter>
+    </ClCompile>
+    <ClCompile Include="TempEnemy.cpp">
+      <Filter>Source Files\Behaviours\Enemy</Filter>
+    </ClCompile>
+    <ClCompile Include="Enemy.cpp">
+      <Filter>Source Files\Enemies</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Behaviour.h">
-      <Filter>Source Files\Behaviours</Filter>
-    </ClInclude>
     <ClInclude Include="Camera.h">
       <Filter>Source Files\Game</Filter>
     </ClInclude>
@@ -171,6 +177,18 @@
     <ClInclude Include="AudioPlayer.h">
       <Filter>Source Files\Handlers</Filter>
     </ClInclude>
+    <ClInclude Include="Behaviour.h">
+      <Filter>Source Files\Behaviours</Filter>
+    </ClInclude>
+    <ClInclude Include="PlayerController.h">
+      <Filter>Source Files\Behaviours\Player</Filter>
+    </ClInclude>
+    <ClInclude Include="TempEnemy.h">
+      <Filter>Source Files\Behaviours\Enemy</Filter>
+    </ClInclude>
+    <ClInclude Include="Enemy.h">
+      <Filter>Source Files\Enemies</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Source Files">
@@ -224,6 +242,15 @@
     </Filter>
     <Filter Include="Source Files\Effects\Particles">
       <UniqueIdentifier>{70bd2cd7-9789-4347-b073-bb93ac079a71}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Behaviours\Player">
+      <UniqueIdentifier>{ce859d28-7d44-45cc-b89e-5c6abec8e21f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Behaviours\Enemy">
+      <UniqueIdentifier>{3a37f8a4-2067-4987-ac03-3aefbe21ca44}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Enemies">
+      <UniqueIdentifier>{d5905e4c-0e45-4aa9-afa4-b0f645b7a854}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
 </Project>

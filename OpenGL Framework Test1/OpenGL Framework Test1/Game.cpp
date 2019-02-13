@@ -10,8 +10,13 @@
 #include "MouseLook.h"
 #include "CameraBehaviour.h"
 #include "AudioPlayer.h"
+#include "PlayerController.h"
+#include "TempEnemy.h"
 
 #include "Input.h"
+
+std::vector<GameObject*> Game::enemies;
+
 Game::Game()
 {
 }
@@ -79,6 +84,8 @@ void Game::initGame()
 	m_testArea->LoadFromFile("./Resources/Objects/TestArea/", "TestArea");
 	m_brazier = new Model();
 	m_brazier->LoadFromFile("./Resources/Objects/Brazier/", "brazier");
+	m_box = new Model();
+	m_box->LoadFromFile("./Resources/Objects/Box/", "cube");
 	
 	ShaderManager::loadShaders();
 
@@ -135,6 +142,15 @@ void Game::initGame()
 #pragma endregion
 
 	//Set up the test Scene
+	auto attackBox = new GameObject("AttackBox");
+	attackBox->localTransform.setPos(glm::vec3(0.f, 0.f, 0.3f));
+	attackBox->localTransform.setScale(glm::vec3(0.2f, 0.2f, 1.f));
+	attackBox->addBehaviour(new MeshRenderBehaviour(m_box, ShaderManager::getShader(GBUFFER_SHADER)));
+
+	auto enemy = new GameObject("TestEnemy");
+	enemy->localTransform.setPos(glm::vec3(0.f, 0.5f, 4.f));
+	enemy->addBehaviour(new MeshRenderBehaviour(m_box, ShaderManager::getShader(GBUFFER_SHADER)));
+	enemies.push_back(enemy);
 
 	auto ravager = new GameObject("Ravager");
 	ravager->addBehaviour(new MeshRenderBehaviour(m_ravager, ShaderManager::getShader(GBUFFER_SHADER)));
@@ -145,7 +161,7 @@ void Game::initGame()
 
 	auto cameraObject = new GameObject("Camera");
 
-	cameraObject->localTransform.setPos(glm::vec3(0, 0, 3.f));
+	cameraObject->localTransform.setPos(glm::vec3(0, 0.5f, 3.f));
 
 	camera->setTransform(&cameraObject->worldTransform);
 
@@ -166,17 +182,24 @@ void Game::initGame()
 	scene->addChild(brazier);
 	scene->addChild(ravager);
 	scene->addChild(testArea);
+	scene->addChild(enemy);
+	scene->addChild(attackBox);
 
 	Camera::mainCameraTransform = &(cameraObject->worldTransform);
 
 
 	//TODO: Set up transform class so that a world transform can exist
-	ravagerPhys = new P_PhysicsBody(&ravager->localTransform, 1.f, true, SPHERE, 1.f, 0.f, 0.f, glm::vec3(0, 0.5f, 0));
-	P_PhysicsBody::P_bodyCount.push_back(ravagerPhys);
-	P_PhysicsBody::P_bodyCount.push_back(new P_PhysicsBody(new Transform(), 1.f, false, BOX, 1.f, 8.f, 8.f, glm::vec3(0, -0.5f, 0), 0, 0, true));
-	P_PhysicsBody::P_bodyCount.push_back(new P_PhysicsBody(new Transform(), 1.f, false, BOX, 1.f, 2.f, 2.f, glm::vec3(0, -0.5f, 5), 0, 0, true));
-	P_PhysicsBody::P_bodyCount.push_back(new P_PhysicsBody(new Transform(), 1.f, false, BOX, 1.f, 8.f, 8.f, glm::vec3(0, -0.5f, 10), 0, 0, true));
-
+	ravagerPhys = new P_PhysicsBody(ravager, 1.f, true, SPHERE, 0.5f, 0.f, 0.f, glm::vec3(0, 0.5f, 0), 0.0f, 1.0f, false, false, "Ravager");
+	hitBox = new P_PhysicsBody(attackBox, 1.f, false, BOX, .2f, .2f, 2.f, VEC3ZERO, 0.f, 0.f, false, true, "Sword");
+	enemyBox = new P_PhysicsBody(enemy, 1.f, false, SPHERE, 0.5f, 0.f, 0.f, VEC3ZERO, 0.f, 0.f, true, false, "Enemy");
+	enemy->addBehaviour(new TempEnemy(enemyBox));
+	ravager->addBehaviour(new PlayerController(ravagerPhys, hitBox));
+	ravager->addChild(attackBox);
+	ravagerPhys->trackNames(true);
+	enemyBox->trackNames(true);
+	P_PhysicsBody::P_bodyCount.push_back(new P_PhysicsBody(new GameObject("Floor"), 1.f, false, BOX, 1.f, 8.f, 8.f, glm::vec3(0, -0.5f, 0), 0, 0, true, false, "Floor"));
+	P_PhysicsBody::P_bodyCount.push_back(new P_PhysicsBody(new GameObject("Floor"), 1.f, false, BOX, 1.f, 2.f, 2.f, glm::vec3(0, -0.5f, 5), 0, 0, true, false, "Floor"));
+	P_PhysicsBody::P_bodyCount.push_back(new P_PhysicsBody(new GameObject("Floor"), 1.f, false, BOX, 1.f, 8.f, 8.f, glm::vec3(0, -0.5f, 10), 0, 0, true, false, "Floor"));
 
 	//Load audio track for drum loop
 	AudioPlayer::loadAudio(*new AudioTrack("Ambiance", FMOD_3D, AudioType::EFFECT, { 0.f, 0.f, 0.f }, { 0.f, 0.f, 0.f }, true, 0.1f, 5000.f), "Ambiance");
@@ -191,20 +214,36 @@ void Game::update()
 {
 	Time::update();
 
-	//Remove this when done testing. Or use as a jump for testing purposes.
-	if (Input::GetKeyDown(KeyCode::Space)) {
-		ravagerPhys->P_velocity.y = 4.f;
-	}
+	if (Input::GetKeyDown(KeyCode::Escape))
+		exit(0);
 
 	if (Input::GetKeyPress(KeyCode::F1)) {
 		displayBuffers = !displayBuffers;
 	}
 
-	ParticleManager::update(Time::deltaTime);
+	if (Input::GetKeyDown(KeyCode::H))
+	{
+		delete enemyBox;
+		enemyBox = nullptr;
+		GameObject* parent = enemies[0]->getParent();
+		std::vector<GameObject*> childVec = *parent->getChildren();
+		parent->removeChildren();
+		for (GameObject* obj : childVec)
+		{
+			if (obj != enemies[0])
+			{
+				parent->addChild(obj);
+			}
+		}
+		delete enemies[0];
+	}
 
+	ParticleManager::update(Time::deltaTime);
+	
 	AudioPlayer::update(Time::deltaTime);
 
 	P_PhysicsBody::P_physicsUpdate(Time::deltaTime);
+
 	for (unsigned int i = 0; i < m_activeScenes.size(); ++i) {
 		m_activeScenes[i]->update();
 	}
@@ -377,6 +416,25 @@ int Game::run() {
 	AudioPlayer::close();
 	SDL_Quit();
 	return 0;
+}
+
+void Game::spawnEnemy(EnemyType _type, glm::vec3 _location)
+{
+	auto enemy = new Enemy("Enemy");
+	enemy->localTransform.setPos(_location);
+	switch (_type)
+	{
+	case RAVAGER:
+		enemy->addBehaviour(new MeshRenderBehaviour(m_ravager, ShaderManager::getShader(GBUFFER_SHADER)));
+		break;
+	case LESSER_GHOUL:
+	case GREATER_GHOUL:
+	default:
+		enemy->addBehaviour(new MeshRenderBehaviour(m_box, ShaderManager::getShader(GBUFFER_SHADER)));
+		break;
+	}
+
+	enemies.push_back(enemy);
 }
 
 void Game::initGLEW() {

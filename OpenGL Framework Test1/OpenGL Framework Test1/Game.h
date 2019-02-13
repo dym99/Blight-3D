@@ -9,6 +9,7 @@
 #include "Utilities.h"
 #include "P_PhysicsBody.h"
 #include "ParticleManager.h"
+#include "Enemy.h"
 
 class Game {
 public:
@@ -25,6 +26,8 @@ public:
 
 	int run();
 
+	void spawnEnemy(EnemyType _type, glm::vec3 _location);
+
 private:
 	Display *m_display;
 
@@ -33,6 +36,7 @@ private:
 	Model *m_ravager;
 	Model *m_testArea;
 	Model *m_brazier;
+	Model *m_box;
 
 	Shader *m_shader;
 
@@ -54,6 +58,11 @@ private:
 	std::vector<Scene*> m_activeScenes;
 
 	P_PhysicsBody *ravagerPhys;
+	P_PhysicsBody *hitBox;
+	P_PhysicsBody *enemyBox;
+
+	static std::vector<GameObject*> enemies;
+	static std::vector<P_PhysicsBody*> enemyBodies;
 };
 
 #endif
