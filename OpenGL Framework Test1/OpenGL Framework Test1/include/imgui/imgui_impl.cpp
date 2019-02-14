@@ -244,9 +244,9 @@ void TTK::internal::imguiDraw(ImDrawData* draw_data)
 	glScissor(last_scissor_box[0], last_scissor_box[1], (GLsizei)last_scissor_box[2], (GLsizei)last_scissor_box[3]);
 
 	glUseProgram(0);
-	glBindVertexArray(0);
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 	glDisableVertexAttribArray(g_AttribLocationPosition);
 	glDisableVertexAttribArray(g_AttribLocationUV);
 	glDisableVertexAttribArray(g_AttribLocationColor);
+	glBindVertexArray(0);
 }

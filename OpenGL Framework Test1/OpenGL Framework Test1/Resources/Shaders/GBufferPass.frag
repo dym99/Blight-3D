@@ -1,6 +1,6 @@
 #version 420
 
-uniform sampler2D uTex;
+layout(binding = 0) uniform sampler2D uTex;
 uniform vec3 colorTint;
 
 in vec2 TexCoords;
@@ -14,7 +14,7 @@ layout(location = 2) out vec3 outPositions;
 void main()
 {
     //Standard color output
-    outColors.rgb = texture(uTex, TexCoords).rgb * colorTint;
+    outColors.rgb = texture(uTex, TexCoords).rgb;
     outColors.a = 1.0;
 
     //Pack normals
