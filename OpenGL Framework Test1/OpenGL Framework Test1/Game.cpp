@@ -102,15 +102,15 @@ void Game::initGame()
 	m_logunModel.loadBindMatrices();
 	m_logunModel.loadAnimMatrices(0);
 	m_logunModel.calculateBindBones(0);
-	//m_UBO_LBones.allocateMemory(sizeof(glm::mat4) * 255);
-	//m_UBO_LBones.bind(1);
-	//testVec.clear();
-	//testVec.resize(0);
-	//testVec = m_logunModel.getBindBones();
-	//for (int i = 0; i < testVec.size(); ++i)
-	//{
-	//	m_UBO_LBones.sendMatrix(testVec[i], i * sizeof(glm::mat4));
-	//}
+	m_UBO_LBones.allocateMemory(sizeof(glm::mat4) * 255);
+	m_UBO_LBones.bind(1);
+	testVec.clear();
+	testVec.resize(0);
+	testVec = m_logunModel.getBindBones();
+	for (int i = 0; i < testVec.size(); ++i)
+	{
+		m_UBO_LBones.sendMatrix(testVec[i], i * sizeof(glm::mat4));
+	}
 
 
 	m_ravagerAlbedo = Texture("diffuseTex");

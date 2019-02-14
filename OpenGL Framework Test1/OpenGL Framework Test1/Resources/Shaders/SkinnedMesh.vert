@@ -21,30 +21,31 @@ layout (std140, binding = 1) uniform bones
 
 void main()
 {
-	//vec4 skinned = 	weights.x * (uBones[groups.x+1] * vec4(position, 1.0)) +
-	//				weights.y * (uBones[groups.y+1] * vec4(position, 1.0)) +
-	//				weights.z * (uBones[groups.z+1] * vec4(position, 1.0)) +
-	//				weights.w * (uBones[groups.w+1] * vec4(position, 1.0));
-
 	vec4 nWeights = normalize(weights);
+//	
+//	vec4 skinned = 	nWeights.x * (uBones[groups.x+1] * vec4(position, 1.0)) +
+//					nWeights.y * (uBones[groups.y+1] * vec4(position, 1.0)) +
+//					nWeights.z * (uBones[groups.z+1] * vec4(position, 1.0)) +
+//					nWeights.w * (uBones[groups.w+1] * vec4(position, 1.0));
+
 	
 	vec4 skinned = vec4(vec3(0,0,0),1.0);
 	
 	if (groups.x<255 && groups.x >= 0) {
-		skinned += nWeights.x * (uBones[groups.x+1] * vec4(position, 1.0));
+		skinned += nWeights.x * (uBones[groups.x] * vec4(position, 1.0));
+		if (groups.y<255 && groups.y >= 0) {
+			skinned += nWeights.y * (uBones[groups.y] * vec4(position, 1.0));
+			if (groups.z<255 && groups.z >= 0) {
+				skinned += nWeights.z * (uBones[groups.z] * vec4(position, 1.0));
+				if (groups.w<255 && groups.w >= 0) {
+					skinned += nWeights.w * (uBones[groups.w] * vec4(position, 1.0));
+				}		
+			}
+		}
 	}
-	if (groups.y<255 && groups.y >= 0) {
-		skinned += nWeights.y * (uBones[groups.y+1] * vec4(position, 1.0));
-	}
-	if (groups.z<255 && groups.z >= 0) {
-		skinned += nWeights.z * (uBones[groups.z+1] * vec4(position, 1.0));
-	}
-	if (groups.w<255 && groups.w >= 0) {
-		skinned += nWeights.w * (uBones[groups.w+1] * vec4(position, 1.0));
-	}
-					
+				
 	gl_Position = uProj * uView * uModel * skinned;
-    TexCoords = texCoord;    
+    TexCoords = texCoord;
 	normal0 = mat3(uModel) * normal;
-	fragPosition = (uModel * vec4(position, 1.0)).rgb;
+	fragPosition = (uModel * vec4(skinned.xyz, 1.0)).rgb;
 }
