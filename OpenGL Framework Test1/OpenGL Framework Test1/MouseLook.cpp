@@ -53,6 +53,12 @@ void MouseLook::update()
 	if (Input::GetKey(KeyCode::D)) {
 		m_playerObject->localTransform.setPos(m_playerObject->localTransform.getPos() + (glm::vec3)(glm::rotate(glm::radians(-m_RotX), glm::vec3(0, 1, 0))*glm::vec4(-2, 0, 0, 0))*Time::deltaTime);
 	}
+
+	if (Input::GetKeyDown(KeyCode::F7)) {
+		glm::vec3 position = m_playerObject->localTransform.getPos();
+		printf("CurrentPosition: (%f, %f, %f)\n", position.x, position.y, position.z);
+		printf("Where to Put Light: (%f, %f, %f)\n", position.x, 0.5f, position.z);
+	}
 }
 
 void MouseLook::render()

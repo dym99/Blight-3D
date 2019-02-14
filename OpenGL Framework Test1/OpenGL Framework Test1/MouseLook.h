@@ -14,6 +14,8 @@ public:
 	void renderTransparent() override;
 	void renderGUI() override;
 
+	inline GameObject& getPlayerObject() { return *m_playerObject; }
+
 private:
 	float m_distance, m_RotX, m_RotY;
 	GameObject *m_playerObject;

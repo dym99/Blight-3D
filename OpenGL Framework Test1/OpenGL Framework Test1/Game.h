@@ -38,10 +38,13 @@ private:
 	Model *m_brazier;
 	Model *m_bottomRoom;
 	Model *m_grove;
+	Model *m_grove2;
 	Model *m_leftRoom;
 	Model *m_rightRoom;
 	Model *m_topRoom1;
 	Model *m_topRoom2;
+	Model *m_tree;
+	Model *m_altar;
 
 	Shader *m_shader;
 
@@ -63,6 +66,7 @@ private:
 	std::vector<Scene*> m_activeScenes;
 
 	P_PhysicsBody *ravagerPhys;
+	P_PhysicsBody *floor;
 
 	bool guiEnabled = false;
 };
