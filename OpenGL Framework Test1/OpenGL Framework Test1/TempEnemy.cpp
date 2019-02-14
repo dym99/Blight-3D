@@ -36,8 +36,9 @@ void TempEnemy::update()
 	float vectorL = sqrt((vectorPT.x * vectorPT.x) + (vectorPT.y * vectorPT.y) + (vectorPT.z * vectorPT.z));
 	if (vectorL > CLOSEST_RAD)
 	{
-		vectorPT.y *= 0;
-		m_bodyObject->P_addForce(vectorPT / (vectorL / 50));
+		glm::vec3 tingy = (glm::normalize(vectorPT)) * glm::vec3(50.f, 0.f, 50.f);
+		m_bodyObject->P_addForce(tingy);
+		std::cout << tingy.x << ", " << tingy.y << ", " << tingy.z << std::endl;
 	}
 
 	//m_bodyObject->getGameObject()->localTransform.setScale(glm::vec3(1.f, health / 2, 1.f));

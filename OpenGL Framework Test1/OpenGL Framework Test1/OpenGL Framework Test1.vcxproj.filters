@@ -38,16 +38,16 @@
       <Filter>Source Files\Physics</Filter>
     </ClCompile>
     <ClCompile Include="Mesh.cpp">
-      <Filter>Source Files\Loaders</Filter>
+      <Filter>Source Files\Game\Loaders</Filter>
     </ClCompile>
     <ClCompile Include="Texture.cpp">
-      <Filter>Source Files\Loaders</Filter>
+      <Filter>Source Files\Game\Loaders</Filter>
     </ClCompile>
     <ClCompile Include="Model.cpp">
-      <Filter>Source Files\Loaders</Filter>
+      <Filter>Source Files\Game\Loaders</Filter>
     </ClCompile>
     <ClCompile Include="Material.cpp">
-      <Filter>Source Files\Loaders</Filter>
+      <Filter>Source Files\Game\Loaders</Filter>
     </ClCompile>
     <ClCompile Include="main.cpp">
       <Filter>Source Files</Filter>
@@ -133,16 +133,16 @@
       <Filter>Source Files\Physics</Filter>
     </ClInclude>
     <ClInclude Include="Mesh.h">
-      <Filter>Source Files\Loaders</Filter>
+      <Filter>Source Files\Game\Loaders</Filter>
     </ClInclude>
     <ClInclude Include="Texture.h">
-      <Filter>Source Files\Loaders</Filter>
+      <Filter>Source Files\Game\Loaders</Filter>
     </ClInclude>
     <ClInclude Include="Model.h">
-      <Filter>Source Files\Loaders</Filter>
+      <Filter>Source Files\Game\Loaders</Filter>
     </ClInclude>
     <ClInclude Include="Material.h">
-      <Filter>Source Files\Loaders</Filter>
+      <Filter>Source Files\Game\Loaders</Filter>
     </ClInclude>
     <ClInclude Include="Input.h">
       <Filter>Source Files\Handlers</Filter>
@@ -198,9 +198,6 @@
     <Filter Include="Source Files\Display">
       <UniqueIdentifier>{e34fc625-2cab-495c-a9cd-d2d7564d2b6b}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Source Files\Loaders">
-      <UniqueIdentifier>{b7bcd7e0-7392-4afa-9d51-422bbc3df44a}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Source Files\Maths">
       <UniqueIdentifier>{f6d8081d-94c8-4b90-845c-7d3d975d61d9}</UniqueIdentifier>
     </Filter>
@@ -251,6 +248,9 @@
     </Filter>
     <Filter Include="Source Files\Enemies">
       <UniqueIdentifier>{d5905e4c-0e45-4aa9-afa4-b0f645b7a854}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Game\Loaders">
+      <UniqueIdentifier>{b7bcd7e0-7392-4afa-9d51-422bbc3df44a}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
 </Project>
