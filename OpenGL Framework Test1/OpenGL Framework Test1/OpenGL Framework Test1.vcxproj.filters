@@ -100,6 +100,15 @@
     <ClCompile Include="include\imgui\imgui_impl.cpp">
       <Filter>Source Files\GUI\ImGUI</Filter>
     </ClCompile>
+    <ClCompile Include="Enemy.cpp">
+      <Filter>Source Files\Enemies</Filter>
+    </ClCompile>
+    <ClCompile Include="TempEnemy.cpp">
+      <Filter>Source Files\Behaviours\Enemy</Filter>
+    </ClCompile>
+    <ClCompile Include="PlayerController.cpp">
+      <Filter>Source Files\Behaviours\Player</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Behaviour.h">
@@ -207,6 +216,15 @@
     <ClInclude Include="include\imgui\stb_truetype.h">
       <Filter>Source Files\GUI\ImGUI</Filter>
     </ClInclude>
+    <ClInclude Include="Enemy.h">
+      <Filter>Source Files\Enemies</Filter>
+    </ClInclude>
+    <ClInclude Include="TempEnemy.h">
+      <Filter>Source Files\Behaviours\Enemy</Filter>
+    </ClInclude>
+    <ClInclude Include="PlayerController.h">
+      <Filter>Source Files\Behaviours\Player</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Source Files">
@@ -266,6 +284,15 @@
     </Filter>
     <Filter Include="Source Files\GUI\ImGUI">
       <UniqueIdentifier>{82e52776-c7b3-4395-ba19-ec683960f99b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Enemies">
+      <UniqueIdentifier>{2ffa0415-14c0-4693-988e-a8382065717d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Behaviours\Enemy">
+      <UniqueIdentifier>{32477239-2b48-49dc-bb5c-bab40ef29de1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Behaviours\Player">
+      <UniqueIdentifier>{72749c84-4678-406c-8667-aefa674e4eb9}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
 </Project>

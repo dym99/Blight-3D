@@ -1,21 +1,23 @@
 #include "Game.h"
 #include <iostream>
 
-
-#include "P_PhysicsBody.h"
-
 #include "ShaderManager.h"
 #include "MeshRenderBehaviour.h"
 #include "TestRotateBehaviour.h"
 #include "MouseLook.h"
 #include "CameraBehaviour.h"
 #include "AudioPlayer.h"
+#include "PlayerController.h"
+#include "TempEnemy.h"
 
 #include "Input.h"
 
 #ifndef _DEBUG
 #define _DEBUG 0
 #endif
+
+std::vector<Enemy*> Game::enemies;
+std::vector<P_PhysicsBody*> Game::enemyBodies;
 
 Game::Game()
 {
@@ -104,6 +106,8 @@ void Game::initGame()
 	m_tree->LoadFromFile("./Resources/Objects/MainLevel/", "Tree");
 	m_altar = new Model();
 	m_altar->LoadFromFile("./Resources/Objects/MainLevel/", "SkullAltar");
+	m_box = new Model();
+	m_box->LoadFromFile("./Resources/Objects/Box/", "cube");
 	
 	ShaderManager::loadShaders();
 
@@ -161,14 +165,14 @@ void Game::initGame()
 
 	//Set up the test Scene
 
-	auto ravager = new GameObject("Ravager");
-	ravager->addBehaviour(new MeshRenderBehaviour(m_ravager, ShaderManager::getShader(GBUFFER_SHADER)));
+	player = new GameObject("Ravager");
+	player->addBehaviour(new MeshRenderBehaviour(m_ravager, ShaderManager::getShader(GBUFFER_SHADER)));
 	if (_DEBUG)
-		ravager->localTransform.setPos(glm::vec3(0.f, 25.f, 0.f));
+		player->localTransform.setPos(glm::vec3(0.f, 25.f, 0.f));
 
-	auto cameraPivot = new GameObject("CameraPivot");
+	cameraPivot = new GameObject("CameraPivot");
 	cameraPivot->localTransform.setPos(glm::vec3(0.f,1.f,0.f));
-	cameraPivot->addBehaviour(new MouseLook(ravager));
+	cameraPivot->addBehaviour(new MouseLook(player));
 
 	auto cameraObject = new GameObject("Camera");
 
@@ -177,7 +181,7 @@ void Game::initGame()
 	camera->setTransform(&cameraObject->worldTransform);
 
 	cameraPivot->addChild(cameraObject);
-	ravager->addChild(cameraPivot);
+	player->addChild(cameraPivot);
 	
 #pragma region braziers
 	auto brazier = new GameObject("brazier");
@@ -455,7 +459,7 @@ void Game::initGame()
 
 
 	auto scene = new Scene("DemoScene");
-	scene->addChild(ravager);
+	scene->addChild(player);
 	scene->addChild(bottomRoom);
 	scene->addChild(grove);
 	scene->addChild(leftRoom);
@@ -569,173 +573,184 @@ void Game::initGame()
 
 	Camera::mainCameraTransform = &(cameraObject->worldTransform);
 
-	ravagerPhys = new P_PhysicsBody(&ravager->localTransform, 1.f, true, SPHERE, 1.f, 0.f, 0.f, glm::vec3(0, 0.5f, 0));
+	auto attackBox = new GameObject("AttackBox");
+	attackBox->localTransform.setPos(glm::vec3(0.f, 0.f, 0.3f));
+	attackBox->localTransform.setScale(glm::vec3(0.2f, 0.2f, 1.f));
+	attackBox->addBehaviour(new MeshRenderBehaviour(m_box, ShaderManager::getShader(GBUFFER_SHADER)));
+
+	ravagerPhys = new P_PhysicsBody(player, 1.f, true, SPHERE, 0.5f, 0.f, 0.f, glm::vec3(0, 0.5f, 0), 0.0f, 1.0f, false, false, "Player");
+	hitBox = new P_PhysicsBody(attackBox, 1.f, false, BOX, .2f, .2f, 2.f, VEC3ZERO, 0.f, 0.f, false, true, "Sword");
+
+	player->addBehaviour(new PlayerController(ravagerPhys, hitBox));
+	player->addChild(attackBox);
+	ravagerPhys->trackNames(true);
 
 	//World Physics Bodies
 	{
-		auto owo = new Transform(glm::vec3(4.f, -0.4f, 0.f)*2.f, glm::vec3(0.f, 0.f, 0.f));
-		floor = new P_PhysicsBody(owo, 1.0f, false, BOX, 1.f * 2, 56.f * 2, 54.f * 2, glm::vec3(0.f, 0.f, 1.f), 0.f, 0.f, true);
-		owo = new Transform(glm::vec3(4.f, -0.4f, 0.f)*2.f, glm::vec3(0.f, 0.f, 0.f));
-		owo->setPos(glm::vec3(0.5f, 2.f, -9.f) * 2.f);
-		new P_PhysicsBody(owo, 1.0f, false, BOX, 5.f * 2.f, 13.f * 2.f, 1.f * 2.f, glm::vec3(0.f, 0.f, 1.f), 0.f, 0.f, true);
-		owo = new Transform(glm::vec3(4.f, -0.4f, 0.f)*2.f, glm::vec3(0.f, 0.f, 0.f));
-		owo->setPos(glm::vec3(20.25f, 2.f, -9.f) * 2.f);
-		new P_PhysicsBody(owo, 1.0f, false, BOX, 5.f, 23.5f, 1.f, glm::vec3(0.f, 0.f, 1.f), 0.f, 0.f, true);
-		owo = new Transform(glm::vec3(4.f, -0.4f, 0.f)*2.f, glm::vec3(0.f, 0.f, 0.f));
-		owo->setPos(glm::vec3(-15.75f, 2.f, -9.f));
-		new P_PhysicsBody(owo, 1.0f, false, BOX, 5.f * 2.f, 16.5f * 2.f, 1.f * 2.f, glm::vec3(0.f, 0.f, 1.f), 0.f, 0.f, true);
-		owo = new Transform(glm::vec3(4.f, -0.4f, 0.f)*2.f, glm::vec3(0.f, 0.f, 0.f));
-		owo->setPos(glm::vec3(-12.f, 2.f, -14.75f) * 2.f);
-		new P_PhysicsBody(owo, 1.0f, false, BOX, 5.f * 2.f, 1.f * 2.f, 24.5f * 2.f, glm::vec3(0.f, 0.f, 1.f), 0.f, 0.f, true);
-		owo = new Transform(glm::vec3(4.f, -0.4f, 0.f)*2.f, glm::vec3(0.f, 0.f, 0.f));
-		owo->setPos(glm::vec3(-12.f, 2.f, 15.5f) * 2.f);
-		new P_PhysicsBody(owo, 1.0f, false, BOX, 5.f * 2.f, 1.f * 2.f, 23.f * 2.f, glm::vec3(0.f, 0.f, 1.f), 0.f, 0.f, true);
-		owo = new Transform(glm::vec3(4.f, -0.4f, 0.f)*2.f, glm::vec3(0.f, 0.f, 0.f));
-		owo->setPos(glm::vec3(-14.f, 2.f, 9.f) * 2.f);
-		new P_PhysicsBody(owo, 1.0f, false, BOX, 5.f * 2.f, 20.f * 2.f, 1.f * 2.f, glm::vec3(0.f, 0.f, 1.f), 0.f, 0.f, true);
-		owo = new Transform(glm::vec3(4.f, -0.4f, 0.f)*2.f, glm::vec3(0.f, 0.f, 0.f));
-		owo->setPos(glm::vec3(12.f, 2.f, -14.25f) * 2.f);
-		new P_PhysicsBody(owo, 1.0f, false, BOX, 5.f * 2.f, 1.f * 2.f, 25.5f * 2.f, glm::vec3(0.f, 0.f, 1.f), 0.f, 0.f, true);
-		owo = new Transform(glm::vec3(4.f, -0.4f, 0.f)*2.f, glm::vec3(0.f, 0.f, 0.f));
-		owo->setPos(glm::vec3(12.f, 2.f, 14.25f) * 2.f);
-		new P_PhysicsBody(owo, 1.0f, false, BOX, 5.f * 2.f, 1.f * 2.f, 25.5f * 2.f, glm::vec3(0.f, 0.f, 1.f), 0.f, 0.f, true);
-		owo = new Transform(glm::vec3(4.f, -0.4f, 0.f)*2.f, glm::vec3(0.f, 0.f, 0.f));
-		owo->setPos(glm::vec3(18.f, 2.f, 9.f) * 2.f);
-		new P_PhysicsBody(owo, 1.0f, false, BOX, 5.f * 2.f, 28.f * 2.f, 1.f * 2.f, glm::vec3(0.f, 0.f, 1.f), 0.f, 0.f, true);
-		owo = new Transform(glm::vec3(4.f, -0.4f, 0.f)*2.f, glm::vec3(0.f, 0.f, 0.f));
-		owo->setPos(glm::vec3(32.f, 2.f, -0.25f) * 2.f);
-		new P_PhysicsBody(owo, 1.0f, false, BOX, 5.f * 2.f, 1.f * 2.f, 18.5f * 2.f, glm::vec3(0.f, 0.f, 1.f), 0.f, 0.f, true);
-		owo = new Transform(glm::vec3(4.f, -0.4f, 0.f)*2.f, glm::vec3(0.f, 0.f, 0.f));
-		owo->setPos(glm::vec3(0.f, 2.f, 27.f) * 2.f);
-		new P_PhysicsBody(owo, 1.0f, false, BOX, 5.f * 2.f, 24.f * 2.f, 1.f * 2.f, glm::vec3(0.f, 0.f, 1.f), 0.f, 0.f, true);
-		owo = new Transform(glm::vec3(4.f, -0.4f, 0.f)*2.f, glm::vec3(0.f, 0.f, 0.f));
-		owo->setPos(glm::vec3(0.f, 2.f, -27.f) * 2.f);
-		new P_PhysicsBody(owo, 1.0f, false, BOX, 5.f * 2.f, 24.f * 2.f, 1.f * 2.f, glm::vec3(0.f, 0.f, 1.f), 0.f, 0.f, true);
-		owo = new Transform(glm::vec3(4.f, -0.4f, 0.f)*2.f, glm::vec3(0.f, 0.f, 0.f));
-		owo->setPos(glm::vec3(-24.f, 2.f, 0.f) * 2.f);
-		new P_PhysicsBody(owo, 1.0f, false, BOX, 5.f * 2.f, 1.f * 2.f, 18.f * 2.f, glm::vec3(0.f, 0.f, 1.f), 0.f, 0.f, true);
+		auto owo = new GameObject("World");
+		owo->localTransform.setPos(glm::vec3(4.f, -0.4f, 0.f)*2.f);
+		floor = new P_PhysicsBody(owo, 1.0f, false, BOX, 1.f * 2, 56.f * 2, 54.f * 2, glm::vec3(0.f, 0.f, 0.f), 0.f, 0.f, true);
+		owo = new GameObject("World");
+		owo->localTransform.setPos(glm::vec3(0.5f, 2.f, -9.f) * 2.f);
+		new P_PhysicsBody(owo, 1.0f, false, BOX, 5.f * 2.f, 13.f * 2.f, 1.f * 2.f, glm::vec3(0.f, 0.f, 0.f), 0.f, 0.f, true);
+		owo = new GameObject("World"); 
+		owo->localTransform.setPos(glm::vec3(20.25f, 2.f, -9.f) * 2.f);
+		new P_PhysicsBody(owo, 1.0f, false, BOX, 5.f, 23.5f, 1.f, glm::vec3(0.f, 0.f, 0.f), 0.f, 0.f, true);
+		owo = new GameObject("World"); 
+		owo->localTransform.setPos(glm::vec3(-15.75f, 2.f, -9.f));
+		new P_PhysicsBody(owo, 1.0f, false, BOX, 5.f * 2.f, 16.5f * 2.f, 1.f * 2.f, glm::vec3(0.f, 0.f, 0.f), 0.f, 0.f, true);
+		owo = new GameObject("World"); 
+		owo->localTransform.setPos(glm::vec3(-12.f, 2.f, -14.75f) * 2.f);
+		new P_PhysicsBody(owo, 1.0f, false, BOX, 5.f * 2.f, 1.f * 2.f, 24.5f * 2.f, glm::vec3(0.f, 0.f, 0.f), 0.f, 0.f, true);
+		owo = new GameObject("World"); 
+		owo->localTransform.setPos(glm::vec3(-12.f, 2.f, 15.5f) * 2.f);
+		new P_PhysicsBody(owo, 1.0f, false, BOX, 5.f * 2.f, 1.f * 2.f, 23.f * 2.f, glm::vec3(0.f, 0.f, 0.f), 0.f, 0.f, true);
+		owo = new GameObject("World"); 
+		owo->localTransform.setPos(glm::vec3(-14.f, 2.f, 9.f) * 2.f);
+		new P_PhysicsBody(owo, 1.0f, false, BOX, 5.f * 2.f, 20.f * 2.f, 1.f * 2.f, glm::vec3(0.f, 0.f, 0.f), 0.f, 0.f, true);
+		owo = new GameObject("World"); 
+		owo->localTransform.setPos(glm::vec3(12.f, 2.f, -14.25f) * 2.f);
+		new P_PhysicsBody(owo, 1.0f, false, BOX, 5.f * 2.f, 1.f * 2.f, 25.5f * 2.f, glm::vec3(0.f, 0.f, 0.f), 0.f, 0.f, true);
+		owo = new GameObject("World"); 
+		owo->localTransform.setPos(glm::vec3(12.f, 2.f, 14.25f) * 2.f);
+		new P_PhysicsBody(owo, 1.0f, false, BOX, 5.f * 2.f, 1.f * 2.f, 25.5f * 2.f, glm::vec3(0.f, 0.f, 0.f), 0.f, 0.f, true);
+		owo = new GameObject("World"); 
+		owo->localTransform.setPos(glm::vec3(18.f, 2.f, 9.f) * 2.f);
+		new P_PhysicsBody(owo, 1.0f, false, BOX, 5.f * 2.f, 28.f * 2.f, 1.f * 2.f, glm::vec3(0.f, 0.f, 0.f), 0.f, 0.f, true);
+		owo = new GameObject("World"); 
+		owo->localTransform.setPos(glm::vec3(32.f, 2.f, -0.25f) * 2.f);
+		new P_PhysicsBody(owo, 1.0f, false, BOX, 5.f * 2.f, 1.f * 2.f, 18.5f * 2.f, glm::vec3(0.f, 0.f, 0.f), 0.f, 0.f, true);
+		owo = new GameObject("World"); 
+		owo->localTransform.setPos(glm::vec3(0.f, 2.f, 27.f) * 2.f);
+		new P_PhysicsBody(owo, 1.0f, false, BOX, 5.f * 2.f, 24.f * 2.f, 1.f * 2.f, glm::vec3(0.f, 0.f, 0.f), 0.f, 0.f, true);
+		owo = new GameObject("World"); 
+		owo->localTransform.setPos(glm::vec3(0.f, 2.f, -27.f) * 2.f);
+		new P_PhysicsBody(owo, 1.0f, false, BOX, 5.f * 2.f, 24.f * 2.f, 1.f * 2.f, glm::vec3(0.f, 0.f, 0.f), 0.f, 0.f, true);
+		owo = new GameObject("World"); 
+		owo->localTransform.setPos(glm::vec3(-24.f, 2.f, 0.f) * 2.f);
+		new P_PhysicsBody(owo, 1.0f, false, BOX, 5.f * 2.f, 1.f * 2.f, 18.f * 2.f, glm::vec3(0.f, 0.f, 0.f), 0.f, 0.f, true);
 
 
-		owo = new Transform(glm::vec3(4.f, -0.4f, 0.f)*2.f, glm::vec3(0.f, 0.f, 0.f));
-		owo->setPos(glm::vec3(13.f, 2.f, 1.75f) * 2.f);
-		new P_PhysicsBody(owo, 1.0f, false, BOX, 5.f * 2.f, 3.f * 2.f, 0.5f * 2.f, glm::vec3(0.f, 0.f, 1.f), 0.f, 0.f, true);
+		owo = new GameObject("World"); 
+		owo->localTransform.setPos(glm::vec3(13.f, 2.f, 1.75f) * 2.f);
+		new P_PhysicsBody(owo, 1.0f, false, BOX, 5.f * 2.f, 3.f * 2.f, 0.5f * 2.f, glm::vec3(0.f, 0.f, 0.f), 0.f, 0.f, true);
 
 
-		owo = new Transform(glm::vec3(4.f, -0.4f, 0.f)*2.f, glm::vec3(0.f, 0.f, 0.f));
-		owo->setPos(glm::vec3(15.f, 3.f, 1.75f) * 2.f);
-		new P_PhysicsBody(owo, 1.0f, false, BOX, 3.f * 2.f, 1.f * 2.f, 0.5f * 2.f, glm::vec3(0.f, 0.f, 1.f), 0.f, 0.f, true);
+		owo = new GameObject("World"); 
+		owo->localTransform.setPos(glm::vec3(15.f, 3.f, 1.75f) * 2.f);
+		new P_PhysicsBody(owo, 1.0f, false, BOX, 3.f * 2.f, 1.f * 2.f, 0.5f * 2.f, glm::vec3(0.f, 0.f, 0.f), 0.f, 0.f, true);
 
 
-		owo = new Transform(glm::vec3(4.f, -0.4f, 0.f)*2.f, glm::vec3(0.f, 0.f, 0.f));
-		owo->setPos(glm::vec3(16.25f, 2.f, 1.75f) * 2.f);
-		new P_PhysicsBody(owo, 1.0f, false, BOX, 5.f * 2.f, 1.5f * 2.f, 0.5f * 2.f, glm::vec3(0.f, 0.f, 1.f), 0.f, 0.f, true);
+		owo = new GameObject("World"); 
+		owo->localTransform.setPos(glm::vec3(16.25f, 2.f, 1.75f) * 2.f);
+		new P_PhysicsBody(owo, 1.0f, false, BOX, 5.f * 2.f, 1.5f * 2.f, 0.5f * 2.f, glm::vec3(0.f, 0.f, 0.f), 0.f, 0.f, true);
 
 
-		owo = new Transform(glm::vec3(4.f, -0.4f, 0.f)*2.f, glm::vec3(0.f, 0.f, 0.f));
-		owo->setPos(glm::vec3(13.f, 2.f, -1.75f) * 2.f);
-		new P_PhysicsBody(owo, 1.0f, false, BOX, 5.f * 2.f, 3.f * 2.f, 0.5f * 2.f, glm::vec3(0.f, 0.f, 1.f), 0.f, 0.f, true);
+		owo = new GameObject("World"); 
+		owo->localTransform.setPos(glm::vec3(13.f, 2.f, -1.75f) * 2.f);
+		new P_PhysicsBody(owo, 1.0f, false, BOX, 5.f * 2.f, 3.f * 2.f, 0.5f * 2.f, glm::vec3(0.f, 0.f, 0.f), 0.f, 0.f, true);
 
 
-		owo = new Transform(glm::vec3(4.f, -0.4f, 0.f)*2.f, glm::vec3(0.f, 0.f, 0.f));
-		owo->setPos(glm::vec3(15.f, 3.f, -1.75f) * 2.f);
-		new P_PhysicsBody(owo, 1.0f, false, BOX, 3.f * 2.f, 1.f * 2.f, 0.5f * 2.f, glm::vec3(0.f, 0.f, 1.f), 0.f, 0.f, true);
+		owo = new GameObject("World"); 
+		owo->localTransform.setPos(glm::vec3(15.f, 3.f, -1.75f) * 2.f);
+		new P_PhysicsBody(owo, 1.0f, false, BOX, 3.f * 2.f, 1.f * 2.f, 0.5f * 2.f, glm::vec3(0.f, 0.f, 0.f), 0.f, 0.f, true);
 
 
-		owo = new Transform(glm::vec3(4.f, -0.4f, 0.f)*2.f, glm::vec3(0.f, 0.f, 0.f));
-		owo->setPos(glm::vec3(16.25f, 2.f, -1.75f) * 2.f);
-		new P_PhysicsBody(owo, 1.0f, false, BOX, 5.f * 2.f, 1.5f * 2.f, 0.5f * 2.f, glm::vec3(0.f, 0.f, 1.f), 0.f, 0.f, true);
+		owo = new GameObject("World"); 
+		owo->localTransform.setPos(glm::vec3(16.25f, 2.f, -1.75f) * 2.f);
+		new P_PhysicsBody(owo, 1.0f, false, BOX, 5.f * 2.f, 1.5f * 2.f, 0.5f * 2.f, glm::vec3(0.f, 0.f, 0.f), 0.f, 0.f, true);
 
 
-		owo = new Transform(glm::vec3(4.f, -0.4f, 0.f)*2.f, glm::vec3(0.f, 0.f, 0.f));
-		owo->setPos(glm::vec3(16.75f, 2.f, 0.f) * 2.f);
-		new P_PhysicsBody(owo, 1.0f, false, BOX, 5.f * 2.f, 0.5f * 2.f, 4.f * 2.f, glm::vec3(0.f, 0.f, 1.f), 0.f, 0.f, true);
+		owo = new GameObject("World"); 
+		owo->localTransform.setPos(glm::vec3(16.75f, 2.f, 0.f) * 2.f);
+		new P_PhysicsBody(owo, 1.0f, false, BOX, 5.f * 2.f, 0.5f * 2.f, 4.f * 2.f, glm::vec3(0.f, 0.f, 0.f), 0.f, 0.f, true);
 
 
-		owo = new Transform(glm::vec3(4.f, -0.4f, 0.f)*2.f, glm::vec3(0.f, 0.f, 0.f));
-		owo->setPos(glm::vec3(20.f, 2.f, 5.f) * 2.f);
-		new P_PhysicsBody(owo, 1.0f, false, BOX, 5.f * 2.f, 1.f * 2.f, 7.f * 2.f, glm::vec3(0.f, 0.f, 1.f), 0.f, 0.f, true);
+		owo = new GameObject("World"); 
+		owo->localTransform.setPos(glm::vec3(20.f, 2.f, 5.f) * 2.f);
+		new P_PhysicsBody(owo, 1.0f, false, BOX, 5.f * 2.f, 1.f * 2.f, 7.f * 2.f, glm::vec3(0.f, 0.f, 0.f), 0.f, 0.f, true);
 
 
-		owo = new Transform(glm::vec3(4.f, -0.4f, 0.f)*2.f, glm::vec3(0.f, 0.f, 0.f));
-		owo->setPos(glm::vec3(20.f, 2.f, -5.f) * 2.f);
-		new P_PhysicsBody(owo, 1.0f, false, BOX, 5.f * 2.f, 1.f * 2.f, 7.f * 2.f, glm::vec3(0.f, 0.f, 1.f), 0.f, 0.f, true);
+		owo = new GameObject("World"); 
+		owo->localTransform.setPos(glm::vec3(20.f, 2.f, -5.f) * 2.f);
+		new P_PhysicsBody(owo, 1.0f, false, BOX, 5.f * 2.f, 1.f * 2.f, 7.f * 2.f, glm::vec3(0.f, 0.f, 0.f), 0.f, 0.f, true);
 
 
-		owo = new Transform(glm::vec3(4.f, -0.4f, 0.f)*2.f, glm::vec3(0.f, 0.f, 0.f));
-		owo->setPos(glm::vec3(20.75f, 2.f, 1.75f) * 2.f);
-		new P_PhysicsBody(owo, 1.0f, false, BOX, 5.f * 2.f, 2.5f * 2.f, 0.5f * 2.f, glm::vec3(0.f, 0.f, 1.f), 0.f, 0.f, true);
+		owo = new GameObject("World"); 
+		owo->localTransform.setPos(glm::vec3(20.75f, 2.f, 1.75f) * 2.f);
+		new P_PhysicsBody(owo, 1.0f, false, BOX, 5.f * 2.f, 2.5f * 2.f, 0.5f * 2.f, glm::vec3(0.f, 0.f, 0.f), 0.f, 0.f, true);
 
 
-		owo = new Transform(glm::vec3(4.f, -0.4f, 0.f)*2.f, glm::vec3(0.f, 0.f, 0.f));
-		owo->setPos(glm::vec3(20.75f, 2.f, -1.75f) * 2.f);
-		new P_PhysicsBody(owo, 1.0f, false, BOX, 5.f * 2.f, 2.5f * 2.f, 0.5f * 2.f, glm::vec3(0.f, 0.f, 1.f), 0.f, 0.f, true);
+		owo = new GameObject("World"); 
+		owo->localTransform.setPos(glm::vec3(20.75f, 2.f, -1.75f) * 2.f);
+		new P_PhysicsBody(owo, 1.0f, false, BOX, 5.f * 2.f, 2.5f * 2.f, 0.5f * 2.f, glm::vec3(0.f, 0.f, 0.f), 0.f, 0.f, true);
 
 
-		owo = new Transform(glm::vec3(4.f, -0.4f, 0.f)*2.f, glm::vec3(0.f, 0.f, 0.f));
-		owo->setPos(glm::vec3(23.f, 3.75f, 1.75f) * 2.f);
-		new P_PhysicsBody(owo, 1.0f, false, BOX, 1.5f * 2.f, 2.f * 2.f, 0.5f * 2.f, glm::vec3(0.f, 0.f, 1.f), 0.f, 0.f, true);
+		owo = new GameObject("World"); 
+		owo->localTransform.setPos(glm::vec3(23.f, 3.75f, 1.75f) * 2.f);
+		new P_PhysicsBody(owo, 1.0f, false, BOX, 1.5f * 2.f, 2.f * 2.f, 0.5f * 2.f, glm::vec3(0.f, 0.f, 0.f), 0.f, 0.f, true);
 
 
-		owo = new Transform(glm::vec3(4.f, -0.4f, 0.f)*2.f, glm::vec3(0.f, 0.f, 0.f));
-		owo->setPos(glm::vec3(23.f, 3.75f, -1.75f) * 2.f);
-		new P_PhysicsBody(owo, 1.0f, false, BOX, 1.5f * 2.f, 2.f * 2.f, 0.5f * 2.f, glm::vec3(0.f, 0.f, 1.f), 0.f, 0.f, true);
+		owo = new GameObject("World"); 
+		owo->localTransform.setPos(glm::vec3(23.f, 3.75f, -1.75f) * 2.f);
+		new P_PhysicsBody(owo, 1.0f, false, BOX, 1.5f * 2.f, 2.f * 2.f, 0.5f * 2.f, glm::vec3(0.f, 0.f, 0.f), 0.f, 0.f, true);
 
 
-		owo = new Transform(glm::vec3(4.f, -0.4f, 0.f)*2.f, glm::vec3(0.f, 0.f, 0.f));
-		owo->setPos(glm::vec3(25.75f, 2.f, 1.75f) * 2.f);
-		new P_PhysicsBody(owo, 1.0f, false, BOX, 5.f * 2.f, 3.5f * 2.f, 0.5f * 2.f, glm::vec3(0.f, 0.f, 1.f), 0.f, 0.f, true);
+		owo = new GameObject("World"); 
+		owo->localTransform.setPos(glm::vec3(25.75f, 2.f, 1.75f) * 2.f);
+		new P_PhysicsBody(owo, 1.0f, false, BOX, 5.f * 2.f, 3.5f * 2.f, 0.5f * 2.f, glm::vec3(0.f, 0.f, 0.f), 0.f, 0.f, true);
 
 
-		owo = new Transform(glm::vec3(4.f, -0.4f, 0.f)*2.f, glm::vec3(0.f, 0.f, 0.f));
-		owo->setPos(glm::vec3(25.75f, 2.f, -1.75f) * 2.f);
-		new P_PhysicsBody(owo, 1.0f, false, BOX, 5.f * 2.f, 3.5f * 2.f, 0.5f * 2.f, glm::vec3(0.f, 0.f, 1.f), 0.f, 0.f, true);
+		owo = new GameObject("World"); 
+		owo->localTransform.setPos(glm::vec3(25.75f, 2.f, -1.75f) * 2.f);
+		new P_PhysicsBody(owo, 1.0f, false, BOX, 5.f * 2.f, 3.5f * 2.f, 0.5f * 2.f, glm::vec3(0.f, 0.f, 0.f), 0.f, 0.f, true);
 
 
-		owo = new Transform(glm::vec3(4.f, -0.4f, 0.f)*2.f, glm::vec3(0.f, 0.f, 0.f));
-		owo->setPos(glm::vec3(27.75, 2.f, 0.f) * 2.f);
-		new P_PhysicsBody(owo, 1.0f, false, BOX, 5.f * 2.f, 0.5f * 2.f, 8.f * 2.f, glm::vec3(0.f, 0.f, 1.f), 0.f, 0.f, true);
+		owo = new GameObject("World"); 
+		owo->localTransform.setPos(glm::vec3(27.75, 2.f, 0.f) * 2.f);
+		new P_PhysicsBody(owo, 1.0f, false, BOX, 5.f * 2.f, 0.5f * 2.f, 8.f * 2.f, glm::vec3(0.f, 0.f, 0.f), 0.f, 0.f, true);
 
 
-		owo = new Transform(glm::vec3(4.f, -0.4f, 0.f)*2.f, glm::vec3(0.f, 0.f, 0.f));
-		owo->setPos(glm::vec3(27.75f, 3.75f, 5.f) * 2.f);
-		new P_PhysicsBody(owo, 1.0f, false, BOX, 1.5f * 2.f, 0.5f * 2.f, 2.f * 2.f, glm::vec3(0.f, 0.f, 1.f), 0.f, 0.f, true);
+		owo = new GameObject("World"); 
+		owo->localTransform.setPos(glm::vec3(27.75f, 3.75f, 5.f) * 2.f);
+		new P_PhysicsBody(owo, 1.0f, false, BOX, 1.5f * 2.f, 0.5f * 2.f, 2.f * 2.f, glm::vec3(0.f, 0.f, 0.f), 0.f, 0.f, true);
 
 
-		owo = new Transform(glm::vec3(4.f, -0.4f, 0.f)*2.f, glm::vec3(0.f, 0.f, 0.f));
-		owo->setPos(glm::vec3(27.75, 3.75, -5.f) * 2.f);
-		new P_PhysicsBody(owo, 1.0f, false, BOX, 1.5f * 2.f, 0.5f * 2.f, 2.f * 2.f, glm::vec3(0.f, 0.f, 1.f), 0.f, 0.f, true);
+		owo = new GameObject("World"); 
+		owo->localTransform.setPos(glm::vec3(27.75, 3.75, -5.f) * 2.f);
+		new P_PhysicsBody(owo, 1.0f, false, BOX, 1.5f * 2.f, 0.5f * 2.f, 2.f * 2.f, glm::vec3(0.f, 0.f, 0.f), 0.f, 0.f, true);
 
 
-		owo = new Transform(glm::vec3(4.f, -0.4f, 0.f)*2.f, glm::vec3(0.f, 0.f, 0.f));
-		owo->setPos(glm::vec3(27.75, 2.f, 7.25f) * 2.f);
-		new P_PhysicsBody(owo, 1.0f, false, BOX, 5.f * 2.f, 0.5f * 2.f, 2.5f * 2.f, glm::vec3(0.f, 0.f, 1.f), 0.f, 0.f, true);
+		owo = new GameObject("World"); 
+		owo->localTransform.setPos(glm::vec3(27.75, 2.f, 7.25f) * 2.f);
+		new P_PhysicsBody(owo, 1.0f, false, BOX, 5.f * 2.f, 0.5f * 2.f, 2.5f * 2.f, glm::vec3(0.f, 0.f, 0.f), 0.f, 0.f, true);
 
 
-		owo = new Transform(glm::vec3(4.f, -0.4f, 0.f)*2.f, glm::vec3(0.f, 0.f, 0.f));
-		owo->setPos(glm::vec3(27.75, 2.f, -7.25) * 2.f);
-		new P_PhysicsBody(owo, 1.0f, false, BOX, 5.f * 2.f, 0.5f * 2.f, 2.5f * 2.f, glm::vec3(0.f, 0.f, 1.f), 0.f, 0.f, true);
+		owo = new GameObject("World"); 
+		owo->localTransform.setPos(glm::vec3(27.75, 2.f, -7.25) * 2.f);
+		new P_PhysicsBody(owo, 1.0f, false, BOX, 5.f * 2.f, 0.5f * 2.f, 2.5f * 2.f, glm::vec3(0.f, 0.f, 0.f), 0.f, 0.f, true);
 
 
-		owo = new Transform(glm::vec3(4.f, -0.4f, 0.f)*2.f, glm::vec3(0.f, 0.f, 0.f));
-		owo->setPos(glm::vec3(0.f, 2.f, 8.75f) * 2.f);
-		new P_PhysicsBody(owo, 1.0f, false, BOX, 5.f * 2.f, 23.f * 2.f, 0.5f * 2.f, glm::vec3(0.f, 0.f, 1.f), 0.f, 0.f, true);
+		owo = new GameObject("World"); 
+		owo->localTransform.setPos(glm::vec3(0.f, 2.f, 8.75f) * 2.f);
+		new P_PhysicsBody(owo, 1.0f, false, BOX, 5.f * 2.f, 23.f * 2.f, 0.5f * 2.f, glm::vec3(0.f, 0.f, 0.f), 0.f, 0.f, true);
 
 
-		owo = new Transform(glm::vec3(4.f, -0.4f, 0.f)*2.f, glm::vec3(0.f, 0.f, 0.f));
-		owo->setPos(glm::vec3(0.f, 2.f, -8.75f) * 2.f);
-		new P_PhysicsBody(owo, 1.0f, false, BOX, 5.f * 2.f, 23.f * 2.f, 0.5f * 2.f, glm::vec3(0.f, 0.f, 1.f), 0.f, 0.f, true);
+		owo = new GameObject("World"); 
+		owo->localTransform.setPos(glm::vec3(0.f, 2.f, -8.75f) * 2.f);
+		new P_PhysicsBody(owo, 1.0f, false, BOX, 5.f * 2.f, 23.f * 2.f, 0.5f * 2.f, glm::vec3(0.f, 0.f, 0.f), 0.f, 0.f, true);
 
 
-		owo = new Transform(glm::vec3(4.f, -0.4f, 0.f)*2.f, glm::vec3(0.f, 0.f, 0.f));
-		owo->setPos(glm::vec3(4.f, 10.f, 0.f) * 2.f);
-		new P_PhysicsBody(owo, 1.0f, false, BOX, 1.f * 2.f, 56.f * 2.f, 54.f * 2.f, glm::vec3(0.f, 0.f, 1.f), 0.f, 0.f, true);
+		owo = new GameObject("World"); 
+		owo->localTransform.setPos(glm::vec3(4.f, 10.f, 0.f) * 2.f);
+		new P_PhysicsBody(owo, 1.0f, false, BOX, 1.f * 2.f, 56.f * 2.f, 54.f * 2.f, glm::vec3(0.f, 0.f, 0.f), 0.f, 0.f, true);
 	}
 	
 	//P_PhysicsBody::P_bodyCount.push_back(ravagerPhys);
 	//P_PhysicsBody::P_bodyCount.push_back(floor);
 
 	if (_DEBUG)
-		new P_PhysicsBody(new Transform(), 1.f, false, BOX, 1.f, 500.f, 500.f, glm::vec3(0, 20.f, 0), 0, 0, true);
+		new P_PhysicsBody(new GameObject("World"), 1.f, false, BOX, 1.f, 500.f, 500.f, glm::vec3(0, 20.f, 0), 0, 0, true);
 
 
 #pragma region Level Physics Bodies
@@ -760,6 +775,28 @@ void Game::update()
 	//Remove this when done testing. Or use as a jump for testing purposes.
 	if (Input::GetKeyDown(KeyCode::Space)) {
 		ravagerPhys->P_velocity.y = 4.f;
+	}
+
+	///SUPER SKETCHY KILL BUTTON
+	if (Input::GetKeyDown(KeyCode::K))
+	{
+		//std::vector<Behaviour*>* behav = player->getBehaviours();
+		//PlayerController* playR = (PlayerController*)&behav[1];
+		//playR->health = 0.f;
+
+
+
+	}
+
+
+	if (Input::GetKeyDown(KeyCode::Escape))
+	{
+		exit(0);
+	}
+
+	if (Input::GetKeyPress(KeyCode::G))
+	{
+		spawnEnemy(RAVAGER, VEC3ZERO + glm::vec3(0, 2, 0));
 	}
 
 	if (Input::GetKeyPress(KeyCode::F1)) {
@@ -910,12 +947,73 @@ void Game::GUI()
 {
 	UI::Start(WINDOW_WIDTH, WINDOW_HEIGHT);
 
-	ImGui::SliderFloat3("Ravager Position", &ravagerPhys->getTransform().getPos()[0], -5.f, 5.f);
+	ImGui::SliderFloat3("Ravager Position", &ravagerPhys->getGameObject()->localTransform.getPos()[0], -5.f, 5.f);
 
 
 	UI::End();
 }
 	
+void Game::spawnEnemy(EnemyType _type, glm::vec3 _location)
+{
+	auto enemy = new Enemy("Enemy");
+	enemy->localTransform.setPos(_location);
+	switch (_type)
+	{
+	case RAVAGER:
+		enemy->addBehaviour(new MeshRenderBehaviour(m_ravager, ShaderManager::getShader(GBUFFER_SHADER)));
+		break;
+	case LESSER_GHOUL:
+	case GREATER_GHOUL:
+	default:
+		enemy->addBehaviour(new MeshRenderBehaviour(m_box, ShaderManager::getShader(GBUFFER_SHADER)));
+		break;
+	}
+
+	enemies.push_back(enemy);
+
+	m_activeScenes[0]->addChild(enemy);
+
+	P_PhysicsBody* enemyBody = new P_PhysicsBody(enemy, 10.f, true, SPHERE, 0.5f, 0.f, 0.f, VEC3ZERO, 0.f, 1.f, false, false, "Enemy");
+	enemyBodies.push_back(enemyBody);
+	enemy->addBehaviour(new TempEnemy(enemyBody, enemy, player));
+	enemyBody->trackNames(true);
+}
+
+void Game::killEnemy(Enemy* _toKill)
+{
+	int i = 0;
+	bool proceed = false;
+
+	for (i; i < enemies.size(); ++i)
+	{
+		if (enemies[i] == _toKill)
+		{
+			proceed = true;
+			break;
+		}
+	}
+	if (proceed)
+	{
+		delete enemyBodies[i];
+		enemyBodies.erase(enemyBodies.begin() + i);
+		enemies[i]->getParent()->removeChild(enemies[i]);
+		//GameObject* parent = enemies[0]->getParent();
+		//std::vector<GameObject*> childVec = *parent->getChildren();
+		//parent->removeChildren();
+		//for (GameObject* obj : childVec)
+		//{
+		//	if (obj != enemies[0])
+		//	{
+		//		parent->addChild(obj);
+		//	}
+		//}
+		delete enemies[i];
+		enemies.erase(enemies.begin() + i);
+	}
+	else
+		std::cout << "ERROR: Enemy not found!" << std::endl;
+}
+
 int Game::run() {
 	while (m_display->isOpen()) {
 

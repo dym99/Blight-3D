@@ -5,13 +5,13 @@
 GameObject::GameObject(const std::string& _name)
 {
 	localTransform = Transform();
-	worldTransform = {	{1,0,0,0},
+	worldTransform = { {1,0,0,0},
 						{0,1,0,0},
 						{0,0,1,0},
 						{0,0,0,1} };
 
 	m_behaviours = std::vector<Behaviour*>();
-	m_children   = std::vector<GameObject*>();
+	m_children = std::vector<GameObject*>();
 
 	m_name = _name;
 
@@ -38,6 +38,15 @@ void GameObject::addChild(GameObject *_child)
 void GameObject::removeChildren()
 {
 	m_children.clear();
+}
+
+void GameObject::removeChild(GameObject * _child)
+{
+	for (int i = 0; i < m_children.size(); i++)
+	{
+		if (m_children[i] == _child)
+			m_children.erase(m_children.begin() + i);
+	}
 }
 
 void GameObject::addBehaviour(Behaviour *_behaviour)
@@ -103,4 +112,9 @@ std::vector<Behaviour*> *GameObject::getBehaviours()
 GameObject * GameObject::getParent()
 {
 	return m_parent;
+}
+
+std::string GameObject::getName()
+{
+	return m_name;
 }

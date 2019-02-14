@@ -10,6 +10,7 @@
 #include "P_PhysicsBody.h"
 #include "ParticleManager.h"
 #include "UI.h"
+#include "Enemy.h"
 
 class Game {
 public:
@@ -27,6 +28,9 @@ public:
 	void GUI();
 
 	int run();
+
+	void spawnEnemy(EnemyType _type, glm::vec3 _location);
+	static void killEnemy(Enemy* _toKill);
 
 private:
 	Display *m_display;
@@ -46,7 +50,10 @@ private:
 	Model *m_tree;
 	Model *m_altar;
 
+	Model *m_box;
+
 	Shader *m_shader;
+
 
 	bool displayBuffers = false;
 
@@ -66,9 +73,17 @@ private:
 	std::vector<Scene*> m_activeScenes;
 
 	P_PhysicsBody *ravagerPhys;
+	P_PhysicsBody *hitBox;
 	P_PhysicsBody *floor;
 
+	GameObject* player;
+	GameObject* playerLoc;
+	GameObject* cameraPivot;
+
 	bool guiEnabled = false;
+
+	static std::vector<Enemy*> enemies;
+	static std::vector<P_PhysicsBody*> enemyBodies;
 };
 
 #endif

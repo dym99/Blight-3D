@@ -17,6 +17,8 @@ public:
 	//Call the CPS on this object.
 	void removeChildren();
 
+	void removeChild(GameObject* _child);
+
 	//Add a behaviour to this object.
 	void addBehaviour(Behaviour *behaviour);
 
@@ -32,6 +34,8 @@ public:
 	std::vector<Behaviour*> *getBehaviours();
 
 	GameObject* getParent();
+
+	std::string getName();
 
 	Transform localTransform;
 	glm::mat4 worldTransform;

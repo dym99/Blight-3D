@@ -7,7 +7,7 @@
 #include <iostream>
 #include <vector>
 #include "P_Collider.h"
-#include "Transform.h"
+#include "GameObject.h"
 #include "MathFunc.h"
 #include <math.h>
 
@@ -44,8 +44,8 @@ class P_PhysicsBody
 {
 public:
 	P_PhysicsBody();
-	P_PhysicsBody(Transform* _transform, float _mass, bool _gravity, P_Collider_Type _type, float _h, float _w = 1.0f, float _d = 1.0f, glm::vec3 _offset = glm::vec3(0, 0, 0), float _bounciness = 0.0f, float _friction = 0.0f, bool _kinematic = false, bool _trigger = false, P_FlagType _flag = F_DEFAULT);
-	P_PhysicsBody(Transform* _transform, float _mass, bool _gravity, bool _kinematic = false);
+	P_PhysicsBody(GameObject* _gameObject, float _mass, bool _gravity, P_Collider_Type _type, float _h, float _w = 1.0f, float _d = 1.0f, glm::vec3 _offset = glm::vec3(0, 0, 0), float _bounciness = 0.0f, float _friction = 0.0f, bool _kinematic = false, bool _trigger = false, std::string name = "NewBody", P_FlagType _flag = F_DEFAULT);
+	P_PhysicsBody(GameObject* _gameObject, float _mass, bool _gravity, bool _kinematic = false);
 	~P_PhysicsBody();
 
 	//Rudimentary collision check that uses bounding spheres. This is soon to be changed to probably AABB
@@ -82,10 +82,15 @@ public:
 	void setFriction(float _friction) { P_friction = _friction; }
 	float getFriction() { return P_friction; }
 	P_Collider* getCollider() { return P_collider; }
-	void setTransform(Transform* _transform) { P_transform = _transform; P_position = _transform->getPos(); }
-	inline Transform& getTransform() { return *P_transform; }
+	void setGameObject(GameObject* _gameObject) { P_gameObject = _gameObject; }
+	GameObject* getGameObject() { return P_gameObject; }
+	void setName(std::string _name) { P_name = _name; }
+	std::vector<std::string> getTriggeredNames() { return P_triggeredNames; }
+	void trackNames(bool _track) { P_trackNames = _track; }
+	glm::vec3 getPos() { return P_position; }
+
 	//Only call after physics update
-	bool get_triggered() { return P_triggered; }
+	bool getTriggered() { return P_triggered; }
 
 	void giveFlag(P_FlagType _newFlag) { P_flags.push_back(_newFlag); }
 	void removeFlags() { P_flags.clear(); }
@@ -133,11 +138,15 @@ private:
 	*/
 	bool P_isTrigger = false; 
 	bool P_triggered = false;
-
+	bool P_trackNames = false;
+	std::vector<std::string> P_triggeredNames;
+	
 	P_Collider* P_collider;
 
-	Transform* P_transform;
+	GameObject* P_gameObject;
 	glm::vec3 startPos;
+
+	std::string P_name;
 };
 
 
