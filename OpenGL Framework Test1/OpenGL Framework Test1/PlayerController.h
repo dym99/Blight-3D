@@ -1,8 +1,6 @@
 #pragma once
 #include "Behaviour.h"
 
-#define SWORD_DUR 0.5f
-
 enum PlayerState
 {
 	IDLE,
@@ -25,13 +23,26 @@ public:
 	void renderTransparent() override;
 	void renderGUI() override;
 private:
+	float health;
+
 	//How many times in a row has the player attacked?
-	int comboNumber = 0;
-	bool attacking = false;
-	float attackTimer = 0.0f;
-	float comboLag = 0.5;
+	int m_comboNumber = 0;
+
+	//Is the player currently mid-attack?
+	bool m_attacking = false;
+	
+	//How much time is left in the current action?
+	float m_attackTimer = 0.0f;
+	float m_timeSinceAttack = 0.0f;
+	bool left = false;
+
+	//Objects that make up the player
 	P_PhysicsBody *m_playerObject;
 	P_PhysicsBody *m_swordHitbox;
+
+	//Current action the player is performing
 	PlayerState m_theState;
 
+	//Button state
+	bool m_prevLMouse;
 };

@@ -1,6 +1,7 @@
 #include "P_PhysicsBody.h"
 #include "GL/glew.h"
 #include "GameObject.h"
+#include "glm/gtc/quaternion.hpp"
 #define VEC3I glm::vec3(1, 0, 0)
 #define VEC3J glm::vec3(0, 1, 0)
 #define VEC3K glm::vec3(0, 0, 1)
@@ -174,11 +175,18 @@ P_CollisionData P_PhysicsBody::P_checkCollision(int i, int o)
 			glm::vec3 Current = body2->P_position + body2->getCollider()->getOffset();
 			glm::vec3 Target = body1->P_position + body1->getCollider()->getOffset();
 			//Quaternion TargetRot = target.transform.rotation;
+			glm::quat targetRot = glm::quat_cast(body1->getGameObject()->worldTransform);
 			//Quaternion rotInv = Quaternion.Inverse(TargetRot);
+			glm::quat inverseRot = glm::inverse(targetRot);
 			
+			//Bring the sphere into the box's coordinate system
 			Current = Current - Target;
 			//Current = rotInv * Current;
+			Current = inverseRot * Current;
+			//glm::vec3 temp = inverseRot * Current;
+			//std::cout << "(" << temp.x << " " << temp.y << " " << temp.z << ") " << body2->P_name << " (" << body2->P_position.x << " " << body2->P_position.y << " " << body2->P_position.z << ")" << std::endl;
 			//Target = rotInv * Target;
+			Target = inverseRot * Target;
 			glm::vec3 size(body1->getCollider()->getWidth() * 0.5, body1->getCollider()->getHeight() * 0.5, body1->getCollider()->getDepth() * 0.5);
 			
 			float valX = findClosestOnCube(Current.x, size.x);
@@ -189,8 +197,11 @@ P_CollisionData P_PhysicsBody::P_checkCollision(int i, int o)
 			closestPoint = closestPoint + Target;
 			
 			//closestPoint = TargetRot * closestPoint;
+			closestPoint = targetRot * closestPoint;
 			//Target = TargetRot * Target;
+			Target = targetRot * Target;
 			//Current = TargetRot * Current;
+			Current = targetRot * Current;
 			Current = Current + Target;
 
 			//Line between Current and Closest Point to be used as normal;
@@ -286,7 +297,7 @@ void P_PhysicsBody::P_physicsUpdate(float dt)
 						if (body1->P_trackNames)
 							body1->P_triggeredNames.push_back(body2->P_name);
 						if (body2->P_trackNames)
-							body2->P_triggeredNames.push_back(body2->P_name);
+							body2->P_triggeredNames.push_back(body1->P_name);
 
 						/*COLLISION HAS BEEN DETECTED*/
 						/*

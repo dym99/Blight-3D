@@ -15,7 +15,8 @@
 
 #include "Input.h"
 
-std::vector<GameObject*> Game::enemies;
+std::vector<Enemy*> Game::enemies;
+std::vector<P_PhysicsBody*> Game::enemyBodies;
 
 Game::Game()
 {
@@ -147,17 +148,17 @@ void Game::initGame()
 	attackBox->localTransform.setScale(glm::vec3(0.2f, 0.2f, 1.f));
 	attackBox->addBehaviour(new MeshRenderBehaviour(m_box, ShaderManager::getShader(GBUFFER_SHADER)));
 
-	auto enemy = new GameObject("TestEnemy");
-	enemy->localTransform.setPos(glm::vec3(0.f, 0.5f, 4.f));
-	enemy->addBehaviour(new MeshRenderBehaviour(m_box, ShaderManager::getShader(GBUFFER_SHADER)));
-	enemies.push_back(enemy);
+	//auto enemy = new GameObject("TestEnemy");
+	//enemy->localTransform.setPos(glm::vec3(0.f, 0.5f, 4.f));
+	//enemy->addBehaviour(new MeshRenderBehaviour(m_box, ShaderManager::getShader(GBUFFER_SHADER)));
+	//enemies.push_back(enemy);
 
-	auto ravager = new GameObject("Ravager");
-	ravager->addBehaviour(new MeshRenderBehaviour(m_ravager, ShaderManager::getShader(GBUFFER_SHADER)));
+	player = new GameObject("Ravager");
+	player->addBehaviour(new MeshRenderBehaviour(m_ravager, ShaderManager::getShader(GBUFFER_SHADER)));
 
 	auto cameraPivot = new GameObject("CameraPivot");
 	cameraPivot->localTransform.setPos(glm::vec3(0.f,1.f,0.f));
-	cameraPivot->addBehaviour(new MouseLook(ravager));
+	cameraPivot->addBehaviour(new MouseLook(player));
 
 	auto cameraObject = new GameObject("Camera");
 
@@ -166,7 +167,7 @@ void Game::initGame()
 	camera->setTransform(&cameraObject->worldTransform);
 
 	cameraPivot->addChild(cameraObject);
-	ravager->addChild(cameraPivot);
+	player->addChild(cameraPivot);
 	
 	auto brazier = new GameObject("brazier");
 	brazier->addBehaviour(new MeshRenderBehaviour(m_brazier, ShaderManager::getShader(GBUFFER_SHADER)));
@@ -180,26 +181,30 @@ void Game::initGame()
 
 	auto scene = new Scene("DemoScene");
 	scene->addChild(brazier);
-	scene->addChild(ravager);
+	scene->addChild(player);
 	scene->addChild(testArea);
-	scene->addChild(enemy);
+	//scene->addChild(enemy);
 	scene->addChild(attackBox);
 
 	Camera::mainCameraTransform = &(cameraObject->worldTransform);
 
 
 	//TODO: Set up transform class so that a world transform can exist
-	ravagerPhys = new P_PhysicsBody(ravager, 1.f, true, SPHERE, 0.5f, 0.f, 0.f, glm::vec3(0, 0.5f, 0), 0.0f, 1.0f, false, false, "Ravager");
+	ravagerPhys = new P_PhysicsBody(player, 1.f, true, SPHERE, 0.5f, 0.f, 0.f, glm::vec3(0, 0.5f, 0), 0.0f, 1.0f, false, false, "Player");
 	hitBox = new P_PhysicsBody(attackBox, 1.f, false, BOX, .2f, .2f, 2.f, VEC3ZERO, 0.f, 0.f, false, true, "Sword");
-	enemyBox = new P_PhysicsBody(enemy, 1.f, false, SPHERE, 0.5f, 0.f, 0.f, VEC3ZERO, 0.f, 0.f, true, false, "Enemy");
-	enemy->addBehaviour(new TempEnemy(enemyBox));
-	ravager->addBehaviour(new PlayerController(ravagerPhys, hitBox));
-	ravager->addChild(attackBox);
+	//enemyBox = new P_PhysicsBody(enemy, 1.f, false, SPHERE, 0.5f, 0.f, 0.f, VEC3ZERO, 0.f, 0.f, true, false, "Enemy");
+	//enemy->addBehaviour(new TempEnemy(enemyBox));
+	player->addBehaviour(new PlayerController(ravagerPhys, hitBox));
+	player->addChild(attackBox);
 	ravagerPhys->trackNames(true);
-	enemyBox->trackNames(true);
-	P_PhysicsBody::P_bodyCount.push_back(new P_PhysicsBody(new GameObject("Floor"), 1.f, false, BOX, 1.f, 8.f, 8.f, glm::vec3(0, -0.5f, 0), 0, 0, true, false, "Floor"));
-	P_PhysicsBody::P_bodyCount.push_back(new P_PhysicsBody(new GameObject("Floor"), 1.f, false, BOX, 1.f, 2.f, 2.f, glm::vec3(0, -0.5f, 5), 0, 0, true, false, "Floor"));
-	P_PhysicsBody::P_bodyCount.push_back(new P_PhysicsBody(new GameObject("Floor"), 1.f, false, BOX, 1.f, 8.f, 8.f, glm::vec3(0, -0.5f, 10), 0, 0, true, false, "Floor"));
+	//enemyBox->trackNames(true);
+	GameObject* owo = new GameObject("Floor");
+	owo->localTransform.setRot(glm::vec3(0, 90, 0));
+	//scene->addChild(owo);
+
+	new P_PhysicsBody(owo, 1.f, false, BOX, 1.f, 8.f, 8.f, glm::vec3(0, -0.5f, 0), 0, 0, true, false, "Floor");
+	new P_PhysicsBody(owo, 1.f, false, BOX, 1.f, 2.f, 2.f, glm::vec3(0, -0.5f, 5), 0, 0, true, false, "Floor");
+	new P_PhysicsBody(owo, 1.f, false, BOX, 1.f, 8.f, 8.f, glm::vec3(0, -0.5f, 10), 0, 0, true, false, "Floor");
 
 	//Load audio track for drum loop
 	AudioPlayer::loadAudio(*new AudioTrack("Ambiance", FMOD_3D, AudioType::EFFECT, { 0.f, 0.f, 0.f }, { 0.f, 0.f, 0.f }, true, 0.1f, 5000.f), "Ambiance");
@@ -221,21 +226,9 @@ void Game::update()
 		displayBuffers = !displayBuffers;
 	}
 
-	if (Input::GetKeyDown(KeyCode::H))
+	if (Input::GetKeyPress(KeyCode::G))
 	{
-		delete enemyBox;
-		enemyBox = nullptr;
-		GameObject* parent = enemies[0]->getParent();
-		std::vector<GameObject*> childVec = *parent->getChildren();
-		parent->removeChildren();
-		for (GameObject* obj : childVec)
-		{
-			if (obj != enemies[0])
-			{
-				parent->addChild(obj);
-			}
-		}
-		delete enemies[0];
+		spawnEnemy(RAVAGER, glm::vec3(0, 0.5f, 4));
 	}
 
 	ParticleManager::update(Time::deltaTime);
@@ -435,6 +428,48 @@ void Game::spawnEnemy(EnemyType _type, glm::vec3 _location)
 	}
 
 	enemies.push_back(enemy);
+
+	m_activeScenes[0]->addChild(enemy);
+
+	P_PhysicsBody* enemyBody = new P_PhysicsBody(enemy, 10.f, false, SPHERE, 0.5f, 0.f, 0.f, VEC3ZERO, 0.f, 1.f, false, false, "Enemy");
+	enemyBodies.push_back(enemyBody);
+	enemy->addBehaviour(new TempEnemy(enemyBody, enemy, player));
+	enemyBody->trackNames(true);
+}
+
+void Game::killEnemy(Enemy* _toKill)
+{
+	int i = 0;
+	bool proceed = false;
+
+	for (i; i < enemies.size(); ++i)
+	{
+		if (enemies[i] == _toKill)
+		{
+			proceed = true;
+			break;
+		}
+	}
+	if (proceed)
+	{
+		delete enemyBodies[i];
+		enemyBodies.erase(enemyBodies.begin() + i);
+		enemies[i]->getParent()->removeChild(enemies[i]);
+		//GameObject* parent = enemies[0]->getParent();
+		//std::vector<GameObject*> childVec = *parent->getChildren();
+		//parent->removeChildren();
+		//for (GameObject* obj : childVec)
+		//{
+		//	if (obj != enemies[0])
+		//	{
+		//		parent->addChild(obj);
+		//	}
+		//}
+		delete enemies[i];
+		enemies.erase(enemies.begin() + i);
+	}
+	else
+		std::cout << "ERROR: Enemy not found!" << std::endl;
 }
 
 void Game::initGLEW() {

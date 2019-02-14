@@ -24,5 +24,5 @@ public:
 private:
 	P_PhysicsBody* m_physics;
 	float m_health;
-	Transform* target;
+	GameObject* target;
 };

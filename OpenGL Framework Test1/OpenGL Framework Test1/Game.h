@@ -27,6 +27,7 @@ public:
 	int run();
 
 	void spawnEnemy(EnemyType _type, glm::vec3 _location);
+	static void killEnemy(Enemy* _toKill);
 
 private:
 	Display *m_display;
@@ -61,7 +62,9 @@ private:
 	P_PhysicsBody *hitBox;
 	P_PhysicsBody *enemyBox;
 
-	static std::vector<GameObject*> enemies;
+	GameObject* player;
+
+	static std::vector<Enemy*> enemies;
 	static std::vector<P_PhysicsBody*> enemyBodies;
 };
 

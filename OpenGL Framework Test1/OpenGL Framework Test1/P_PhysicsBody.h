@@ -87,6 +87,7 @@ public:
 	void setName(std::string _name) { P_name = _name; }
 	std::vector<std::string> getTriggeredNames() { return P_triggeredNames; }
 	void trackNames(bool _track) { P_trackNames = _track; }
+	glm::vec3 getPos() { return P_position; }
 
 	//Only call after physics update
 	bool getTriggered() { return P_triggered; }

@@ -40,6 +40,15 @@ void GameObject::removeChildren()
 	m_children.clear();
 }
 
+void GameObject::removeChild(GameObject * _child)
+{
+	for (int i = 0; i < m_children.size(); i++)
+	{
+		if (m_children[i] == _child)
+			m_children.erase(m_children.begin() + i);
+	}
+}
+
 void GameObject::addBehaviour(Behaviour *_behaviour)
 {
 	//Give the behaviour a handle to the object and add it to the list.
@@ -103,4 +112,9 @@ std::vector<Behaviour*> *GameObject::getBehaviours()
 GameObject * GameObject::getParent()
 {
 	return m_parent;
+}
+
+std::string GameObject::getName()
+{
+	return m_name;
 }
