@@ -63,11 +63,11 @@ void MeshRenderBehaviour::render()
 	m_shader->update(*Camera::mainCamera);
 	m_shader->sendUniform("uModel", m_parentObject->worldTransform);
 	if (m_IMDL) {
-		m_shader->sendUniform("colorTint", glm::vec4(1, 1, 1, 1));
+		//m_shader->sendUniform("colorTint", glm::vec4(1, 1, 1, 1));
 		m_iModel->draw(m_shader);
 	}
 	else {
-		m_shader->sendUniform("colorTint", m_model->colorTint);
+		//m_shader->sendUniform("colorTint", m_model->colorTint);
 		m_model->Draw(m_shader);
 	}
 	//}

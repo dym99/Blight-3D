@@ -829,7 +829,7 @@ void Game::draw()
 
 	//Copies depth texture from gbuffer to deferred composite
 	
-	GUI();
+	//GUI();
 
 	//F1 to toggle displaying of buffers
 	if (!displayBuffers) {
