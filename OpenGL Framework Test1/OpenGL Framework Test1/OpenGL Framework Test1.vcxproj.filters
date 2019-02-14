@@ -100,6 +100,7 @@
     <ClCompile Include="include\imgui\imgui_impl.cpp">
       <Filter>Source Files\GUI\ImGUI</Filter>
     </ClCompile>
+<<<<<<< HEAD
     <ClCompile Include="Enemy.cpp">
       <Filter>Source Files\Enemies</Filter>
     </ClCompile>
@@ -108,6 +109,10 @@
     </ClCompile>
     <ClCompile Include="PlayerController.cpp">
       <Filter>Source Files\Behaviours\Player</Filter>
+=======
+    <ClCompile Include="IModel.cpp">
+      <Filter>Source Files\Loaders</Filter>
+>>>>>>> Graphics-IMDL
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -216,6 +221,7 @@
     <ClInclude Include="include\imgui\stb_truetype.h">
       <Filter>Source Files\GUI\ImGUI</Filter>
     </ClInclude>
+<<<<<<< HEAD
     <ClInclude Include="Enemy.h">
       <Filter>Source Files\Enemies</Filter>
     </ClInclude>
@@ -224,6 +230,10 @@
     </ClInclude>
     <ClInclude Include="PlayerController.h">
       <Filter>Source Files\Behaviours\Player</Filter>
+=======
+    <ClInclude Include="IModel.h">
+      <Filter>Source Files\Loaders</Filter>
+>>>>>>> Graphics-IMDL
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
