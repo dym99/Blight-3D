@@ -17,7 +17,6 @@ uniform mat4 uProj;
 layout (std140, binding = 1) uniform bones
 {
 	uniform mat4[255] uBones;
-	uniform uint uBoneCount;
 };
 
 void main()
@@ -29,7 +28,7 @@ void main()
 
 	vec4 nWeights = normalize(weights);
 	
-	vec4 skinned = vec4(position,1.0);
+	vec4 skinned = vec4(vec3(0,0,0),1.0);
 	
 	if (groups.x<255 && groups.x >= 0) {
 		skinned += nWeights.x * (uBones[groups.x+1] * vec4(position, 1.0));

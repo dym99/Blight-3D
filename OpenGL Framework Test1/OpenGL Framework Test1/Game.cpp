@@ -276,7 +276,6 @@ void Game::draw()
 
 	ShaderManager::update(*Camera::mainCamera);
 
-	m_logunModel.
 
 	//Camera 1
 	{
