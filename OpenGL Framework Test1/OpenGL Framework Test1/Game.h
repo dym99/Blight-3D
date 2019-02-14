@@ -10,7 +10,9 @@
 #include "P_PhysicsBody.h"
 #include "ParticleManager.h"
 #include "UI.h"
+#include "IModel.h"
 #include "Enemy.h"
+
 
 class Game {
 public:
@@ -37,18 +39,18 @@ private:
 
 	//TODO: Replace resources here with resource loader class
 
-	Model *m_ravager;
-	Model *m_testArea;
-	Model *m_brazier;
-	Model *m_bottomRoom;
-	Model *m_grove;
-	Model *m_grove2;
-	Model *m_leftRoom;
-	Model *m_rightRoom;
-	Model *m_topRoom1;
-	Model *m_topRoom2;
-	Model *m_tree;
-	Model *m_altar;
+	IModel *m_ravager;
+	IModel *m_testArea;
+	IModel *m_brazier;
+	IModel *m_bottomRoom;
+	IModel *m_grove;
+	IModel *m_grove2;
+	IModel *m_leftRoom;
+	IModel *m_rightRoom;
+	IModel *m_topRoom1;
+	IModel *m_topRoom2;
+	IModel *m_tree;
+	IModel *m_altar;
 
 	Model *m_box;
 

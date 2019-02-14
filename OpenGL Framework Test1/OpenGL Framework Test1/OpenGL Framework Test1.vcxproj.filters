@@ -109,6 +109,9 @@
     <ClCompile Include="PlayerController.cpp">
       <Filter>Source Files\Behaviours\Player</Filter>
     </ClCompile>
+    <ClCompile Include="IModel.cpp">
+      <Filter>Source Files\Loaders</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Behaviour.h">
@@ -224,6 +227,9 @@
     </ClInclude>
     <ClInclude Include="PlayerController.h">
       <Filter>Source Files\Behaviours\Player</Filter>
+    </ClInclude>
+    <ClInclude Include="IModel.h">
+      <Filter>Source Files\Loaders</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
