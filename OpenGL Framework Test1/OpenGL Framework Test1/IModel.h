@@ -64,6 +64,7 @@ public:
 	//TODO: just assume textures are named albedo.png, normals.png, spec.png (etc.) unless specifed.
 	//Right now, you have to specify.
 	void setAlbedo(Texture* _tex);
+	BVH m_bindSkeleton;
 
 private:
 	//Vertex attributes
@@ -82,7 +83,6 @@ private:
 
 	std::vector<glm::mat4> m_bindBones;
 
-	BVH m_bindSkeleton;
 	std::vector<BVH*> m_animations;
 
 	float m_percentNextFrame = 0.f;

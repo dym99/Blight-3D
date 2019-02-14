@@ -276,6 +276,8 @@ void Game::draw()
 
 	ShaderManager::update(*Camera::mainCamera);
 
+	m_logunModel.
+
 	//Camera 1
 	{
 		glViewport(0, 0, WINDOW_WIDTH, WINDOW_HEIGHT);

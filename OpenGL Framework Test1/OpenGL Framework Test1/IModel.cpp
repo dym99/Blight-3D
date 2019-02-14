@@ -253,13 +253,16 @@ void IModel::loadFromFile(const std::string& _name, const std::string& _path) {
 						std::sort(vertices[indexPairs[i].vert].m_weights.begin(), vertices[indexPairs[i].vert].m_weights.end(), [](Weight a, Weight b) {return a.m_weight > b.m_weight; });
 					}
 
-					glm::ivec4 groups;
-					glm::vec4 weights;
+					glm::ivec4 groups = glm::ivec4(0,0,0,0);
+					glm::vec4 weights = glm::vec4();
 					//Now grab up to the first four weights and put them in the unpacked groups/weights
 					for (size_t w = 0; w < vertices[indexPairs[i].vert].m_weights.size() && w < 4; ++w) {
 						groups[w] =  vertices[indexPairs[i].vert].m_weights[w].m_group;
 						weights[w] = vertices[indexPairs[i].vert].m_weights[w].m_weight;
 					}
+
+					weights = normalize(weights);
+
 					unpackedGroups.push_back(groups.x);
 					unpackedGroups.push_back(groups.y);
 					unpackedGroups.push_back(groups.z);
