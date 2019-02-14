@@ -100,6 +100,9 @@
     <ClCompile Include="include\imgui\imgui_impl.cpp">
       <Filter>Source Files\GUI\ImGUI</Filter>
     </ClCompile>
+    <ClCompile Include="IModel.cpp">
+      <Filter>Source Files\Loaders</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Behaviour.h">
@@ -206,6 +209,9 @@
     </ClInclude>
     <ClInclude Include="include\imgui\stb_truetype.h">
       <Filter>Source Files\GUI\ImGUI</Filter>
+    </ClInclude>
+    <ClInclude Include="IModel.h">
+      <Filter>Source Files\Loaders</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

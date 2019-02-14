@@ -81,30 +81,50 @@ void Game::initGame()
 	Camera::mainCamera = camera;
 
 	//Load in resources
-	m_ravager = new Model();
-	m_ravager->LoadFromFile("./Resources/Objects/Ravager2/", "Ravager");
-	m_ravager->colorTint = glm::vec3(1.f, 1.f, 1.f);
-	m_testArea = new Model();
-	m_testArea->LoadFromFile("./Resources/Objects/TestArea/", "TestArea");
-	m_brazier = new Model();
-	m_brazier->LoadFromFile("./Resources/Objects/Brazier/", "brazier");
-	m_bottomRoom = new Model();
-	m_bottomRoom->LoadFromFile("./Resources/Objects/MainLevel/", "RoomBottom");
-	m_grove = new Model();
-	m_grove->LoadFromFile("./Resources/Objects/MainLevel/", "GroveTri");
-	m_leftRoom = new Model();
-	m_leftRoom->LoadFromFile("./Resources/Objects/MainLevel/", "RoomLeft");
-	m_rightRoom = new Model();
-	m_rightRoom->LoadFromFile("./Resources/Objects/MainLevel/", "RoomRight");
-	m_topRoom1 = new Model();
-	m_topRoom1->LoadFromFile("./Resources/Objects/MainLevel/", "RoomTop2");
-	m_topRoom2 = new Model();
-	m_topRoom2->LoadFromFile("./Resources/Objects/MainLevel/", "RoomTop1");
-	m_tree = new Model();
-	m_tree->LoadFromFile("./Resources/Objects/MainLevel/", "Tree");
-	m_altar = new Model();
-	m_altar->LoadFromFile("./Resources/Objects/MainLevel/", "SkullAltar");
+	m_ravager = new IModel();
+	m_ravager->loadFromFile("Ravager.imdl", "./Resources/Objects/Ravager/");
+	//m_ravager->colorTint = glm::vec3(1.f, 1.f, 1.f);
+
+	Texture *ravagerAlbedo = new Texture("diffuseTex");
+	ravagerAlbedo->load("./Resources/Objects/Ravager/albedo.png");
+	m_ravager->setAlbedo(ravagerAlbedo);
+
+	m_brazier = new IModel();
+	m_brazier->loadFromFile("Brazier.imdl", "./Resources/Objects/Brazier/");
+
+	Texture *brazierAlbedo = new Texture("diffuseTex");
+	brazierAlbedo->load("./Resources/Objects/Brazier/BrazierBasic.png");
+	m_brazier->setAlbedo(brazierAlbedo);
+
+	m_bottomRoom = new IModel();
+	m_bottomRoom->loadFromFile("MapBottom.imdl", "./Resources/Objects/MainLevel/");
+	m_grove = new IModel();
+	m_grove->loadFromFile("MarshFinal.imdl", "./Resources/Objects/MainLevel/");
+	m_leftRoom = new IModel();
+	m_leftRoom->loadFromFile("MapLeft.imdl", "./Resources/Objects/MainLevel/");
+	m_rightRoom = new IModel();
+	m_rightRoom->loadFromFile("MapRight.imdl", "./Resources/Objects/MainLevel/");
+	m_topRoom1 = new IModel();
+	m_topRoom1->loadFromFile("MapTop2.imdl", "./Resources/Objects/MainLevel/");
+	m_topRoom2 = new IModel();
+	m_topRoom2->loadFromFile("MapTop1.imdl", "./Resources/Objects/MainLevel/");
+	m_tree = new IModel();
+	m_tree->loadFromFile("Tree.imdl", "./Resources/Objects/MainLevel/");
+	m_altar = new IModel();
+	m_altar->loadFromFile("SkullAltar.imdl", "./Resources/Objects/MainLevel/");
 	
+	Texture *roomTex = new Texture("diffuseTex");
+	roomTex->load("./Resources/Objects/MainLevel/BlightLevelTexturesOne.png");
+
+	m_bottomRoom->setAlbedo(roomTex);
+	m_grove->setAlbedo(roomTex);
+	m_leftRoom->setAlbedo(roomTex);
+	m_rightRoom->setAlbedo(roomTex);
+	m_topRoom1->setAlbedo(roomTex);
+	m_topRoom2->setAlbedo(roomTex);
+	m_tree->setAlbedo(roomTex);
+	m_altar->setAlbedo(roomTex);
+
 	ShaderManager::loadShaders();
 
 	ParticleManager::loadParticles();
