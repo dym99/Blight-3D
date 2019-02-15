@@ -64,12 +64,14 @@ private:
 	//Framebuffers
 	FrameBuffer *gBuffer;
 	FrameBuffer *deferredComposite;
+	FrameBuffer *edgeBuffer;
 	FrameBuffer *workBuffer1;
 	FrameBuffer *workBuffer2;
 	FrameBuffer *workBuffer3;
 
 	//Texture
 	Texture *uiImage;
+	Texture *toonRamp;
 
 	std::vector<Scene>  m_scenes;
 	std::vector<Scene*> m_activeScenes;

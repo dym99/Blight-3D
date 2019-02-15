@@ -30,18 +30,30 @@ Game::~Game()
 	}
 	m_activeScenes.clear();
 
-	delete uiImage;
+	if (uiImage != nullptr)
+		delete uiImage;
 	uiImage = nullptr;
+	if (toonRamp != nullptr)
+		delete toonRamp;
+	toonRamp = nullptr;
 
-	delete gBuffer;
+	if (gBuffer != nullptr)
+		delete gBuffer;
 	gBuffer = nullptr;
-	delete deferredComposite;
+	if (deferredComposite != nullptr)
+		delete deferredComposite;
 	deferredComposite = nullptr;
-	delete workBuffer1;
+	if (edgeBuffer != nullptr)
+		delete edgeBuffer;
+	edgeBuffer = nullptr;
+	if (workBuffer1 != nullptr)
+		delete workBuffer1;
 	workBuffer1 = nullptr;
-	delete workBuffer2;
+	if (workBuffer2 != nullptr)
+		delete workBuffer2;
 	workBuffer2 = nullptr;
-	delete workBuffer3;
+	if (workBuffer3 != nullptr)
+		delete workBuffer3;
 	workBuffer3 = nullptr;
 }
 
@@ -61,12 +73,15 @@ void Game::initGame()
 	//Initialise Framebuffers
 	gBuffer = new FrameBuffer(3);
 	deferredComposite = new FrameBuffer(1);
+	edgeBuffer = new FrameBuffer(1);
 	workBuffer1 = new FrameBuffer(1);
 	workBuffer2 = new FrameBuffer(1);
 	workBuffer3 = new FrameBuffer(1);
 
 	uiImage = new Texture();
 	uiImage->load("./Resources/Textures/UIpost.png");
+	toonRamp = new Texture();
+	toonRamp->load("./Resources/Textures/ToonRamp.png");
 
 	//Initializes the screen quad
 	InitFullScreenQuad();
@@ -150,9 +165,18 @@ void Game::initGame()
 
 	deferredComposite->InitDepthTexture(WINDOW_WIDTH, WINDOW_HEIGHT);
 	deferredComposite->InitColorTexture(0, WINDOW_WIDTH, WINDOW_HEIGHT, GL_RGBA8, GL_NEAREST, GL_CLAMP_TO_EDGE);
-
+	
 	if (!deferredComposite->CheckFBO()) {
 		std::cout << "Deferred Composite failed to load.\n\n";
+		system("pause");
+		exit(0);
+	}
+
+	edgeBuffer->InitDepthTexture(WINDOW_WIDTH, WINDOW_HEIGHT);
+	edgeBuffer->InitColorTexture(0, WINDOW_WIDTH, WINDOW_HEIGHT, GL_RGBA8, GL_NEAREST, GL_CLAMP_TO_EDGE);
+
+	if (!edgeBuffer->CheckFBO()) {
+		std::cout << "Edge buffer failed to load.\n\n";
 		system("pause");
 		exit(0);
 	}
@@ -847,6 +871,7 @@ void Game::draw()
 	glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 	deferredComposite->Clear();
 	gBuffer->Clear();
+	edgeBuffer->Clear();
 	workBuffer1->Clear();
 	workBuffer2->Clear();
 	workBuffer3->Clear();
@@ -873,18 +898,21 @@ void Game::draw()
 	if (!displayBuffers) {
 #pragma region Normal Render
 		deferredComposite->Bind();
-		ShaderManager::getPost(DEFERREDLIGHT_POST)->bind();
-		ShaderManager::getPost(DEFERREDLIGHT_POST)->sendUniform("uScene", 0);			//Albedo color
-		ShaderManager::getPost(DEFERREDLIGHT_POST)->sendUniform("uNormalMap", 1);		//Normals
-		ShaderManager::getPost(DEFERREDLIGHT_POST)->sendUniform("uPositionMap", 2);		//Frag positions
+		ShaderManager::getPost(TOONDEFERRED_POST)->bind();
+		ShaderManager::getPost(TOONDEFERRED_POST)->sendUniform("uScene", 0);			//Albedo color
+		ShaderManager::getPost(TOONDEFERRED_POST)->sendUniform("uNormalMap", 1);		//Normals
+		ShaderManager::getPost(TOONDEFERRED_POST)->sendUniform("uPositionMap", 2);		//Frag positions
+		ShaderManager::getPost(TOONDEFERRED_POST)->sendUniform("uTexToonRamp", 3);		//Toon ramp
 		gBuffer->bindTex(0, 0);
 		gBuffer->bindTex(1, 1);
 		gBuffer->bindTex(2, 2);
+		toonRamp->bind(3);
 		DrawFullScreenQuad();
+		Texture::unbind(3);
 		Texture::unbind(2);
 		Texture::unbind(1);
 		Texture::unbind(0);
-		ShaderManager::getPost(DEFERREDLIGHT_POST)->unbind();
+		ShaderManager::getPost(TOONDEFERRED_POST)->unbind();
 
 		deferredComposite->Unbind();
 		
@@ -939,16 +967,37 @@ void Game::draw()
 	/// * Performs Frame buffer stuffs, don't remove pls and thank
 	//glEnable(GL_BLEND);
 	//*
-	ShaderManager::getPost(UI_POST)->bind();
-	ShaderManager::getPost(UI_POST)->sendUniform("uiTex", 1);
-	uiImage->bind(1);
-	ProcessFramebufferStuff(*deferredComposite, *workBuffer1, *workBuffer2, *workBuffer3,
-								ShaderManager::getBloom(), *ShaderManager::getPost(PASSTHROUGH_POST),
-									true, false);
-	uiImage->unbind(1);//*/
+	//ShaderManager::getPost(UI_POST)->bind();
+	//ShaderManager::getPost(UI_POST)->sendUniform("uiTex", 1);
+	//uiImage->bind(1);
+	////ProcessFramebufferStuff(*deferredComposite, *workBuffer1, *workBuffer2, *workBuffer3,
+	////							ShaderManager::getBloom(), *ShaderManager::getPost(PASSTHROUGH_POST),
+	////								true, false);
+	//uiImage->unbind(1);//*/
 	//glDisable(GL_BLEND);
 	/// * Will be commented out in case this branch gets used for Expo
 	//////////////////////////////////////////////////////////////////////////////////////////////
+
+	edgeBuffer->Bind();
+	ShaderManager::getPost(EDGEDETECTION_POST)->bind();
+	ShaderManager::getPost(EDGEDETECTION_POST)->sendUniform("uNormalMap", 0);
+	ShaderManager::getPost(EDGEDETECTION_POST)->sendUniform("uDepthMap", 1);
+	gBuffer->bindTex(0, 1);			//Normal map
+	gBuffer->bindTex(1);			//depth map
+	DrawFullScreenQuad();
+	Texture::unbind(1);
+	Texture::unbind(0);
+	edgeBuffer->Unbind();
+
+	ShaderManager::getPost(ADDEDGE_POST)->bind();
+	ShaderManager::getPost(ADDEDGE_POST)->sendUniform("uSceneTex", 0);
+	ShaderManager::getPost(ADDEDGE_POST)->sendUniform("uEdgeTex", 1);
+	deferredComposite->bindTex(0, 0);		//scene
+	edgeBuffer->bindTex(1, 0);				//Edge buffer
+	DrawFullScreenQuad();
+	Texture::unbind(1);
+	Texture::unbind(0);
+	ShaderManager::getPost(ADDEDGE_POST)->bind();
 
 	//Render the particle emitters
 	if (!displayBuffers)
