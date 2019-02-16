@@ -1,10 +1,10 @@
-#version 330 core
+#version 420
 
 out vec4 FragColor;
 
 in vec2 TexCoords;
 
-uniform sampler2D uTex;
+layout(binding = 0) uniform sampler2D uTex;
 uniform float uTime;
 
 vec3 rgbToHSV(vec3 rgb)

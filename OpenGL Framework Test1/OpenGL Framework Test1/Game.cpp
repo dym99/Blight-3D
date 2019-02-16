@@ -71,7 +71,7 @@ void Game::initGame()
 	UI::InitImGUI();
 
 	//Initialise Framebuffers
-	gBuffer = new FrameBuffer(3);
+	gBuffer = new GBuffer(WINDOW_WIDTH, WINDOW_HEIGHT);
 	deferredComposite = new FrameBuffer(1);
 	edgeBuffer = new FrameBuffer(1);
 	workBuffer1 = new FrameBuffer(1);
@@ -151,17 +151,10 @@ void Game::initGame()
 
 	//Frame Buffers
 #pragma region FrameBuffers
-	gBuffer->InitDepthTexture(WINDOW_WIDTH, WINDOW_HEIGHT);
-	gBuffer->InitColorTexture(0, WINDOW_WIDTH, WINDOW_HEIGHT, GL_RGBA8, GL_NEAREST, GL_CLAMP_TO_EDGE);		//Flat color (albedo)
-	gBuffer->InitColorTexture(1, WINDOW_WIDTH, WINDOW_HEIGHT, GL_RGB8, GL_NEAREST, GL_CLAMP_TO_EDGE);		//Normals (xyz)
-	gBuffer->InitColorTexture(2, WINDOW_WIDTH, WINDOW_HEIGHT, GL_RGB32F, GL_NEAREST, GL_CLAMP_TO_EDGE);		//View Space Positions (xyz)
-
-
-	if (!gBuffer->CheckFBO()) {
-		std::cout << "GBuffer failed to load.\n\n";
-		system("pause");
-		exit(0);
-	}
+	//gBuffer->InitDepthTexture(WINDOW_WIDTH, WINDOW_HEIGHT);
+	//gBuffer->InitColorTexture(0, WINDOW_WIDTH, WINDOW_HEIGHT, GL_RGBA8, GL_NEAREST, GL_CLAMP_TO_EDGE);		//Flat color (albedo)
+	//gBuffer->InitColorTexture(1, WINDOW_WIDTH, WINDOW_HEIGHT, GL_RGB8, GL_NEAREST, GL_CLAMP_TO_EDGE);		//Normals (xyz)
+	//gBuffer->InitColorTexture(2, WINDOW_WIDTH, WINDOW_HEIGHT, GL_RGB32F, GL_NEAREST, GL_CLAMP_TO_EDGE);		//View Space Positions (xyz)
 
 	deferredComposite->InitDepthTexture(WINDOW_WIDTH, WINDOW_HEIGHT);
 	deferredComposite->InitColorTexture(0, WINDOW_WIDTH, WINDOW_HEIGHT, GL_RGBA8, GL_NEAREST, GL_CLAMP_TO_EDGE);
@@ -895,72 +888,28 @@ void Game::draw()
 	//GUI();
 
 	//F1 to toggle displaying of buffers
-	if (!displayBuffers) {
-#pragma region Normal Render
+	if (!displayBuffers) 
+	{
 		deferredComposite->Bind();
 		ShaderManager::getPost(TOONDEFERRED_POST)->bind();
-		ShaderManager::getPost(TOONDEFERRED_POST)->sendUniform("uScene", 0);			//Albedo color
-		ShaderManager::getPost(TOONDEFERRED_POST)->sendUniform("uNormalMap", 1);		//Normals
-		ShaderManager::getPost(TOONDEFERRED_POST)->sendUniform("uPositionMap", 2);		//Frag positions
-		ShaderManager::getPost(TOONDEFERRED_POST)->sendUniform("uTexToonRamp", 3);		//Toon ramp
-		gBuffer->bindTex(0, 0);
-		gBuffer->bindTex(1, 1);
-		gBuffer->bindTex(2, 2);
+		gBuffer->bindLighting();
 		toonRamp->bind(3);
 		DrawFullScreenQuad();
-		Texture::unbind(3);
-		Texture::unbind(2);
-		Texture::unbind(1);
-		Texture::unbind(0);
+		toonRamp->unbind(3);
+		gBuffer->unbindLighting();
 		ShaderManager::getPost(TOONDEFERRED_POST)->unbind();
-
 		deferredComposite->Unbind();
-		
-#pragma endregion
 	}
-	else {
-#pragma region Buffer Renders
-		//*
-		glViewport(0, WINDOW_HEIGHT / 2, WINDOW_WIDTH / 2, WINDOW_HEIGHT / 2);					///Top Left
-		ShaderManager::getPost(PASSTHROUGH_POST)->bind();
-		ShaderManager::getPost(PASSTHROUGH_POST)->sendUniform("uTex", 0);
-		gBuffer->bindTex(0, 0);		//Albedo Color
-		DrawFullScreenQuad();
-		Texture::unbind(0);
-		ShaderManager::getPost(PASSTHROUGH_POST)->unbind();
-
-		glViewport(WINDOW_WIDTH / 2, WINDOW_HEIGHT / 2, WINDOW_WIDTH / 2, WINDOW_HEIGHT / 2);	///Top Right
-		ShaderManager::getPost(PASSTHROUGH_POST)->bind();
-		ShaderManager::getPost(PASSTHROUGH_POST)->sendUniform("uTex", 0);
-		gBuffer->bindTex(0, 1);			//Normals
-		DrawFullScreenQuad();
-		Texture::unbind(0);
-		ShaderManager::getPost(PASSTHROUGH_POST)->unbind();
-
-		glViewport(0, 0, WINDOW_WIDTH / 2, WINDOW_HEIGHT / 2);									///Bottom Left
-		ShaderManager::getPost(PASSTHROUGH_POST)->bind();
-		ShaderManager::getPost(PASSTHROUGH_POST)->sendUniform("uTex", 0);
-		gBuffer->bindTex(0, 2);		//Frag Positions 
-		DrawFullScreenQuad();
-		Texture::unbind(0);
-		ShaderManager::getPost(PASSTHROUGH_POST)->unbind();
+	else
+	{
+		gBuffer->drawBuffers();
 
 		glViewport(WINDOW_WIDTH / 2, 0, WINDOW_WIDTH / 2, WINDOW_HEIGHT / 2);					///Bottom Right
 		ShaderManager::getPost(DEFERREDLIGHT_POST)->bind();
-		ShaderManager::getPost(DEFERREDLIGHT_POST)->sendUniform("uScene", 0);			//Albedo color
-		ShaderManager::getPost(DEFERREDLIGHT_POST)->sendUniform("uNormalMap", 1);		//Normals
-		ShaderManager::getPost(DEFERREDLIGHT_POST)->sendUniform("uPositionMap", 2);		//Frag positions
-		gBuffer->bindTex(0, 0);
-		gBuffer->bindTex(1, 1);
-		gBuffer->bindTex(2, 2);
+		gBuffer->bindLighting();
 		DrawFullScreenQuad();
-		Texture::unbind(2);
-		Texture::unbind(1);
-		Texture::unbind(0);
+		gBuffer->unbindLighting();
 		ShaderManager::getPost(DEFERREDLIGHT_POST)->unbind();
-
-		//*/
-#pragma endregion
 	}
 
 	//////////////////////////////////////////////////////////////////////////////////////////////

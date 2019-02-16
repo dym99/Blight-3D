@@ -1,4 +1,4 @@
-#version 330 core
+#version 420
 
 out vec4 FragColor;
 
@@ -10,7 +10,7 @@ float normInnerRadius = 200.0;
 float normOuterRadius = 300.0;
 uniform float uTime;
 
-uniform sampler2D uTex;
+layout(binding = 0) uniform sampler2D uTex;
 
 vec3 backgroundColor = vec3(0.0, 0.05, 0.1);
 

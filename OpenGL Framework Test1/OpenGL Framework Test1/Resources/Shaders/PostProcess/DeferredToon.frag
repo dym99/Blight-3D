@@ -1,4 +1,4 @@
-#version 330 core
+#version 420
 
 out vec4 FragColor;
 
@@ -459,10 +459,10 @@ uniform Light light[48] = {
 	),
 };
 
-uniform sampler2D uScene;
-uniform sampler2D uNormalMap;
-uniform sampler2D uPositionMap;
-uniform sampler2D uTexToonRamp;
+layout(binding = 0) uniform sampler2D uScene;
+layout(binding = 1) uniform sampler2D uNormalMap;
+layout(binding = 2) uniform sampler2D uPositionMap;
+layout(binding = 3) uniform sampler2D uTexToonRamp;
 
 uniform Material material;
 

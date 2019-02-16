@@ -16,9 +16,6 @@
     <ClCompile Include="Display.cpp">
       <Filter>Source Files\Display</Filter>
     </ClCompile>
-    <ClCompile Include="FrameBuffer.cpp">
-      <Filter>Source Files\Display</Filter>
-    </ClCompile>
     <ClCompile Include="Game.cpp">
       <Filter>Source Files\Game</Filter>
     </ClCompile>
@@ -112,6 +109,24 @@
     <ClCompile Include="IModel.cpp">
       <Filter>Source Files\Loaders</Filter>
     </ClCompile>
+    <ClCompile Include="GBuffer.cpp">
+      <Filter>Source Files\Buffers</Filter>
+    </ClCompile>
+    <ClCompile Include="CombinationBuffer.cpp">
+      <Filter>Source Files\Buffers</Filter>
+    </ClCompile>
+    <ClCompile Include="Light.cpp">
+      <Filter>Source Files\Effects\Lights</Filter>
+    </ClCompile>
+    <ClCompile Include="FrameBuffer.cpp">
+      <Filter>Source Files\Buffers</Filter>
+    </ClCompile>
+    <ClCompile Include="DirectionalLight.cpp">
+      <Filter>Source Files\Effects\Lights</Filter>
+    </ClCompile>
+    <ClCompile Include="PointLight.cpp">
+      <Filter>Source Files\Effects\Lights</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Behaviour.h">
@@ -127,9 +142,6 @@
       <Filter>Source Files\Behaviours\Graphics</Filter>
     </ClInclude>
     <ClInclude Include="Display.h">
-      <Filter>Source Files\Display</Filter>
-    </ClInclude>
-    <ClInclude Include="FrameBuffer.h">
       <Filter>Source Files\Display</Filter>
     </ClInclude>
     <ClInclude Include="Game.h">
@@ -231,6 +243,24 @@
     <ClInclude Include="IModel.h">
       <Filter>Source Files\Loaders</Filter>
     </ClInclude>
+    <ClInclude Include="GBuffer.h">
+      <Filter>Source Files\Buffers</Filter>
+    </ClInclude>
+    <ClInclude Include="CombinationBuffer.h">
+      <Filter>Source Files\Buffers</Filter>
+    </ClInclude>
+    <ClInclude Include="Light.h">
+      <Filter>Source Files\Effects\Lights</Filter>
+    </ClInclude>
+    <ClInclude Include="FrameBuffer.h">
+      <Filter>Source Files\Buffers</Filter>
+    </ClInclude>
+    <ClInclude Include="DirectionalLight.h">
+      <Filter>Source Files\Effects\Lights</Filter>
+    </ClInclude>
+    <ClInclude Include="PointLight.h">
+      <Filter>Source Files\Effects\Lights</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Source Files">
@@ -299,6 +329,12 @@
     </Filter>
     <Filter Include="Source Files\Behaviours\Player">
       <UniqueIdentifier>{72749c84-4678-406c-8667-aefa674e4eb9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Buffers">
+      <UniqueIdentifier>{c8e742ee-31b2-4f7b-b619-519bb6c7d8e2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Effects\Lights">
+      <UniqueIdentifier>{a1b36d43-ddd9-4fff-9247-5c39188b69a7}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
 </Project>

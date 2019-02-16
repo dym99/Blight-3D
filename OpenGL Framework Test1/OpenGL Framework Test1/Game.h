@@ -5,6 +5,7 @@
 #include "Scene.h"
 #include "Shader.h"
 #include "FrameBuffer.h"
+#include "GBuffer.h"
 #include "Display.h"
 #include "Utilities.h"
 #include "P_PhysicsBody.h"
@@ -62,7 +63,7 @@ private:
 	///////////////////////
 
 	//Framebuffers
-	FrameBuffer *gBuffer;
+	GBuffer *gBuffer;
 	FrameBuffer *deferredComposite;
 	FrameBuffer *edgeBuffer;
 	FrameBuffer *workBuffer1;

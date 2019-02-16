@@ -41,6 +41,11 @@ public:
 	void bindTex(GLuint textureUnit);
 
 	/*
+	//quick unbind for the texture
+	*/
+	void unbindTex(GLuint textureUnit);
+
+	/*
 	//Copies a buffer to another FBO
 	*- This is the buffer you're copying to, set to GL_NONE to copy from back buffer
 	*- This is the buffer mask you're copying (GL_DEPTH_BUFFER_BIT or GL_COLOR_BUFFER_BIT)

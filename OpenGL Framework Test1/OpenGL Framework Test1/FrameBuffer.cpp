@@ -130,6 +130,12 @@ void FrameBuffer::bindTex(GLuint textureUnit)
 	glBindTexture(GL_TEXTURE_2D, GetDepthHandle());
 }
 
+void FrameBuffer::unbindTex(GLuint textureUnit)
+{
+	glActiveTexture(GL_TEXTURE0 + textureUnit);
+	glBindTexture(GL_TEXTURE_2D, GL_NONE);
+}
+
 void FrameBuffer::copyTo(GLuint FBODraw, GLbitfield mask, int windowWidth, int windowHeight)
 {
 	glBindFramebuffer(GL_READ_FRAMEBUFFER, FBO);
