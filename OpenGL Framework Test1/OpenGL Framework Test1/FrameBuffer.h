@@ -2,12 +2,16 @@
 #define __FRAME_BUFFER_H__
 
 #include <GL/glew.h>
+#include <vector>
 
 class FrameBuffer {
 public:
 	FrameBuffer() = delete;
 	FrameBuffer(unsigned int _NumColorAttachments);
 	~FrameBuffer();
+
+	//Call everythin
+	void init(unsigned int _NumColorAttachments);
 
 	//Init the different textures
 	void InitDepthTexture(unsigned int width, unsigned int height);
@@ -26,6 +30,9 @@ public:
 	//Binds and unbinds the FBO
 	void Bind();
 	void Unbind();
+
+	//Resize the frame buffer
+	void resize(int windowWidth, int windowHeight);
 
 	/*
 	//Sends the color texture to openGL
@@ -67,6 +74,8 @@ public:
 	*/
 	void copyFrom(GLuint FBORead, GLbitfield mask, int windowWidth, int windowHeight);
 
+	virtual void drawBuffers();
+
 	//Getters
 	GLuint getFBO() const;
 	GLuint GetDepthHandle() const;
@@ -77,6 +86,10 @@ private:
 	GLuint depthAttachment = GL_NONE;
 	GLuint *colorAttachments = nullptr;
 	GLenum *bufs = nullptr;
+
+	std::vector<GLint> formats;
+	std::vector<GLint> filters;
+	std::vector<GLint> wraps;
 
 	unsigned int numColorAttachments = 0;
 };

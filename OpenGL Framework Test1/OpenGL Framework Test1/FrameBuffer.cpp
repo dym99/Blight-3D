@@ -1,6 +1,17 @@
 #include "FrameBuffer.h"
+#include <iostream>
 
 FrameBuffer::FrameBuffer(unsigned int _NumColorAttachments)
+{
+	init(_NumColorAttachments);
+}
+
+FrameBuffer::~FrameBuffer()
+{
+	Unload();
+}
+
+void FrameBuffer::init(unsigned int _NumColorAttachments)
 {
 	numColorAttachments = _NumColorAttachments;
 
@@ -10,14 +21,12 @@ FrameBuffer::FrameBuffer(unsigned int _NumColorAttachments)
 
 	//Required parameter for gldrawbuffers()
 	bufs = new GLenum[numColorAttachments];
-	for (int i = 0; i < numColorAttachments; i++) {
+	for (unsigned int i = 0; i < numColorAttachments; i++) {
 		bufs[i] = GL_COLOR_ATTACHMENT0 + i;
 	}
-}
-
-FrameBuffer::~FrameBuffer()
-{
-	Unload();
+	formats.resize(numColorAttachments);
+	filters.resize(numColorAttachments);
+	wraps.resize(numColorAttachments);
 }
 
 void FrameBuffer::InitDepthTexture(unsigned int width, unsigned int height)
@@ -118,6 +127,18 @@ void FrameBuffer::Unbind()
 	glBindFramebuffer(GL_FRAMEBUFFER, GL_NONE);
 }
 
+void FrameBuffer::resize(int windowWidth, int windowHeight)
+{
+	Unload();
+	init(numColorAttachments);
+	for (unsigned int i = 0; i < numColorAttachments; i++)
+	{
+		InitColorTexture(i, windowWidth, windowHeight, formats[i], filters[i], wraps[i]);
+	}
+	InitDepthTexture(windowWidth, windowHeight);
+}
+
+
 void FrameBuffer::bindTex(GLuint textureUnit, unsigned int colorIndex)
 {
 	glActiveTexture(GL_TEXTURE0+textureUnit);
@@ -158,6 +179,11 @@ void FrameBuffer::copyFrom(GLuint FBORead, GLbitfield mask, int windowWidth, int
 
 	glBindFramebuffer(GL_FRAMEBUFFER, GL_NONE);
 	glBindFramebuffer(GL_READ_FRAMEBUFFER, GL_NONE);
+}
+
+void FrameBuffer::drawBuffers()
+{
+	std::cout << "Non-Implemented Function called in FrameBuffer" << std::endl;
 }
 
 GLuint FrameBuffer::getFBO() const

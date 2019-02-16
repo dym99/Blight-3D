@@ -6,6 +6,7 @@
 #include "Shader.h"
 #include "FrameBuffer.h"
 #include "GBuffer.h"
+#include "CombinationBuffer.h"
 #include "Display.h"
 #include "Utilities.h"
 #include "P_PhysicsBody.h"

@@ -182,6 +182,7 @@
     <ClCompile Include="TestRotateBehaviour.cpp" />
     <ClCompile Include="Texture.cpp" />
     <ClCompile Include="UI.cpp" />
+    <ClCompile Include="UniformBuffer.cpp" />
     <ClCompile Include="Utilities.cpp" />
     <ClCompile Include="Utils.cpp" />
   </ItemGroup>
@@ -228,6 +229,7 @@
     <ClInclude Include="Texture.h" />
     <ClInclude Include="Transform.h" />
     <ClInclude Include="UI.h" />
+    <ClInclude Include="UniformBuffer.h" />
     <ClInclude Include="Utilities.h" />
     <ClInclude Include="Utils.h" />
   </ItemGroup>

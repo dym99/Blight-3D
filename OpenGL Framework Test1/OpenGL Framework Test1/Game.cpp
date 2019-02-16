@@ -151,11 +151,6 @@ void Game::initGame()
 
 	//Frame Buffers
 #pragma region FrameBuffers
-	//gBuffer->InitDepthTexture(WINDOW_WIDTH, WINDOW_HEIGHT);
-	//gBuffer->InitColorTexture(0, WINDOW_WIDTH, WINDOW_HEIGHT, GL_RGBA8, GL_NEAREST, GL_CLAMP_TO_EDGE);		//Flat color (albedo)
-	//gBuffer->InitColorTexture(1, WINDOW_WIDTH, WINDOW_HEIGHT, GL_RGB8, GL_NEAREST, GL_CLAMP_TO_EDGE);		//Normals (xyz)
-	//gBuffer->InitColorTexture(2, WINDOW_WIDTH, WINDOW_HEIGHT, GL_RGB32F, GL_NEAREST, GL_CLAMP_TO_EDGE);		//View Space Positions (xyz)
-
 	deferredComposite->InitDepthTexture(WINDOW_WIDTH, WINDOW_HEIGHT);
 	deferredComposite->InitColorTexture(0, WINDOW_WIDTH, WINDOW_HEIGHT, GL_RGBA8, GL_NEAREST, GL_CLAMP_TO_EDGE);
 	
@@ -821,9 +816,6 @@ void Game::update()
 		//std::vector<Behaviour*>* behav = player->getBehaviours();
 		//PlayerController* playR = (PlayerController*)&behav[1];
 		//playR->health = 0.f;
-
-
-
 	}
 
 
@@ -911,36 +903,32 @@ void Game::draw()
 		gBuffer->unbindLighting();
 		ShaderManager::getPost(DEFERREDLIGHT_POST)->unbind();
 	}
-
-	//////////////////////////////////////////////////////////////////////////////////////////////
-	/// * Performs Frame buffer stuffs, don't remove pls and thank
-	//glEnable(GL_BLEND);
-	//*
-	//ShaderManager::getPost(UI_POST)->bind();
-	//ShaderManager::getPost(UI_POST)->sendUniform("uiTex", 1);
-	//uiImage->bind(1);
-	////ProcessFramebufferStuff(*deferredComposite, *workBuffer1, *workBuffer2, *workBuffer3,
-	////							ShaderManager::getBloom(), *ShaderManager::getPost(PASSTHROUGH_POST),
-	////								true, false);
-	//uiImage->unbind(1);//*/
-	//glDisable(GL_BLEND);
-	/// * Will be commented out in case this branch gets used for Expo
-	//////////////////////////////////////////////////////////////////////////////////////////////
+	
+	{
+		//////////////////////////////////////////////////////////////////////////////////////////////
+		/// * Performs Frame buffer stuffs, don't remove pls and thank
+		//glEnable(GL_BLEND);
+		//*
+		//ShaderManager::getPost(UI_POST)->bind();
+		//ShaderManager::getPost(UI_POST)->sendUniform("uiTex", 1);
+		//uiImage->bind(1);
+		////ProcessFramebufferStuff(*deferredComposite, *workBuffer1, *workBuffer2, *workBuffer3,
+		////							ShaderManager::getBloom(), *ShaderManager::getPost(PASSTHROUGH_POST),
+		////								true, false);
+		//uiImage->unbind(1);//*/
+		//glDisable(GL_BLEND);
+		/// * Will be commented out in case this branch gets used for Expo
+		//////////////////////////////////////////////////////////////////////////////////////////////
+	}
 
 	edgeBuffer->Bind();
 	ShaderManager::getPost(EDGEDETECTION_POST)->bind();
-	ShaderManager::getPost(EDGEDETECTION_POST)->sendUniform("uNormalMap", 0);
-	ShaderManager::getPost(EDGEDETECTION_POST)->sendUniform("uDepthMap", 1);
-	gBuffer->bindTex(0, 1);			//Normal map
-	gBuffer->bindTex(1);			//depth map
+	gBuffer->bindEdge();
 	DrawFullScreenQuad();
-	Texture::unbind(1);
-	Texture::unbind(0);
+	gBuffer->unbindEdge();
 	edgeBuffer->Unbind();
 
 	ShaderManager::getPost(ADDEDGE_POST)->bind();
-	ShaderManager::getPost(ADDEDGE_POST)->sendUniform("uSceneTex", 0);
-	ShaderManager::getPost(ADDEDGE_POST)->sendUniform("uEdgeTex", 1);
 	deferredComposite->bindTex(0, 0);		//scene
 	edgeBuffer->bindTex(1, 0);				//Edge buffer
 	DrawFullScreenQuad();

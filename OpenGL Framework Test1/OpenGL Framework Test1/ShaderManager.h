@@ -5,10 +5,17 @@
 
 #include <vector>
 
+enum ShaderTypes {
+	SHADERS,
+	GEOM,
+	POSTPROCESS
+};
 
 enum Shaders {
 	PHONG_SHADER,
 	GBUFFER_SHADER,
+	POINT_SHADER,
+	DIRECTIONAL_SHADER,
 
 	NUM_SHADERS
 };

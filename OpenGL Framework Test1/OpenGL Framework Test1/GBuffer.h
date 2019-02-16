@@ -13,8 +13,10 @@ public:
 	void bindLighting();
 	void unbindLighting();
 
-	//Make sure to bind a shader before calling this
-	void drawBuffers();
+	void bindEdge();
+	void unbindEdge();
+
+	virtual void drawBuffers() override;
 
 private:
 	float windowWidth, windowHeight;

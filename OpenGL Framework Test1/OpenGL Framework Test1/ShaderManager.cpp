@@ -19,6 +19,16 @@ void ShaderManager::loadShaders()
 		"./Resources/Shaders/GBufferPass.frag"
 	));
 
+	m_shaders.push_back(new Shader(
+		"./Resources/Shaders/StaticGeometry.vert",
+		"./Resources/Shaders/pointLighting.frag"
+	));
+
+	m_shaders.push_back(new Shader(
+		"./Resources/Shaders/StaticGeometry.vert",
+		"./Resources/Shaders/directionalLighting.frag"
+	));
+
 	//Geometry shaders
 	m_geomShaders.push_back(new Shader(
 		"./Resources/Shaders/Particles/Billboard.vert",

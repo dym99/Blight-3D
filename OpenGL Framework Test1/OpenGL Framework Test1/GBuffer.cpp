@@ -28,16 +28,28 @@ GBuffer::~GBuffer()
 
 void GBuffer::bindLighting()
 {
-	bindTex(0, 0);
-	bindTex(1, 1);
-	bindTex(2, 2);
+	bindTex(0, 0);			// Bind Albedo
+	bindTex(1, 1);			// Bind Normal
+	bindTex(2, 2);			// Bind Positions
 }
 
 void GBuffer::unbindLighting()
 {
-	unbindTex(0);
+	unbindTex(2);			// Unbind Positions
+	unbindTex(1);			// Unbind Normal
+	unbindTex(0);			// Unbind Albedo
+}
+
+void GBuffer::bindEdge()
+{
+	bindTex(0, 1);
+	bindTex(1);
+}
+
+void GBuffer::unbindEdge()
+{
 	unbindTex(1);
-	unbindTex(2);
+	unbindTex(0);
 }
 
 void GBuffer::drawBuffers()

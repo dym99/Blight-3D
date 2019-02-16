@@ -127,6 +127,9 @@
     <ClCompile Include="PointLight.cpp">
       <Filter>Source Files\Effects\Lights</Filter>
     </ClCompile>
+    <ClCompile Include="UniformBuffer.cpp">
+      <Filter>Source Files\Buffers</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Behaviour.h">
@@ -260,6 +263,9 @@
     </ClInclude>
     <ClInclude Include="PointLight.h">
       <Filter>Source Files\Effects\Lights</Filter>
+    </ClInclude>
+    <ClInclude Include="UniformBuffer.h">
+      <Filter>Source Files\Buffers</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
