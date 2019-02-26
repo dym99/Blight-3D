@@ -13,12 +13,6 @@
 #define BLOOM_DOWNSCALE			4.0f
 #define BLOOM_BLUR_PASSES		4
 
-//Initializes the full screen quad for framebuffering
-void InitFullScreenQuad();
-
-//Draws the full screen quad to the screen for framebuffering
-void DrawFullScreenQuad();
-
 void printDebugControls();
 
 //Runs the high pass for the bloom effect

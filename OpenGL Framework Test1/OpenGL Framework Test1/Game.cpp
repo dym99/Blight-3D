@@ -72,7 +72,7 @@ void Game::initGame()
 
 	//Initialise Framebuffers
 	gBuffer = new GBuffer(WINDOW_WIDTH, WINDOW_HEIGHT);
-	deferredComposite = new FrameBuffer(1);
+	deferredComposite = new PostBuffer;
 	edgeBuffer = new FrameBuffer(1);
 	workBuffer1 = new FrameBuffer(1);
 	workBuffer2 = new FrameBuffer(1);
@@ -84,7 +84,7 @@ void Game::initGame()
 	toonRamp->load("./Resources/Textures/ToonRamp.png");
 
 	//Initializes the screen quad
-	InitFullScreenQuad();
+	FrameBuffer::initFSQ();
 
 	//Initializes the audio player and sets it up
 	AudioPlayer::init(100, FMOD_INIT_NORMAL);
@@ -151,45 +151,46 @@ void Game::initGame()
 
 	//Frame Buffers
 #pragma region FrameBuffers
-	deferredComposite->InitDepthTexture(WINDOW_WIDTH, WINDOW_HEIGHT);
-	deferredComposite->InitColorTexture(0, WINDOW_WIDTH, WINDOW_HEIGHT, GL_RGBA8, GL_NEAREST, GL_CLAMP_TO_EDGE);
+	/*deferredComposite->initDepthTexture(WINDOW_WIDTH, WINDOW_HEIGHT);
+	deferredComposite->initColorTexture(0, WINDOW_WIDTH, WINDOW_HEIGHT, GL_RGBA8, GL_NEAREST, GL_CLAMP_TO_EDGE);
 	
-	if (!deferredComposite->CheckFBO()) {
+	if (!deferredComposite->checkFBO()) {
 		std::cout << "Deferred Composite failed to load.\n\n";
 		system("pause");
 		exit(0);
-	}
+	}*/
+	deferredComposite->init(WINDOW_WIDTH, WINDOW_HEIGHT);
 
-	edgeBuffer->InitDepthTexture(WINDOW_WIDTH, WINDOW_HEIGHT);
-	edgeBuffer->InitColorTexture(0, WINDOW_WIDTH, WINDOW_HEIGHT, GL_RGBA8, GL_NEAREST, GL_CLAMP_TO_EDGE);
+	edgeBuffer->initDepthTexture(WINDOW_WIDTH, WINDOW_HEIGHT);
+	edgeBuffer->initColorTexture(0, WINDOW_WIDTH, WINDOW_HEIGHT, GL_RGBA8, GL_NEAREST, GL_CLAMP_TO_EDGE);
 
-	if (!edgeBuffer->CheckFBO()) {
+	if (!edgeBuffer->checkFBO()) {
 		std::cout << "Edge buffer failed to load.\n\n";
 		system("pause");
 		exit(0);
 	}
 
-	workBuffer1->InitColorTexture(0, WINDOW_WIDTH / BLOOM_DOWNSCALE, WINDOW_HEIGHT / BLOOM_DOWNSCALE,
+	workBuffer1->initColorTexture(0, WINDOW_WIDTH / BLOOM_DOWNSCALE, WINDOW_HEIGHT / BLOOM_DOWNSCALE,
 		GL_RGB8, GL_LINEAR, GL_CLAMP_TO_EDGE);
 
-	if (!workBuffer1->CheckFBO()) {
+	if (!workBuffer1->checkFBO()) {
 		std::cout << "FBO2 failed to load.\n\n";
 		system("pause");
 		exit(0);
 	}
 
-	workBuffer2->InitColorTexture(0, WINDOW_WIDTH / BLOOM_DOWNSCALE, WINDOW_HEIGHT / BLOOM_DOWNSCALE,
+	workBuffer2->initColorTexture(0, WINDOW_WIDTH / BLOOM_DOWNSCALE, WINDOW_HEIGHT / BLOOM_DOWNSCALE,
 		GL_RGB8, GL_LINEAR, GL_CLAMP_TO_EDGE);
 
-	if (!workBuffer2->CheckFBO()) {
+	if (!workBuffer2->checkFBO()) {
 		std::cout << "FBO3 failed to load.\n\n";
 		system("pause");
 		exit(0);
 	}
 
-	workBuffer3->InitColorTexture(0, WINDOW_WIDTH, WINDOW_HEIGHT, GL_RGBA8, GL_NEAREST, GL_CLAMP_TO_EDGE);
+	workBuffer3->initColorTexture(0, WINDOW_WIDTH, WINDOW_HEIGHT, GL_RGBA8, GL_NEAREST, GL_CLAMP_TO_EDGE);
 
-	if (!workBuffer3->CheckFBO()) {
+	if (!workBuffer3->checkFBO()) {
 		std::cout << "FBO4 Failed to load.\n\n";
 		system("pause");
 		exit(0);
@@ -854,25 +855,25 @@ void Game::draw()
 {
 	/// Clear Buffers ///
 	glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
-	deferredComposite->Clear();
-	gBuffer->Clear();
-	edgeBuffer->Clear();
-	workBuffer1->Clear();
-	workBuffer2->Clear();
-	workBuffer3->Clear();
+	deferredComposite->clear();
+	gBuffer->clear();
+	edgeBuffer->clear();
+	workBuffer1->clear();
+	workBuffer2->clear();
+	workBuffer3->clear();
 
 	ShaderManager::update(*Camera::mainCamera);
 
 	//Camera 1
 	{
 		glViewport(0, 0, WINDOW_WIDTH, WINDOW_HEIGHT);
-		gBuffer->Bind();
+		gBuffer->bind();
 
 		for (unsigned int i = 0; i < m_activeScenes.size(); ++i) {
 			m_activeScenes[i]->onRender();
 		}
 
-		gBuffer->Unbind();
+		gBuffer->unbind();
 	}
 
 	//Copies depth texture from gbuffer to deferred composite
@@ -882,15 +883,13 @@ void Game::draw()
 	//F1 to toggle displaying of buffers
 	if (!displayBuffers) 
 	{
-		deferredComposite->Bind();
 		ShaderManager::getPost(TOONDEFERRED_POST)->bind();
 		gBuffer->bindLighting();
 		toonRamp->bind(3);
-		DrawFullScreenQuad();
+		deferredComposite->drawTo();
 		toonRamp->unbind(3);
 		gBuffer->unbindLighting();
 		ShaderManager::getPost(TOONDEFERRED_POST)->unbind();
-		deferredComposite->Unbind();
 	}
 	else
 	{
@@ -899,41 +898,27 @@ void Game::draw()
 		glViewport(WINDOW_WIDTH / 2, 0, WINDOW_WIDTH / 2, WINDOW_HEIGHT / 2);					///Bottom Right
 		ShaderManager::getPost(DEFERREDLIGHT_POST)->bind();
 		gBuffer->bindLighting();
-		DrawFullScreenQuad();
+		FrameBuffer::drawFSQ();
 		gBuffer->unbindLighting();
 		ShaderManager::getPost(DEFERREDLIGHT_POST)->unbind();
 	}
-	
-	{
-		//////////////////////////////////////////////////////////////////////////////////////////////
-		/// * Performs Frame buffer stuffs, don't remove pls and thank
-		//glEnable(GL_BLEND);
-		//*
-		//ShaderManager::getPost(UI_POST)->bind();
-		//ShaderManager::getPost(UI_POST)->sendUniform("uiTex", 1);
-		//uiImage->bind(1);
-		////ProcessFramebufferStuff(*deferredComposite, *workBuffer1, *workBuffer2, *workBuffer3,
-		////							ShaderManager::getBloom(), *ShaderManager::getPost(PASSTHROUGH_POST),
-		////								true, false);
-		//uiImage->unbind(1);//*/
-		//glDisable(GL_BLEND);
-		/// * Will be commented out in case this branch gets used for Expo
-		//////////////////////////////////////////////////////////////////////////////////////////////
-	}
 
-	edgeBuffer->Bind();
+	edgeBuffer->bind();
 	ShaderManager::getPost(EDGEDETECTION_POST)->bind();
 	gBuffer->bindEdge();
-	DrawFullScreenQuad();
+	FrameBuffer::drawFSQ();
 	gBuffer->unbindEdge();
-	edgeBuffer->Unbind();
+	edgeBuffer->unbind();
+	
+	//Example of how to use the new composite buffer
+	//ShaderManager::getPost(GREYSCALE_POST)->bind();
+	//deferredComposite->draw();
+	//ShaderManager::getPost(GREYSCALE_POST)->unbind();
 
 	ShaderManager::getPost(ADDEDGE_POST)->bind();
-	deferredComposite->bindTex(0, 0);		//scene
 	edgeBuffer->bindTex(1, 0);				//Edge buffer
-	DrawFullScreenQuad();
+	deferredComposite->drawToScreen();
 	Texture::unbind(1);
-	Texture::unbind(0);
 	ShaderManager::getPost(ADDEDGE_POST)->bind();
 
 	//Render the particle emitters

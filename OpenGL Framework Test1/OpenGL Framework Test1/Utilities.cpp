@@ -1,60 +1,6 @@
 #include "Utilities.h"
 #include <GL/glew.h>
 
-#define BUFFER_OFFSET(i) ((char *) 0 + (i))
-
-GLuint fullScreenQuadVAO = GL_NONE;
-GLuint fullScreenQuadVBO = GL_NONE;
-
-
-void InitFullScreenQuad()
-{
-	float VBO_DATA[]{
-		-1.f, -1.f, 0.f,
-		1.f, -1.f, 0.f,
-		-1.f, 1.f, 0.f,
-
-		1.f, 1.f, 0.f,
-		-1.f, 1.f, 0.f,
-		1.f, -1.f, 0.f,
-
-		0.f, 0.f,
-		1.f, 0.f,
-		0.f, 1.f,
-
-		1.f, 1.f,
-		0.f, 1.f,
-		1.f, 0.f,
-	};
-
-	int vertexSize = 6 * 3 * sizeof(float);
-	int texCoordSize = 6 * 2 * sizeof(float);
-
-	glGenVertexArrays(1, &fullScreenQuadVAO);
-	glBindVertexArray(fullScreenQuadVAO);
-
-	glEnableVertexAttribArray(0); //vertices
-	glEnableVertexAttribArray(1); //UV coordinates
-
-	glGenBuffers(1, &fullScreenQuadVBO);
-	
-	glBindBuffer(GL_ARRAY_BUFFER, fullScreenQuadVBO);
-	glBufferData(GL_ARRAY_BUFFER, vertexSize + texCoordSize, VBO_DATA, GL_STATIC_DRAW);
-
-	glVertexAttribPointer((GLuint)0, 3, GL_FLOAT, GL_FALSE, 0, BUFFER_OFFSET(0));			//send vertex attributes
-	glVertexAttribPointer((GLuint)1, 2, GL_FLOAT, GL_FALSE, 0, BUFFER_OFFSET(vertexSize)); //send uv attributes
-
-	glBindBuffer(GL_ARRAY_BUFFER, GL_NONE);
-	glBindVertexArray(GL_NONE);
-}
-
-void DrawFullScreenQuad()
-{
-	glBindVertexArray(fullScreenQuadVAO);
-	glDrawArrays(GL_TRIANGLES, 0, 6);
-	glBindVertexArray(GL_NONE);
-}
-
 void printDebugControls()
 {
 	std::cout << "Non-Debug Mode Controls:\n\n";
@@ -101,14 +47,14 @@ void BloomHighPass(Shader & BloomHighPass, FrameBuffer & _main, FrameBuffer & _w
 	BloomHighPass.sendUniform("uTex", 0);
 	BloomHighPass.sendUniform("uThreshold", BLOOM_THRESHOLD);
 
-	_work1.Bind();
+	_work1.bind();
 
 	//Gets result of the previous render
-	glBindTexture(GL_TEXTURE_2D, _main.GetColorHandle(0));
-	DrawFullScreenQuad();
+	glBindTexture(GL_TEXTURE_2D, _main.getColorHandle(0));
+	FrameBuffer::drawFSQ();
 	glBindTexture(GL_TEXTURE_2D, GL_NONE);
 
-	_work1.Unbind();
+	_work1.unbind();
 	BloomHighPass.unbind();
 }
 
@@ -121,13 +67,13 @@ void ComputeBlur(Shader & BlurVertical, Shader & BlurHorizontal, FrameBuffer & _
 		BlurHorizontal.sendUniform("uTex", 0);
 		BlurHorizontal.sendUniform("uPixelSize", 1.0f / WINDOW_WIDTH);
 
-		_work2.Bind();
+		_work2.bind();
 
-		glBindTexture(GL_TEXTURE_2D, _work1.GetColorHandle(0));
-		DrawFullScreenQuad();
+		glBindTexture(GL_TEXTURE_2D, _work1.getColorHandle(0));
+		FrameBuffer::drawFSQ();
 		glBindTexture(GL_TEXTURE_2D, GL_NONE);
 
-		_work2.Unbind();
+		_work2.unbind();
 		BlurHorizontal.unbind();
 
 		//Vertical Blur
@@ -135,13 +81,13 @@ void ComputeBlur(Shader & BlurVertical, Shader & BlurHorizontal, FrameBuffer & _
 		BlurVertical.sendUniform("uTex", 0);
 		BlurVertical.sendUniform("uPixelSize", 1.0f / WINDOW_HEIGHT);
 
-		_work1.Bind();
+		_work1.bind();
 
-		glBindTexture(GL_TEXTURE_2D, _work2.GetColorHandle(0));
-		DrawFullScreenQuad();
+		glBindTexture(GL_TEXTURE_2D, _work2.getColorHandle(0));
+		FrameBuffer::drawFSQ();
 		glBindTexture(GL_TEXTURE_2D, GL_NONE);
 
-		_work1.Unbind();
+		_work1.unbind();
 		BlurVertical.unbind();
 	}
 }
@@ -156,19 +102,19 @@ void BloomComposite(Shader & BloomComposite, FrameBuffer & _main, FrameBuffer & 
 	BloomComposite.sendUniform("uBloom", 1);
 
 	if (postProc) {
-		_work3.Bind();
+		_work3.bind();
 	}
 
 	glActiveTexture(GL_TEXTURE0);
-	glBindTexture(GL_TEXTURE_2D, _main.GetColorHandle(0));
+	glBindTexture(GL_TEXTURE_2D, _main.getColorHandle(0));
 	glActiveTexture(GL_TEXTURE1);
-	glBindTexture(GL_TEXTURE_2D, _work1.GetColorHandle(0));
-		DrawFullScreenQuad();
+	glBindTexture(GL_TEXTURE_2D, _work1.getColorHandle(0));
+	FrameBuffer::drawFSQ();
 	glBindTexture(GL_TEXTURE_2D, GL_NONE);
 	glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_2D, GL_NONE);
 
-	_work3.Unbind();
+	_work3.unbind();
 	BloomComposite.unbind();
 }
 
@@ -184,8 +130,8 @@ void ProcessPostProc(FrameBuffer & _buffer, Shader & shader)
 	shader.bind();
 	shader.sendUniform("uTex", 0);
 
-	glBindTexture(GL_TEXTURE_2D, _buffer.GetColorHandle(0));
-	DrawFullScreenQuad();
+	glBindTexture(GL_TEXTURE_2D, _buffer.getColorHandle(0));
+	FrameBuffer::drawFSQ();
 	glBindTexture(GL_TEXTURE_2D, GL_NONE);
 
 	Shader::unbind();

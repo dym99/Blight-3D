@@ -1,6 +1,9 @@
 #include "FrameBuffer.h"
 #include <iostream>
 
+GLuint FrameBuffer::fullScreenQuadVBO = GL_NONE;
+GLuint FrameBuffer::fullScreenQuadVAO = GL_NONE;
+
 FrameBuffer::FrameBuffer(unsigned int _NumColorAttachments)
 {
 	init(_NumColorAttachments);
@@ -8,7 +11,55 @@ FrameBuffer::FrameBuffer(unsigned int _NumColorAttachments)
 
 FrameBuffer::~FrameBuffer()
 {
-	Unload();
+	unload();
+}
+
+void FrameBuffer::initFSQ()
+{
+	float VBO_DATA[]{
+		-1.f, -1.f, 0.f,
+		1.f, -1.f, 0.f,
+		-1.f, 1.f, 0.f,
+
+		1.f, 1.f, 0.f,
+		-1.f, 1.f, 0.f,
+		1.f, -1.f, 0.f,
+
+		0.f, 0.f,
+		1.f, 0.f,
+		0.f, 1.f,
+
+		1.f, 1.f,
+		0.f, 1.f,
+		1.f, 0.f,
+	};
+
+	int vertexSize = 6 * 3 * sizeof(float);
+	int texCoordSize = 6 * 2 * sizeof(float);
+
+	glGenVertexArrays(1, &fullScreenQuadVAO);
+	glBindVertexArray(fullScreenQuadVAO);
+
+	glEnableVertexAttribArray(0); //vertices
+	glEnableVertexAttribArray(1); //UV coordinates
+
+	glGenBuffers(1, &fullScreenQuadVBO);
+
+	glBindBuffer(GL_ARRAY_BUFFER, fullScreenQuadVBO);
+	glBufferData(GL_ARRAY_BUFFER, vertexSize + texCoordSize, VBO_DATA, GL_STATIC_DRAW);
+
+	glVertexAttribPointer((GLuint)0, 3, GL_FLOAT, GL_FALSE, 0, reinterpret_cast<void*>(0));			//send vertex attributes
+	glVertexAttribPointer((GLuint)1, 2, GL_FLOAT, GL_FALSE, 0, reinterpret_cast<void*>(vertexSize)); //send uv attributes
+
+	glBindBuffer(GL_ARRAY_BUFFER, GL_NONE);
+	glBindVertexArray(GL_NONE);
+}
+
+void FrameBuffer::drawFSQ()
+{
+	glBindVertexArray(fullScreenQuadVAO);
+	glDrawArrays(GL_TRIANGLES, 0, 6);
+	glBindVertexArray(GL_NONE);
 }
 
 void FrameBuffer::init(unsigned int _NumColorAttachments)
@@ -29,7 +80,7 @@ void FrameBuffer::init(unsigned int _NumColorAttachments)
 	wraps.resize(numColorAttachments);
 }
 
-void FrameBuffer::InitDepthTexture(unsigned int width, unsigned int height)
+void FrameBuffer::initDepthTexture(unsigned int width, unsigned int height)
 {
 	glBindFramebuffer(GL_FRAMEBUFFER, FBO);
 
@@ -47,7 +98,7 @@ void FrameBuffer::InitDepthTexture(unsigned int width, unsigned int height)
 	glBindFramebuffer(GL_FRAMEBUFFER, GL_NONE);
 }
 
-void FrameBuffer::InitColorTexture(unsigned int index, unsigned int width, unsigned int height, 
+void FrameBuffer::initColorTexture(unsigned int index, unsigned int width, unsigned int height, 
 									GLint internalFormat, GLint filter, GLint wrap)
 {
 	glBindFramebuffer(GL_FRAMEBUFFER, FBO);
@@ -66,18 +117,18 @@ void FrameBuffer::InitColorTexture(unsigned int index, unsigned int width, unsig
 	glBindFramebuffer(GL_FRAMEBUFFER, GL_NONE);
 }
 
-bool FrameBuffer::CheckFBO()
+bool FrameBuffer::checkFBO()
 {
 	glBindFramebuffer(GL_FRAMEBUFFER, FBO);
 
 	if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE) {
-		Unload();
+		unload();
 		return false;
 	}
 	return true;
 }
 
-void FrameBuffer::Unload()
+void FrameBuffer::unload()
 {
 	if (bufs != nullptr) {
 		delete[] bufs;
@@ -100,7 +151,7 @@ void FrameBuffer::Unload()
 	numColorAttachments = 0;
 }
 
-void FrameBuffer::Clear()
+void FrameBuffer::clear()
 {
 	GLbitfield temp = 0x0;
 
@@ -116,39 +167,45 @@ void FrameBuffer::Clear()
 	glBindFramebuffer(GL_FRAMEBUFFER, GL_NONE);
 }
 
-void FrameBuffer::Bind()
+void FrameBuffer::bind()
 {
 	glBindFramebuffer(GL_FRAMEBUFFER, FBO);
 	glDrawBuffers(numColorAttachments, bufs);
 }
 
-void FrameBuffer::Unbind()
+void FrameBuffer::unbind()
 {
 	glBindFramebuffer(GL_FRAMEBUFFER, GL_NONE);
 }
 
 void FrameBuffer::resize(int windowWidth, int windowHeight)
 {
-	Unload();
+	unload();
 	init(numColorAttachments);
 	for (unsigned int i = 0; i < numColorAttachments; i++)
 	{
-		InitColorTexture(i, windowWidth, windowHeight, formats[i], filters[i], wraps[i]);
+		initColorTexture(i, windowWidth, windowHeight, formats[i], filters[i], wraps[i]);
 	}
-	InitDepthTexture(windowWidth, windowHeight);
+	initDepthTexture(windowWidth, windowHeight);
 }
 
+void FrameBuffer::renderToFSQ()
+{
+	bind();
+	FrameBuffer::drawFSQ();
+	unbind();
+}
 
 void FrameBuffer::bindTex(GLuint textureUnit, unsigned int colorIndex)
 {
 	glActiveTexture(GL_TEXTURE0+textureUnit);
-	glBindTexture(GL_TEXTURE_2D, GetColorHandle(colorIndex));
+	glBindTexture(GL_TEXTURE_2D, getColorHandle(colorIndex));
 }
 
 void FrameBuffer::bindTex(GLuint textureUnit)
 {
 	glActiveTexture(GL_TEXTURE0 + textureUnit);
-	glBindTexture(GL_TEXTURE_2D, GetDepthHandle());
+	glBindTexture(GL_TEXTURE_2D, getDepthHandle());
 }
 
 void FrameBuffer::unbindTex(GLuint textureUnit)
@@ -191,12 +248,12 @@ GLuint FrameBuffer::getFBO() const
 	return FBO;
 }
 
-GLuint FrameBuffer::GetDepthHandle() const
+GLuint FrameBuffer::getDepthHandle() const
 {
 	return depthAttachment;
 }
 
-GLuint FrameBuffer::GetColorHandle(unsigned int index) const
+GLuint FrameBuffer::getColorHandle(unsigned int index) const
 {
 	return colorAttachments[index];
 }

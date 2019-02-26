@@ -10,29 +10,34 @@ public:
 	FrameBuffer(unsigned int _NumColorAttachments);
 	~FrameBuffer();
 
+	static void initFSQ();
+	static void drawFSQ();
+
 	//Call everythin
 	void init(unsigned int _NumColorAttachments);
 
 	//Init the different textures
-	void InitDepthTexture(unsigned int width, unsigned int height);
-	void InitColorTexture(unsigned int index, unsigned int width, unsigned int height,
+	void initDepthTexture(unsigned int width, unsigned int height);
+	void initColorTexture(unsigned int index, unsigned int width, unsigned int height,
 							GLint internalFormat, GLint filter, GLint wrap);
 
 	//Checks to make sure that everything is loaded in correctly
-	bool CheckFBO();
+	bool checkFBO();
 
 	//Clears OpenGL memory
-	void Unload();
+	void unload();
 
 	//Clears all attached textures
-	void Clear();
+	void clear();
 
 	//Binds and unbinds the FBO
-	void Bind();
-	void Unbind();
+	void bind();
+	void unbind();
 
 	//Resize the frame buffer
 	void resize(int windowWidth, int windowHeight);
+
+	void renderToFSQ();
 
 	/*
 	//Sends the color texture to openGL
@@ -78,10 +83,13 @@ public:
 
 	//Getters
 	GLuint getFBO() const;
-	GLuint GetDepthHandle() const;
-	GLuint GetColorHandle(unsigned int index) const;
+	GLuint getDepthHandle() const;
+	GLuint getColorHandle(unsigned int index) const;
 
 private:
+	static GLuint fullScreenQuadVBO;
+	static GLuint fullScreenQuadVAO;
+
 	GLuint FBO = GL_NONE;
 	GLuint depthAttachment = GL_NONE;
 	GLuint *colorAttachments = nullptr;

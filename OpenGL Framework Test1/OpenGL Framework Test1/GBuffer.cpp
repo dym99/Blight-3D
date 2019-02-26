@@ -5,12 +5,12 @@
 
 GBuffer::GBuffer(float _windowWidth, float _windowHeight) : FrameBuffer(3)
 {
-	InitDepthTexture(_windowWidth, _windowHeight);
-	InitColorTexture(0, _windowWidth, _windowHeight, GL_RGBA8, GL_NEAREST, GL_CLAMP_TO_EDGE);		//Albedo Buffer
-	InitColorTexture(1, _windowWidth, _windowHeight, GL_RGB8, GL_NEAREST, GL_CLAMP_TO_EDGE);		//Normal Buffer
-	InitColorTexture(2, _windowWidth, _windowHeight, GL_RGB32F, GL_NEAREST, GL_CLAMP_TO_EDGE);
+	initDepthTexture(_windowWidth, _windowHeight);
+	initColorTexture(0, _windowWidth, _windowHeight, GL_RGBA8, GL_NEAREST, GL_CLAMP_TO_EDGE);		//Albedo Buffer
+	initColorTexture(1, _windowWidth, _windowHeight, GL_RGB8, GL_NEAREST, GL_CLAMP_TO_EDGE);		//Normal Buffer
+	initColorTexture(2, _windowWidth, _windowHeight, GL_RGB32F, GL_NEAREST, GL_CLAMP_TO_EDGE);
 
-	if (!CheckFBO())
+	if (!checkFBO())
 	{
 		std::cout << "GBuffer failed to load" << std::endl;
 		system("pause");
@@ -23,7 +23,7 @@ GBuffer::GBuffer(float _windowWidth, float _windowHeight) : FrameBuffer(3)
 
 GBuffer::~GBuffer()
 {
-	Unload();
+	unload();
 }
 
 void GBuffer::bindLighting()
@@ -58,7 +58,7 @@ void GBuffer::drawBuffers()
 	ShaderManager::getPost(PASSTHROUGH_POST)->bind();
 	ShaderManager::getPost(PASSTHROUGH_POST)->sendUniform("uTex", 0);
 	bindTex(0, 0);															//Albedo Color
-	DrawFullScreenQuad();
+	FrameBuffer::drawFSQ();
 	unbindTex(0);
 	ShaderManager::getPost(PASSTHROUGH_POST)->unbind();
 
@@ -66,7 +66,7 @@ void GBuffer::drawBuffers()
 	ShaderManager::getPost(PASSTHROUGH_POST)->bind();
 	ShaderManager::getPost(PASSTHROUGH_POST)->sendUniform("uTex", 0);
 	bindTex(0, 1);															//Normals
-	DrawFullScreenQuad();
+	FrameBuffer::drawFSQ();
 	unbindTex(0);
 	ShaderManager::getPost(PASSTHROUGH_POST)->unbind();
 
@@ -74,7 +74,7 @@ void GBuffer::drawBuffers()
 	ShaderManager::getPost(PASSTHROUGH_POST)->bind();
 	ShaderManager::getPost(PASSTHROUGH_POST)->sendUniform("uTex", 0);
 	bindTex(0, 2);															//Frag Positions 
-	DrawFullScreenQuad();
+	FrameBuffer::drawFSQ();
 	unbindTex(0);
 	ShaderManager::getPost(PASSTHROUGH_POST)->unbind();
 }
