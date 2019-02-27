@@ -97,6 +97,11 @@ void ShaderManager::loadShaders()
 		"./Resources/Shaders/PostProcess/PassThrough.frag"
 	));
 
+	m_postShaders.push_back(new Shader(
+		"./Resources/Shaders/PassThrough.vert",
+		"./Resources/Shaders/PostProcess/ColorCorrection.frag"
+	));
+
 	//Bloom components
 	m_bloomComponents.push_back(new Shader(
 		"./Resources/Shaders/PassThrough.vert",

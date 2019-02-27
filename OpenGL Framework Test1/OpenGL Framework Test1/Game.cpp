@@ -82,6 +82,7 @@ void Game::initGame()
 	uiImage->load("./Resources/Textures/UIpost.png");
 	toonRamp = new Texture();
 	toonRamp->load("./Resources/Textures/ToonRamp.png");
+	colorCorrection = new LUT3D("Warm2Cool.cube");
 
 	//Initializes the screen quad
 	FrameBuffer::initFSQ();
@@ -854,7 +855,7 @@ void Game::update()
 void Game::draw()
 {
 	/// Clear Buffers ///
-	glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
+	glClearColor(0.f, 0.5f, 0.6f, 1.f);
 	deferredComposite->clear();
 	gBuffer->clear();
 	edgeBuffer->clear();
@@ -914,6 +915,12 @@ void Game::draw()
 	//ShaderManager::getPost(GREYSCALE_POST)->bind();
 	//deferredComposite->draw();
 	//ShaderManager::getPost(GREYSCALE_POST)->unbind();
+
+	ShaderManager::getPost(COLORCORR_POST)->bind();
+	colorCorrection->bind(30);
+	//deferredComposite->draw();
+	colorCorrection->unbind(30);
+	ShaderManager::getPost(COLORCORR_POST)->unbind();
 
 	ShaderManager::getPost(ADDEDGE_POST)->bind();
 	edgeBuffer->bindTex(1, 0);				//Edge buffer
@@ -1016,7 +1023,7 @@ int Game::run() {
 
 		update();
 
-		m_display->clear(0.f, 0.f, 0.f, 1.f);
+		m_display->clear(0.f, 0.5f, 0.6f, 1.f);
 
 		draw();
 

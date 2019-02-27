@@ -14,6 +14,7 @@
 #include "UI.h"
 #include "IModel.h"
 #include "Enemy.h"
+#include "LUT.h"
 
 
 class Game {
@@ -74,6 +75,7 @@ private:
 	//Texture
 	Texture *uiImage;
 	Texture *toonRamp;
+	LUT3D *colorCorrection;
 
 	std::vector<Scene>  m_scenes;
 	std::vector<Scene*> m_activeScenes;

@@ -130,6 +130,9 @@
     <ClCompile Include="PostBuffer.cpp">
       <Filter>Source Files\Buffers</Filter>
     </ClCompile>
+    <ClCompile Include="LUT.cpp">
+      <Filter>Source Files\Loaders</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Behaviour.h">
@@ -266,6 +269,9 @@
     </ClInclude>
     <ClInclude Include="PostBuffer.h">
       <Filter>Source Files\Buffers</Filter>
+    </ClInclude>
+    <ClInclude Include="LUT.h">
+      <Filter>Source Files\Loaders</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

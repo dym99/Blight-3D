@@ -22,7 +22,24 @@ struct Light {
 	float quadratic;
 };
 
+struct DirLight {
+	vec4 position;
+	vec3 ambience;
+	vec3 color;
+	vec3 direction;
+
+	float shininess;
+};
+
 in vec2 TexCoords;
+
+uniform DirLight directionLight =  {
+	vec4(0.0, 0.0, 0.0, 0.0),
+	vec3(0.15, 0.15, 0.15),
+	vec3(0.5, 0.5, 0.5),
+	vec3(-0.3, 0.95, 0.0),
+	32.0,
+};
 
 uniform Light light[48] = { 
 	Light(
@@ -466,7 +483,7 @@ layout(binding = 3) uniform sampler2D uTexToonRamp;
 
 uniform Material material;
 
-void calculatePointLight(Light lightyBoi, vec3 fragPosition, vec3 normal0)
+void calculatePointLight(Light lightyBoi, vec3 fragPosition, vec3 normal0, vec4 _textureColor)
 {
 	//Account for interpolation
 	vec3 normal = normalize(normal0);
@@ -482,7 +499,7 @@ void calculatePointLight(Light lightyBoi, vec3 fragPosition, vec3 normal0)
 		float attentuation = 0.5 / (lightyBoi.constant + (lightyBoi.linear * dist) + (lightyBoi.quadratic * (dist * dist)));
 		
 		//Calculate diffuse
-		FragColor.rgb += lightyBoi.diffuse * texture(uTexToonRamp, vec2(NdotL, 0.5)).rgb * attentuation;
+		FragColor.rgb += (lightyBoi.diffuse * 2.0)* texture(uTexToonRamp, vec2(NdotL, 0.5)).rgb * attentuation * vec3(_textureColor * vec4(0.15));
 		
 		//Blinn-Phong bullshit
 		vec3 eye = normalize(-fragPosition);
@@ -495,6 +512,22 @@ void calculatePointLight(Light lightyBoi, vec3 fragPosition, vec3 normal0)
 	}
 }
 
+void calculateDirectionalLight(DirLight lightyBoi, vec3 fragPosition, vec3 normal0, vec4 _textureColor)
+{
+	//Account for interpolation
+	vec3 normal = normalize(normal0);
+
+		// the dot product of the normal and light direction determines how much light there is
+	float NdotL = dot(normal, lightyBoi.direction);
+	
+	// Calculate attenuation (falloff)
+	// Add a small number to avoid divide by zero
+
+	NdotL = max(NdotL, 0.0);
+	// Calculate the diffuse contribution
+	FragColor.rgb += (lightyBoi.color * NdotL) * vec3(_textureColor * vec4(0.5));
+}
+
 void main() 
 {
 	vec4 textureColor = texture(uScene, TexCoords);
@@ -504,52 +537,53 @@ void main()
 	FragColor.rgb = textureColor.rgb * light[0].ambience;
 	FragColor.a = textureColor.a;
 
-	//calculatePointLight(light[47], fragPosition, normal0);
-	//calculatePointLight(light[46], fragPosition, normal0);
-	//calculatePointLight(light[45], fragPosition, normal0);
-	//calculatePointLight(light[44], fragPosition, normal0);
-	//calculatePointLight(light[43], fragPosition, normal0);
-	//calculatePointLight(light[42], fragPosition, normal0);
-	//calculatePointLight(light[41], fragPosition, normal0);
-	//calculatePointLight(light[40], fragPosition, normal0);
-	//calculatePointLight(light[39], fragPosition, normal0);
-	//calculatePointLight(light[38], fragPosition, normal0);
-	//calculatePointLight(light[37], fragPosition, normal0);
-	//calculatePointLight(light[36], fragPosition, normal0);
-	//calculatePointLight(light[35], fragPosition, normal0);
-	//calculatePointLight(light[34], fragPosition, normal0);
-	//calculatePointLight(light[33], fragPosition, normal0);
-	//calculatePointLight(light[32], fragPosition, normal0);
-	//calculatePointLight(light[31], fragPosition, normal0);
-	//calculatePointLight(light[30], fragPosition, normal0);
-	//calculatePointLight(light[29], fragPosition, normal0);
-	//calculatePointLight(light[28], fragPosition, normal0);
-	//calculatePointLight(light[27], fragPosition, normal0);
-	//calculatePointLight(light[26], fragPosition, normal0);
-	//calculatePointLight(light[25], fragPosition, normal0);
-	//calculatePointLight(light[24], fragPosition, normal0);
-	//calculatePointLight(light[23], fragPosition, normal0);
-	//calculatePointLight(light[22], fragPosition, normal0);
-	//calculatePointLight(light[21], fragPosition, normal0);
-	//calculatePointLight(light[20], fragPosition, normal0);
-	//calculatePointLight(light[19], fragPosition, normal0);
-	//calculatePointLight(light[18], fragPosition, normal0);
-	//calculatePointLight(light[17], fragPosition, normal0);
-	//calculatePointLight(light[16], fragPosition, normal0);
-	//calculatePointLight(light[15], fragPosition, normal0);
-	//calculatePointLight(light[14], fragPosition, normal0);
-	//calculatePointLight(light[13], fragPosition, normal0);
-	//calculatePointLight(light[12], fragPosition, normal0);
-	//calculatePointLight(light[11], fragPosition, normal0);
-	//calculatePointLight(light[10], fragPosition, normal0);
-	//calculatePointLight(light[9], fragPosition, normal0);
-	//calculatePointLight(light[8], fragPosition, normal0);
-	//calculatePointLight(light[7], fragPosition, normal0);
-	//calculatePointLight(light[6], fragPosition, normal0);
-	calculatePointLight(light[5], fragPosition, normal0);
-	calculatePointLight(light[4], fragPosition, normal0);
-	calculatePointLight(light[3], fragPosition, normal0);
-	calculatePointLight(light[2], fragPosition, normal0);
-	calculatePointLight(light[0], fragPosition, normal0);
-	calculatePointLight(light[1], fragPosition, normal0);
+	calculatePointLight(light[47], fragPosition, normal0, textureColor);
+	calculatePointLight(light[46], fragPosition, normal0, textureColor);
+	calculatePointLight(light[45], fragPosition, normal0, textureColor);
+	calculatePointLight(light[44], fragPosition, normal0, textureColor);
+	calculatePointLight(light[43], fragPosition, normal0, textureColor);
+	calculatePointLight(light[42], fragPosition, normal0, textureColor);
+	calculatePointLight(light[41], fragPosition, normal0, textureColor);
+	calculatePointLight(light[40], fragPosition, normal0, textureColor);
+	calculatePointLight(light[39], fragPosition, normal0, textureColor);
+	calculatePointLight(light[38], fragPosition, normal0, textureColor);
+	calculatePointLight(light[37], fragPosition, normal0, textureColor);
+	calculatePointLight(light[36], fragPosition, normal0, textureColor);
+	calculatePointLight(light[35], fragPosition, normal0, textureColor);
+	calculatePointLight(light[34], fragPosition, normal0, textureColor);
+	calculatePointLight(light[33], fragPosition, normal0, textureColor);
+	calculatePointLight(light[32], fragPosition, normal0, textureColor);
+	calculatePointLight(light[31], fragPosition, normal0, textureColor);
+	calculatePointLight(light[30], fragPosition, normal0, textureColor);
+	calculatePointLight(light[29], fragPosition, normal0, textureColor);
+	calculatePointLight(light[28], fragPosition, normal0, textureColor);
+	calculatePointLight(light[27], fragPosition, normal0, textureColor);
+	calculatePointLight(light[26], fragPosition, normal0, textureColor);
+	calculatePointLight(light[25], fragPosition, normal0, textureColor);
+	calculatePointLight(light[24], fragPosition, normal0, textureColor);
+	calculatePointLight(light[23], fragPosition, normal0, textureColor);
+	calculatePointLight(light[22], fragPosition, normal0, textureColor);
+	calculatePointLight(light[21], fragPosition, normal0, textureColor);
+	calculatePointLight(light[20], fragPosition, normal0, textureColor);
+	calculatePointLight(light[19], fragPosition, normal0, textureColor);
+	calculatePointLight(light[18], fragPosition, normal0, textureColor);
+	calculatePointLight(light[17], fragPosition, normal0, textureColor);
+	calculatePointLight(light[16], fragPosition, normal0, textureColor);
+	calculatePointLight(light[15], fragPosition, normal0, textureColor);
+	calculatePointLight(light[14], fragPosition, normal0, textureColor);
+	calculatePointLight(light[13], fragPosition, normal0, textureColor);
+	calculatePointLight(light[12], fragPosition, normal0, textureColor);
+	calculatePointLight(light[11], fragPosition, normal0, textureColor);
+	calculatePointLight(light[10], fragPosition, normal0, textureColor);
+	calculatePointLight(light[9], fragPosition, normal0, textureColor);
+	calculatePointLight(light[8], fragPosition, normal0, textureColor);
+	calculatePointLight(light[7], fragPosition, normal0, textureColor);
+	calculatePointLight(light[6], fragPosition, normal0, textureColor);
+	calculatePointLight(light[5], fragPosition, normal0, textureColor);
+	calculatePointLight(light[4], fragPosition, normal0, textureColor);
+	calculatePointLight(light[3], fragPosition, normal0, textureColor);
+	calculatePointLight(light[2], fragPosition, normal0, textureColor);
+	calculatePointLight(light[0], fragPosition, normal0, textureColor);
+	calculatePointLight(light[1], fragPosition, normal0, textureColor);
+	calculateDirectionalLight(directionLight, fragPosition, normal0, textureColor);
 }
