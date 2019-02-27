@@ -14,6 +14,7 @@
 #include "UI.h"
 #include "IModel.h"
 #include "Enemy.h"
+#include "AnimatedModel.h"
 
 
 class Game {
@@ -55,6 +56,8 @@ private:
 	IModel *m_altar;
 
 	Model *m_box;
+
+	AnimatedModel *m_ravagerIdle;
 
 	Shader *m_shader;
 

@@ -29,6 +29,11 @@ void ShaderManager::loadShaders()
 		"./Resources/Shaders/directionalLighting.frag"
 	));
 
+	m_shaders.push_back(new Shader(
+		"./Resources/Shaders/MorphingMesh.vert",
+		"./Resources/Shaders/GBufferPass.frag"
+	));
+
 	//Geometry shaders
 	m_geomShaders.push_back(new Shader(
 		"./Resources/Shaders/Particles/Billboard.vert",

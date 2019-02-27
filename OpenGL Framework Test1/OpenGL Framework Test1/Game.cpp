@@ -1,6 +1,7 @@
 #include "Game.h"
 #include <iostream>
 
+#include "AnimatedModel.h"
 #include "ShaderManager.h"
 #include "MeshRenderBehaviour.h"
 #include "TestRotateBehaviour.h"
@@ -99,7 +100,7 @@ void Game::initGame()
 
 	//Load in resources
 	m_ravager = new IModel();
-	m_ravager->loadFromFile("Ravager.imdl", "./Resources/Objects/Ravager/");
+	m_ravager->loadFromFile("RavagerIdle0.imdl", "./Resources/Objects/Ravager/Anims/");
 	//m_ravager->colorTint = glm::vec3(1.f, 1.f, 1.f);
 
 	Texture *ravagerAlbedo = new Texture("diffuseTex");
@@ -134,6 +135,14 @@ void Game::initGame()
 
 	Texture *roomTex = new Texture("diffuseTex");
 	roomTex->load("./Resources/Objects/MainLevel/BlightLevelTexturesOne.png");
+
+	m_ravagerIdle = new AnimatedModel();
+	m_ravagerIdle->loadFromFiles(6, "RavagerIdle", "Resources/Objects/Ravager/Anims/");
+
+	m_ravagerIdle->setAlbedo(ravagerAlbedo);
+	for (int i = 0; i < 6; ++i) {
+		m_ravagerIdle->setFrameTime(i, 0.8333f);
+	}
 
 	m_bottomRoom->setAlbedo(roomTex);
 	m_grove->setAlbedo(roomTex);
@@ -199,7 +208,8 @@ void Game::initGame()
 	//Set up the test Scene
 
 	player = new GameObject("Ravager");
-	player->addBehaviour(new MeshRenderBehaviour(m_ravager, ShaderManager::getShader(GBUFFER_SHADER)));
+	player->addBehaviour(new MeshRenderBehaviour(m_ravagerIdle, ShaderManager::getShader(GBUFFER_MORPH)));
+	//player->addBehaviour(new MeshRenderBehaviour(m_ravager, ShaderManager::getShader(GBUFFER_SHADER)));
 	if (_DEBUG)
 		player->localTransform.setPos(glm::vec3(0.f, 25.f, 0.f));
 
@@ -804,6 +814,9 @@ void Game::initGame()
 void Game::update()
 {
 	Time::update();
+
+	m_ravagerIdle->update();
+
 
 	//Remove this when done testing. Or use as a jump for testing purposes.
 	if (Input::GetKeyDown(KeyCode::Space)) {

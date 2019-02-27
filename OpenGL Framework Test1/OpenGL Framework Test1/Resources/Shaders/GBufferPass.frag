@@ -11,6 +11,22 @@ layout(location = 0) out vec4 outColors;
 layout(location = 1) out vec3 outNormals;
 layout(location = 2) out vec3 outPositions;
 
+
+vec4 Slerp(vec4 p0, vec4 p1, float t)
+{
+  float dotp = dot(normalize(p0), normalize(p1));
+  if ((dotp > 0.9999) || (dotp<-0.9999))
+  {
+    if (t<=0.5)
+      return p0;
+    return p1;
+  }
+  float theta = acos(dotp);
+  vec4 P = ((p0*sin((1-t)*theta) + p1*sin(t*theta)) / sin(theta));
+  P.w = 1;
+  return P;
+}
+
 void main()
 {
     //Standard color output

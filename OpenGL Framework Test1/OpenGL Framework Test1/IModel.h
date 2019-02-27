@@ -20,6 +20,9 @@ enum VBOType {
 	VBO_GROUPS,
 	VBO_WEIGHTS,
 
+	VBO_LASTPOS,
+	VBO_LASTNORM,
+
 	NUM_VBO
 };
 
@@ -45,7 +48,15 @@ public:
 	IModel(const IModel&);
 	~IModel();
 
+
+	///<summary>
+	///Load *.imdl file directly into VRAM.
+	///</summary>
+	///<param name='_name'>Name of file (including extension)</param>
+	///<param name='_path'>Parent directory of the file.</param>
 	void loadFromFile(const std::string& _name, const std::string& _path = "Resources/Objects/");
+	
+	
 	void draw(Shader *shader);
 
 	//TODO: just assume textures are named albedo.png, normals.png, spec.png (etc.) unless specifed.

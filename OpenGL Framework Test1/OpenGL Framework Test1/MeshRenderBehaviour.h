@@ -4,11 +4,13 @@
 #include "Behaviour.h"
 #include "Model.h"
 #include "IModel.h"
+#include "AnimatedModel.h"
 
 class MeshRenderBehaviour : public Behaviour {
 public:
 	MeshRenderBehaviour(Model* _model, Shader* _shader, const bool& _transparent = false);
 	MeshRenderBehaviour(IModel* _model, Shader* _shader, const bool& _transparent = false);
+	MeshRenderBehaviour(AnimatedModel* _model, Shader* _shader, const bool& _transparent = false);
 	~MeshRenderBehaviour();
 
 	void start() override;
@@ -20,9 +22,11 @@ public:
 private:
 	Model* m_model;
 	IModel* m_iModel;
+	AnimatedModel *m_aModel;
 
 	Shader* m_shader;
-	bool m_transparent;
-	bool m_IMDL;
+	bool m_transparent : 1;
+	bool m_IMDL : 1;
+	bool m_animated : 1;
 };
 #endif

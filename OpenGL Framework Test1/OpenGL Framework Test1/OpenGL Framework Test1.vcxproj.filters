@@ -130,6 +130,9 @@
     <ClCompile Include="UniformBuffer.cpp">
       <Filter>Source Files\Buffers</Filter>
     </ClCompile>
+    <ClCompile Include="AnimatedModel.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Behaviour.h">
@@ -267,6 +270,7 @@
     <ClInclude Include="UniformBuffer.h">
       <Filter>Source Files\Buffers</Filter>
     </ClInclude>
+    <ClInclude Include="AnimatedModel.h" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Source Files">
