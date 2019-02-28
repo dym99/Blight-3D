@@ -8,6 +8,7 @@ MeshRenderBehaviour::MeshRenderBehaviour(Model * _model, Shader* _shader, const 
 	m_model = _model;
 	m_shader = _shader;
 
+	m_animated = false;
 	m_IMDL = false;
 
 	m_transparent = _transparent;
@@ -22,12 +23,27 @@ MeshRenderBehaviour::MeshRenderBehaviour(IModel * _model, Shader * _shader, cons
 	m_iModel = _model;
 	m_shader = _shader;
 
+	m_animated = false;
 	m_IMDL = true;
 
 	m_transparent = _transparent;
 
 	m_active = true;
 
+}
+
+MeshRenderBehaviour::MeshRenderBehaviour(AnimatedModel * _model, Shader * _shader, const bool & _transparent)
+{
+	//Set the model and shader handles.
+	m_aModel = _model;
+	m_shader = _shader;
+
+	m_animated = true;
+	m_IMDL = false;
+
+	m_transparent = _transparent;
+
+	m_active = true;
 }
 
 MeshRenderBehaviour::~MeshRenderBehaviour()
@@ -63,12 +79,16 @@ void MeshRenderBehaviour::render()
 	m_shader->update(*Camera::mainCamera);
 	m_shader->sendUniform("uModel", m_parentObject->worldTransform);
 
-	if (m_IMDL) {
-		m_shader->sendUniform("colorTint", glm::vec4(1, 1, 1, 1));
+	if (m_animated) {
+		//m_shader->sendUniform("colorTint", glm::vec4(1, 1, 1, 1));
+		m_aModel->draw(m_shader);
+	}
+	else if (m_IMDL) {
+		//m_shader->sendUniform("colorTint", glm::vec4(1, 1, 1, 1));
 		m_iModel->draw(m_shader);
 	}
 	else {
-		m_shader->sendUniform("colorTint", m_model->colorTint);
+		//m_shader->sendUniform("colorTint", m_model->colorTint);
 		m_model->Draw(m_shader);
 	}
 	//}

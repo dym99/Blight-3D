@@ -265,28 +265,28 @@ void IModel::loadFromFile(const std::string& _name, const std::string& _path) {
 
 			glBindVertexArray(m_VAO);
 
-			glEnableVertexAttribArray(0);	//Vertices
-			glEnableVertexAttribArray(1);	//UVs
-			glEnableVertexAttribArray(2);	//Normals
+			glEnableVertexAttribArray(VBO_POS);	//Vertices
+			glEnableVertexAttribArray(VBO_TEX);	//UVs
+			glEnableVertexAttribArray(VBO_NORM);	//Normals
 			//glEnableVertexAttribArray(3);	//Tangents
 			//glEnableVertexAttribArray(4);	//Bitangents
-			glEnableVertexAttribArray(5);	//Groups
-			glEnableVertexAttribArray(6);	//Weights
+			glEnableVertexAttribArray(VBO_GROUPS);	//Groups
+			glEnableVertexAttribArray(VBO_WEIGHTS);	//Weights
 
 			//Send the Vertex data to OpenGL
 			glBindBuffer(GL_ARRAY_BUFFER, m_VBO[VBO_POS]);
 			glBufferData(GL_ARRAY_BUFFER, sizeof(float) * unpackedPos.size(), &unpackedPos[0], GL_STATIC_DRAW);
-			glVertexAttribPointer((GLuint)0, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 3, BUFFER_OFFSET(0));
+			glVertexAttribPointer((GLuint)VBO_POS, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 3, BUFFER_OFFSET(0));
 
 			//Send the texture data to OpenGL
 			glBindBuffer(GL_ARRAY_BUFFER, m_VBO[VBO_TEX]);
 			glBufferData(GL_ARRAY_BUFFER, sizeof(float) * unpackedUV.size(), &unpackedUV[0], GL_STATIC_DRAW);
-			glVertexAttribPointer((GLuint)1, 2, GL_FLOAT, GL_FALSE, sizeof(float) * 2, BUFFER_OFFSET(0));
+			glVertexAttribPointer((GLuint)VBO_TEX, 2, GL_FLOAT, GL_FALSE, sizeof(float) * 2, BUFFER_OFFSET(0));
 
 			//Send the normal data to OpenGL
 			glBindBuffer(GL_ARRAY_BUFFER, m_VBO[VBO_NORM]);
 			glBufferData(GL_ARRAY_BUFFER, sizeof(float) * unpackedNorm.size(), &unpackedNorm[0], GL_STATIC_DRAW);
-			glVertexAttribPointer((GLuint)2, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 3, BUFFER_OFFSET(0));
+			glVertexAttribPointer((GLuint)VBO_NORM, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 3, BUFFER_OFFSET(0));
 
 			////Send the tangent data to OpenGL
 			//glBindBuffer(GL_ARRAY_BUFFER, VBO_Tangents);
@@ -301,14 +301,14 @@ void IModel::loadFromFile(const std::string& _name, const std::string& _path) {
 			//Send the group data to OpenGL
 			glBindBuffer(GL_ARRAY_BUFFER, m_VBO[VBO_GROUPS]);
 			glBufferData(GL_ARRAY_BUFFER, sizeof(int) * unpackedGroups.size(), &unpackedGroups[0], GL_STATIC_DRAW);
-			glVertexAttribPointer((GLuint)5, 4, GL_INT, GL_FALSE, sizeof(int) * 4, BUFFER_OFFSET(0));
+			glVertexAttribPointer((GLuint)VBO_GROUPS, 4, GL_INT, GL_FALSE, sizeof(int) * 4, BUFFER_OFFSET(0));
 
 			//Send the weight data to OpenGL
 			glBindBuffer(GL_ARRAY_BUFFER, m_VBO[VBO_WEIGHTS]);
 			glBufferData(GL_ARRAY_BUFFER, sizeof(float) * unpackedWeights.size(), &unpackedWeights[0], GL_STATIC_DRAW);
-			glVertexAttribPointer((GLuint)6, 4, GL_FLOAT, GL_FALSE, sizeof(float) * 4, BUFFER_OFFSET(0));
+			glVertexAttribPointer((GLuint)VBO_WEIGHTS, 4, GL_FLOAT, GL_FALSE, sizeof(float) * 4, BUFFER_OFFSET(0));
 
-			//Cleanup after the buffers you bound
+			//Cleanup after the buffers
 			glBindBuffer(GL_ARRAY_BUFFER, 0);
 			glBindVertexArray(0);
 		}
@@ -325,6 +325,7 @@ void IModel::loadFromFile(const std::string& _name, const std::string& _path) {
 	//Close the file when done.
 	fclose(file);
 }
+
 
 void IModel::draw(Shader * shader) {
 

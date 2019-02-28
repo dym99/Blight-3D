@@ -11,6 +11,7 @@ layout(location = 0) out vec4 outColors;
 layout(location = 1) out vec3 outNormals;
 layout(location = 2) out vec3 outPositions;
 
+
 void main()
 {
     //Standard color output
