@@ -51,7 +51,7 @@ void ShaderManager::loadShaders()
 		"./Resources/Shaders/PassThrough.vert",
 		"./Resources/Shaders/PostProcess/DeferredToon.frag"
 	));
-	
+
 	m_postShaders.push_back(new Shader(
 		"./Resources/Shaders/PassThrough.vert",
 		"./Resources/Shaders/PostProcess/EdgeDetection.frag"
@@ -105,6 +105,11 @@ void ShaderManager::loadShaders()
 	m_postShaders.push_back(new Shader(
 		"./Resources/Shaders/PassThrough.vert",
 		"./Resources/Shaders/PostProcess/ColorCorrection.frag"
+	));
+
+	m_postShaders.push_back(new Shader(
+		"./Resources/SHaders/PassThrough.vert",
+		"./Resources/Shaders/PostProcess/ToonShader.frag"
 	));
 
 	//Bloom components

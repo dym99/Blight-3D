@@ -3,8 +3,8 @@
 layout (binding = 0) uniform sampler2D uNormalMap;
 layout (binding = 1) uniform sampler2D uDepthMap;
 
-uniform vec2 uPixel = vec2(1.0 / 760, 1.0 / 1080);
-uniform float edgeThreshNormal = 4.5;
+uniform vec2 uPixel = vec2(1.0 / 1000, 1.0 / 1000);
+uniform float edgeThreshNormal = 1.f;
 uniform float edgeThreshDepth = 0.00005;
 
 in vec2 TexCoords;

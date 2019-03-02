@@ -83,7 +83,7 @@ void Game::initGame()
 	uiImage->load("./Resources/Textures/UIpost.png");
 	toonRamp = new Texture();
 	toonRamp->load("./Resources/Textures/ToonRamp.png");
-	colorCorrection = new LUT3D("Warm2Cool.cube");
+	colorCorrection = new LUT3D("Blight_Lut.cube");
 
 	//Initializes the screen quad
 	FrameBuffer::initFSQ();
@@ -897,13 +897,13 @@ void Game::draw()
 	//F1 to toggle displaying of buffers
 	if (!displayBuffers) 
 	{
-		ShaderManager::getPost(TOONDEFERRED_POST)->bind();
+		ShaderManager::getPost(DEFERREDLIGHT_POST)->bind();
 		gBuffer->bindLighting();
 		toonRamp->bind(3);
 		deferredComposite->drawTo();
 		toonRamp->unbind(3);
 		gBuffer->unbindLighting();
-		ShaderManager::getPost(TOONDEFERRED_POST)->unbind();
+		ShaderManager::getPost(DEFERREDLIGHT_POST)->unbind();
 	}
 	else
 	{
@@ -916,6 +916,14 @@ void Game::draw()
 		gBuffer->unbindLighting();
 		ShaderManager::getPost(DEFERREDLIGHT_POST)->unbind();
 	}
+
+	ShaderManager::getPost(TOONSHADER_POST)->bind();
+	toonRamp->bind(3);
+	gBuffer->bindTex(1, 0);
+	deferredComposite->draw();
+	gBuffer->unbindTex(1);
+	toonRamp->unbind(3);
+	ShaderManager::getPost(TOONSHADER_POST)->unbind();
 
 	edgeBuffer->bind();
 	ShaderManager::getPost(EDGEDETECTION_POST)->bind();
