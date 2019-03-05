@@ -15,9 +15,10 @@ void main()
     vec4 textureColor = texture(uFinishedFrame, TexCoords);
     vec4 normalColor = texture(uNormalMap, TexCoords) * ambience;
 
-    float intensity = dot(textureColor, normalColor);
+    float luminence = 0.2989 * textureColor.r + 0.587 * textureColor.g + 0.114 * textureColor.b;
 
-    vec4 toonColor = texture(uToonRamp, vec2(intensity, 0.f));
+    vec4 textureOffset = texture(uToonRamp, vec2(luminence, 0.f));
 
-    outColor = vec4(textureColor);
+    //outColor = vec4(luminence);
+    outColor = textureColor * textureOffset;
 }

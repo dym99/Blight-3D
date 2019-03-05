@@ -517,7 +517,7 @@ void calculateDirectionalLight(DirLight lightyBoi, vec3 fragPosition, vec3 norma
 	//Account for interpolation
 	vec3 normal = normalize(normal0);
 
-		// the dot product of the normal and light direction determines how much light there is
+	// the dot product of the normal and light direction determines how much light there is
 	float NdotL = dot(normal, lightyBoi.direction);
 	
 	// Calculate attenuation (falloff)
@@ -525,7 +525,7 @@ void calculateDirectionalLight(DirLight lightyBoi, vec3 fragPosition, vec3 norma
 
 	NdotL = max(NdotL, 0.0);
 	// Calculate the diffuse contribution
-	FragColor.rgb += (lightyBoi.color * NdotL) * vec3(_textureColor * vec4(0.5));
+	FragColor.rgb += (lightyBoi.color * NdotL) * _textureColor.rgb;
 }
 
 void main() 
