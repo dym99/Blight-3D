@@ -136,23 +136,39 @@ void Game::initGame()
 
 	Texture *roomTex = new Texture("diffuseTex");
 	roomTex->load("./Resources/Objects/MainLevel/BlightLevelTexturesOne.png");
+	Texture *blankEmissive = new Texture("emissiveTex");
+	blankEmissive->load("./Resources/Objects/MainLevel/BlightLevelTexturesEmissive.png");
+	Texture *testEmissive = new Texture("emissiveTex");
+	testEmissive->load("./Resources/Objects/Box/face_emis.png");
 
 	m_ravagerIdle = new AnimatedModel();
 	m_ravagerIdle->loadFromFiles(6, "RavagerIdle", "Resources/Objects/Ravager/Anims/");
 
 	m_ravagerIdle->setAlbedo(ravagerAlbedo);
+	m_ravagerIdle->setEmissive(blankEmissive);
 	for (int i = 0; i < 6; ++i) {
 		m_ravagerIdle->setFrameTime(i, 0.8333f);
 	}
 
+
+	m_brazier->setEmissive(blankEmissive);
+	m_ravager->setEmissive(blankEmissive);
 	m_bottomRoom->setAlbedo(roomTex);
+	m_bottomRoom->setEmissive(blankEmissive);
 	m_grove->setAlbedo(roomTex);
+	m_grove->setEmissive(blankEmissive);
 	m_leftRoom->setAlbedo(roomTex);
+	m_leftRoom->setEmissive(blankEmissive);
 	m_rightRoom->setAlbedo(roomTex);
+	m_rightRoom->setEmissive(blankEmissive);
 	m_topRoom1->setAlbedo(roomTex);
+	m_topRoom1->setEmissive(blankEmissive);
 	m_topRoom2->setAlbedo(roomTex);
+	m_topRoom2->setEmissive(blankEmissive);
 	m_tree->setAlbedo(roomTex);
+	m_tree->setEmissive(testEmissive);
 	m_altar->setAlbedo(roomTex);
+	m_altar->setEmissive(blankEmissive);
 
 	
 	ShaderManager::loadShaders();
@@ -924,6 +940,12 @@ void Game::draw()
 	gBuffer->unbindTex(1);
 	toonRamp->unbind(3);
 	ShaderManager::getPost(TOONSHADER_POST)->unbind();
+
+	ShaderManager::getPost(EMISSIVE_POST)->bind();
+	gBuffer->bindTex(1, 3);
+	deferredComposite->draw();
+	gBuffer->unbindTex(1);
+	ShaderManager::getPost(EMISSIVE_POST)->unbind();
 
 	edgeBuffer->bind();
 	ShaderManager::getPost(EDGEDETECTION_POST)->bind();

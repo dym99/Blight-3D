@@ -108,8 +108,13 @@ void ShaderManager::loadShaders()
 	));
 
 	m_postShaders.push_back(new Shader(
-		"./Resources/SHaders/PassThrough.vert",
+		"./Resources/Shaders/PassThrough.vert",
 		"./Resources/Shaders/PostProcess/ToonShader.frag"
+	));
+
+	m_postShaders.push_back(new Shader(
+		"./Resources/Shaders/PassThrough.vert",
+		"./Resources/Shaders/PostProcess/EmissivePost.frag"
 	));
 
 	//Bloom components

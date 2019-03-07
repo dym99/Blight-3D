@@ -330,9 +330,9 @@ void IModel::loadFromFile(const std::string& _name, const std::string& _path) {
 void IModel::draw(Shader * shader) {
 
 	//Draw the mesh
-	m_albedo->bind(0);
-	m_albedo->bind(1);
-	m_albedo->bind(2);
+	m_albedo->bind(0);			//Albedo
+	m_albedo->bind(1);			//Specular
+	m_emissive->bind(2);		//Emissive
 	glBindVertexArray(m_VAO);
 	glDrawArrays(GL_TRIANGLES, 0, m_numVertices * 3);
 	glBindVertexArray(0);
@@ -344,6 +344,11 @@ void IModel::draw(Shader * shader) {
 void IModel::setAlbedo(Texture * _tex)
 {
 	m_albedo = _tex;
+}
+
+void IModel::setEmissive(Texture * _tex)
+{
+	m_emissive = _tex;
 }
 
 

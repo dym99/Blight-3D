@@ -36,7 +36,7 @@ in vec2 TexCoords;
 uniform DirLight directionLight =  {
 	vec4(0.0, 0.0, 0.0, 0.0),
 	vec3(0.15, 0.15, 0.15),
-	vec3(0.5, 0.5, 0.5),
+	vec3(0.9, 0.9, 0.9),
 	vec3(-0.3, 0.95, 0.0),
 	32.0,
 };
@@ -479,6 +479,7 @@ uniform Light light[48] = {
 layout(binding = 0) uniform sampler2D uScene;
 layout(binding = 1) uniform sampler2D uNormalMap;
 layout(binding = 2) uniform sampler2D uPositionMap;
+layout(binding = 3) uniform sampler2D uEmissiveMap;
 
 uniform Material material;
 

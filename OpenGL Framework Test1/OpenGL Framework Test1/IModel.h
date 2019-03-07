@@ -63,6 +63,9 @@ public:
 	//Right now, you have to specify.
 	void setAlbedo(Texture* _tex);
 
+	//Specify Emissive texture
+	void setEmissive(Texture* _tex);
+
 private:
 	//Vertex attributes
 	GLuint m_VAO;
@@ -72,6 +75,7 @@ private:
 	//GLuint m_TEX[NUM_TEX_TYPES];
 
 	Texture* m_albedo;
+	Texture* m_emissive;
 
 	const char* m_path;
 	const char* m_name;
