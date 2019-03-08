@@ -145,6 +145,7 @@
     <ClCompile Include="AnimatedModel.cpp" />
     <ClCompile Include="AudioPlayer.cpp" />
     <ClCompile Include="Behaviour.cpp" />
+    <ClCompile Include="BloomBuffer.cpp" />
     <ClCompile Include="Camera.cpp" />
     <ClCompile Include="CameraBehaviour.cpp" />
     <ClCompile Include="DirectionalLight.cpp" />
@@ -192,6 +193,7 @@
     <ClInclude Include="AnimatedModel.h" />
     <ClInclude Include="AudioPlayer.h" />
     <ClInclude Include="Behaviour.h" />
+    <ClInclude Include="BloomBuffer.h" />
     <ClInclude Include="Camera.h" />
     <ClInclude Include="CameraBehaviour.h" />
     <ClInclude Include="DirectionalLight.h" />

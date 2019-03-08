@@ -201,6 +201,11 @@ Shader * ShaderManager::getPost(int post)
 	return m_postShaders[post];
 }
 
+Shader * ShaderManager::getBloom(int bloom)
+{
+	return m_bloomComponents[bloom];
+}
+
 std::vector<Shader*>& ShaderManager::getBloom()
 {
 	return m_bloomComponents;

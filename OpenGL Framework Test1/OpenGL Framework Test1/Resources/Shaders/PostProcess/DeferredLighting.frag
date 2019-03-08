@@ -36,7 +36,7 @@ in vec2 TexCoords;
 uniform DirLight directionLight =  {
 	vec4(0.0, 0.0, 0.0, 0.0),
 	vec3(0.15, 0.15, 0.15),
-	vec3(0.9, 0.9, 0.9),
+	vec3(0.4, 0.4, 0.4),
 	vec3(-0.3, 0.95, 0.0),
 	32.0,
 };
@@ -531,7 +531,7 @@ void calculateDirectionalLight(DirLight lightyBoi, vec3 fragPosition, vec3 norma
 
 void main() 
 {
-	vec4 textureColor = texture(uScene, TexCoords);
+	vec4 textureColor = texture(uScene, TexCoords) * 3;
     vec3 normal0 = texture(uNormalMap, TexCoords).xyz * 2.0 - 1.0;
 
     vec3 fragPosition = texture(uPositionMap, TexCoords).xyz;

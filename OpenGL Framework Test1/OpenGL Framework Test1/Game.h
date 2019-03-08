@@ -7,6 +7,7 @@
 #include "FrameBuffer.h"
 #include "GBuffer.h"
 #include "PostBuffer.h"
+#include "BloomBuffer.h"
 #include "Display.h"
 #include "Utilities.h"
 #include "P_PhysicsBody.h"
@@ -64,16 +65,18 @@ private:
 
 
 	bool displayBuffers = false;
+	bool displayBloom = false;
 
 	///////////////////////
 
 	//Framebuffers
 	GBuffer *gBuffer;
 	PostBuffer *deferredComposite;
+	BloomBuffer *bloomBuffer;
 	FrameBuffer *edgeBuffer;
-	FrameBuffer *workBuffer1;
+	/*FrameBuffer *workBuffer1;
 	FrameBuffer *workBuffer2;
-	FrameBuffer *workBuffer3;
+	FrameBuffer *workBuffer3;*/
 
 	//Texture
 	Texture *uiImage;

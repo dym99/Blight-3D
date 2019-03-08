@@ -47,6 +47,15 @@ enum PostProcess {
 	NUM_POST
 };
 
+enum Bloom {
+	HIGH_PASS,
+	VERTICAL_PASS,
+	HORIZONTAL_PASS,
+	COMPOSITE_PASS,
+
+	NUM_BLOOM
+};
+
 
 
 class ShaderManager abstract
@@ -61,7 +70,8 @@ public:
 	static Shader* getShader(int shader);
 	static Shader* getGeom(int geom);
 	static Shader* getPost(int post);
-	
+	static Shader* getBloom(int bloom);
+
 	static std::vector<Shader*>& getBloom();
 
 

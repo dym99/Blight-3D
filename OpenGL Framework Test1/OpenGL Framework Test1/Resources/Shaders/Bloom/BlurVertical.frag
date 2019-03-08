@@ -1,6 +1,6 @@
 #version 420
 
-uniform sampler2D uTex; //Source image
+layout(binding = 0) uniform sampler2D uTex; //Source image
 uniform float uPixelSize; //1.0 / Window_Height
 
 out vec3 FragColor;

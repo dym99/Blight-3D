@@ -47,15 +47,6 @@ Game::~Game()
 	if (edgeBuffer != nullptr)
 		delete edgeBuffer;
 	edgeBuffer = nullptr;
-	if (workBuffer1 != nullptr)
-		delete workBuffer1;
-	workBuffer1 = nullptr;
-	if (workBuffer2 != nullptr)
-		delete workBuffer2;
-	workBuffer2 = nullptr;
-	if (workBuffer3 != nullptr)
-		delete workBuffer3;
-	workBuffer3 = nullptr;
 }
 
 void Game::initGame()
@@ -74,10 +65,8 @@ void Game::initGame()
 	//Initialise Framebuffers
 	gBuffer = new GBuffer(WINDOW_WIDTH, WINDOW_HEIGHT);
 	deferredComposite = new PostBuffer;
+	bloomBuffer = new BloomBuffer;
 	edgeBuffer = new FrameBuffer(1);
-	workBuffer1 = new FrameBuffer(1);
-	workBuffer2 = new FrameBuffer(1);
-	workBuffer3 = new FrameBuffer(1);
 
 	uiImage = new Texture();
 	uiImage->load("./Resources/Textures/UIpost.png");
@@ -177,47 +166,15 @@ void Game::initGame()
 
 	//Frame Buffers
 #pragma region FrameBuffers
-	/*deferredComposite->initDepthTexture(WINDOW_WIDTH, WINDOW_HEIGHT);
-	deferredComposite->initColorTexture(0, WINDOW_WIDTH, WINDOW_HEIGHT, GL_RGBA8, GL_NEAREST, GL_CLAMP_TO_EDGE);
-	
-	if (!deferredComposite->checkFBO()) {
-		std::cout << "Deferred Composite failed to load.\n\n";
-		system("pause");
-		exit(0);
-	}*/
 	deferredComposite->init(WINDOW_WIDTH, WINDOW_HEIGHT);
+
+	bloomBuffer->init(WINDOW_WIDTH, WINDOW_HEIGHT, 2.f);
 
 	edgeBuffer->initDepthTexture(WINDOW_WIDTH, WINDOW_HEIGHT);
 	edgeBuffer->initColorTexture(0, WINDOW_WIDTH, WINDOW_HEIGHT, GL_RGBA8, GL_NEAREST, GL_CLAMP_TO_EDGE);
 
 	if (!edgeBuffer->checkFBO()) {
 		std::cout << "Edge buffer failed to load.\n\n";
-		system("pause");
-		exit(0);
-	}
-
-	workBuffer1->initColorTexture(0, WINDOW_WIDTH / BLOOM_DOWNSCALE, WINDOW_HEIGHT / BLOOM_DOWNSCALE,
-		GL_RGB8, GL_LINEAR, GL_CLAMP_TO_EDGE);
-
-	if (!workBuffer1->checkFBO()) {
-		std::cout << "FBO2 failed to load.\n\n";
-		system("pause");
-		exit(0);
-	}
-
-	workBuffer2->initColorTexture(0, WINDOW_WIDTH / BLOOM_DOWNSCALE, WINDOW_HEIGHT / BLOOM_DOWNSCALE,
-		GL_RGB8, GL_LINEAR, GL_CLAMP_TO_EDGE);
-
-	if (!workBuffer2->checkFBO()) {
-		std::cout << "FBO3 failed to load.\n\n";
-		system("pause");
-		exit(0);
-	}
-
-	workBuffer3->initColorTexture(0, WINDOW_WIDTH, WINDOW_HEIGHT, GL_RGBA8, GL_NEAREST, GL_CLAMP_TO_EDGE);
-
-	if (!workBuffer3->checkFBO()) {
-		std::cout << "FBO4 Failed to load.\n\n";
 		system("pause");
 		exit(0);
 	}
@@ -864,6 +821,10 @@ void Game::update()
 		displayBuffers = !displayBuffers;
 	}
 
+	if (Input::GetKeyUp(KeyCode::F2)) {
+		displayBloom = !displayBloom;
+	}
+
 	if (Input::GetKeyDown(KeyCode::F4)) {
 		guiEnabled = !guiEnabled;
 	}
@@ -884,13 +845,10 @@ void Game::update()
 void Game::draw()
 {
 	/// Clear Buffers ///
-	glClearColor(0.f, 0.5f, 0.6f, 1.f);
+	glClearColor(0.f, 0.0f, 0.0f, 1.f);
 	deferredComposite->clear();
 	gBuffer->clear();
 	edgeBuffer->clear();
-	workBuffer1->clear();
-	workBuffer2->clear();
-	workBuffer3->clear();
 
 	ShaderManager::update(*Camera::mainCamera);
 
@@ -941,8 +899,21 @@ void Game::draw()
 	toonRamp->unbind(3);
 	ShaderManager::getPost(TOONSHADER_POST)->unbind();
 
+	ShaderManager::getPost(PASSTHROUGH_POST)->bind();
+	gBuffer->bindTex(0, 3);
+	bloomBuffer->drawTo();
+	gBuffer->unbindTex(0);
+	ShaderManager::getPost(PASSTHROUGH_POST)->unbind();
+
+	bloomBuffer->applyBloom(0.01f, 20);
+
+	if (displayBloom)
+	{
+		bloomBuffer->drawBuffer(2);
+	}
+
 	ShaderManager::getPost(EMISSIVE_POST)->bind();
-	gBuffer->bindTex(1, 3);
+	bloomBuffer->bindTexColor(3, 1);
 	deferredComposite->draw();
 	gBuffer->unbindTex(1);
 	ShaderManager::getPost(EMISSIVE_POST)->unbind();
@@ -1066,7 +1037,7 @@ int Game::run() {
 
 		update();
 
-		m_display->clear(0.f, 0.5f, 0.6f, 1.f);
+		m_display->clear(0.f, 0.0f, 0.0f, 1.f);
 
 		draw();
 

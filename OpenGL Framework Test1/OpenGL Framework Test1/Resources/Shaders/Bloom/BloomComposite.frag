@@ -1,7 +1,7 @@
 #version 420
 
-uniform sampler2D uScene;
-uniform sampler2D uBloom;
+layout(binding = 0) uniform sampler2D uScene;
+layout(binding = 1) uniform sampler2D uBloom;
 
 in vec2 TexCoords;
 
