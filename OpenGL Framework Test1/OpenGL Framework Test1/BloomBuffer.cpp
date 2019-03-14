@@ -75,6 +75,17 @@ void BloomBuffer::unbindTexColor(int index, int textureUnit)
 	m_frameBuffers[index].unbindTex(textureUnit);
 }
 
+void BloomBuffer::reshape(unsigned windowWidth, unsigned windowHeight)
+{
+	for (int i = 0; i < 4; i++)
+	{
+		m_frameBuffers[i].resize(windowWidth, windowHeight);
+	}
+
+	this->windowWidth = windowWidth;
+	this->windowHeight = windowHeight;
+}
+
 void BloomBuffer::compositeBloom()
 {
 	glViewport(0, 0, windowWidth, windowHeight);

@@ -55,6 +55,14 @@ void GBuffer::unbindEdge()
 	unbindTex(0);
 }
 
+void GBuffer::reshape(unsigned windowWidth, unsigned windowHeight)
+{
+	this->windowWidth = windowWidth;
+	this->windowHeight = windowHeight;
+
+	resize(windowWidth, windowHeight);
+}
+
 void GBuffer::drawBuffers()
 {
 	glViewport(0, windowHeight / 2, windowWidth / 2, windowHeight / 2);					///Top Left

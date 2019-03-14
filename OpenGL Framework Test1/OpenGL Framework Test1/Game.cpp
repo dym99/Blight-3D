@@ -17,6 +17,9 @@
 #define _DEBUG 0
 #endif
 
+int window_width = 1920;
+int window_height = 1011;
+
 std::vector<Enemy*> Game::enemies;
 std::vector<P_PhysicsBody*> Game::enemyBodies;
 
@@ -55,7 +58,7 @@ void Game::initGame()
 	initSDL();
 
 	///Initialise the display
-	m_display = new Display("Blight");
+	m_display = new Display("Blight", window_width, window_height);
 
 	///Initialise GLEW
 	initGLEW();
@@ -63,9 +66,11 @@ void Game::initGame()
 	UI::InitImGUI();
 
 	//Initialise Framebuffers
-	gBuffer = new GBuffer(WINDOW_WIDTH, WINDOW_HEIGHT);
+	gBuffer = new GBuffer(window_width, window_height);
 	deferredComposite = new PostBuffer;
 	bloomBuffer = new BloomBuffer;
+	bloomBuffer2 = new BloomBuffer;
+	bloomBuffer3 = new BloomBuffer;
 	edgeBuffer = new FrameBuffer(1);
 
 	uiImage = new Texture();
@@ -166,12 +171,14 @@ void Game::initGame()
 
 	//Frame Buffers
 #pragma region FrameBuffers
-	deferredComposite->init(WINDOW_WIDTH, WINDOW_HEIGHT);
+	deferredComposite->init(window_width, window_height);
 
-	bloomBuffer->init(WINDOW_WIDTH, WINDOW_HEIGHT, 2.f);
+	bloomBuffer->init(window_width, window_height, 2.f);
+	bloomBuffer2->init(window_width, window_height, 4.f);
+	bloomBuffer3->init(window_width, window_height, 8.f);
 
-	edgeBuffer->initDepthTexture(WINDOW_WIDTH, WINDOW_HEIGHT);
-	edgeBuffer->initColorTexture(0, WINDOW_WIDTH, WINDOW_HEIGHT, GL_RGBA8, GL_NEAREST, GL_CLAMP_TO_EDGE);
+	edgeBuffer->initDepthTexture(window_width, window_height);
+	edgeBuffer->initColorTexture(0, window_width, window_height, GL_RGBA8, GL_NEAREST, GL_CLAMP_TO_EDGE);
 
 	if (!edgeBuffer->checkFBO()) {
 		std::cout << "Edge buffer failed to load.\n\n";
@@ -854,7 +861,7 @@ void Game::draw()
 
 	//Camera 1
 	{
-		glViewport(0, 0, WINDOW_WIDTH, WINDOW_HEIGHT);
+		glViewport(0, 0, window_width, window_height);
 		gBuffer->bind();
 
 		for (unsigned int i = 0; i < m_activeScenes.size(); ++i) {
@@ -883,7 +890,7 @@ void Game::draw()
 	{
 		gBuffer->drawBuffers();
 
-		glViewport(WINDOW_WIDTH / 2, 0, WINDOW_WIDTH / 2, WINDOW_HEIGHT / 2);					///Bottom Right
+		glViewport(window_width / 2, 0, window_width / 2, window_height / 2);					///Bottom Right
 		ShaderManager::getPost(DEFERREDLIGHT_POST)->bind();
 		gBuffer->bindLighting();
 		FrameBuffer::drawFSQ();
@@ -905,12 +912,32 @@ void Game::draw()
 	gBuffer->unbindTex(0);
 	ShaderManager::getPost(PASSTHROUGH_POST)->unbind();
 
-	bloomBuffer->applyBloom(0.01f, 20);
+	bloomBuffer->applyBloom(0.01f, 15);
 
 	if (displayBloom)
 	{
 		bloomBuffer->drawBuffer(2);
 	}
+
+	///Blooming more with different downscales
+	///Looks trashy though, need to talk to Dr. Hogue about the fullscreen post effects and see what he thinks about bloom lmao
+	///1/4th size
+	//ShaderManager::getPost(PASSTHROUGH_POST)->bind();
+	//bloomBuffer->bindTexColor(3, 0);
+	//bloomBuffer2->drawTo();
+	//bloomBuffer->unbindTexColor(3, 0);
+	//ShaderManager::getPost(PASSTHROUGH_POST)->unbind();
+	//
+	//bloomBuffer2->applyBloom(0.01f, 2);
+	//
+	///1/8th size
+	//ShaderManager::getPost(PASSTHROUGH_POST)->bind();
+	//bloomBuffer2->bindTexColor(3, 0);
+	//bloomBuffer3->drawTo();
+	//bloomBuffer2->unbindTexColor(3, 0);
+	//ShaderManager::getPost(PASSTHROUGH_POST)->unbind();
+	//
+	//bloomBuffer3->applyBloom(0.01f, 1);
 
 	ShaderManager::getPost(EMISSIVE_POST)->bind();
 	bloomBuffer->bindTexColor(3, 1);
@@ -945,7 +972,7 @@ void Game::draw()
 	//Render the particle emitters
 	if (!displayBuffers)
 	{
-		gBuffer->copyTo(GL_NONE, GL_DEPTH_BUFFER_BIT, WINDOW_WIDTH, WINDOW_HEIGHT);
+		gBuffer->copyTo(GL_NONE, GL_DEPTH_BUFFER_BIT, window_width, window_height);
 		ShaderManager::getGeom(BILLBOARD_GEOM)->bind();
 		ShaderManager::getGeom(BILLBOARD_GEOM)->sendUniform("uTex", 0);
 		for (unsigned int i = 0; i < NUM_PARTICLES; i++)
@@ -958,7 +985,7 @@ void Game::draw()
 
 void Game::GUI()
 {
-	UI::Start(WINDOW_WIDTH, WINDOW_HEIGHT);
+	UI::Start(window_width, window_height);
 
 	ImGui::SliderFloat3("Ravager Position", &ravagerPhys->getGameObject()->localTransform.getPos()[0], -5.f, 5.f);
 
@@ -1027,6 +1054,19 @@ void Game::killEnemy(Enemy* _toKill)
 		std::cout << "ERROR: Enemy not found!" << std::endl;
 }
 
+//void Game::resizeWindow(int w, int h)
+//{
+//	gBuffer->reshape(w, h);
+//	deferredComposite->reshape(w, h);
+//	bloomBuffer->reshape(w, h);
+//	bloomBuffer2->reshape(w, h);
+//	bloomBuffer3->reshape(w, h);
+//	edgeBuffer->resize(w, h);
+//
+//	window_width = w;
+//	window_height = h;
+//}
+
 int Game::run() {
 	while (m_display->isOpen()) {
 
@@ -1047,6 +1087,22 @@ int Game::run() {
 			if (event.type == SDL_QUIT) {
 				m_display->close();
 			}
+			///For some reason It won't even let me place breakpoints in the function so I can't even debug it?
+			///It's skipping half the code as well when resizing the framebuffers.
+			///If anyone wants to uncomment this along with the "resizeWindow" function, and debug it, you're welcome to try
+			///Recommend just switching it to be completely full screen ?
+			/*Quick aside: The issue that's happening is it's not recreating the color buffers, it's skipping over the loop that creates them*/
+			//if (event.type == SDL_WINDOWEVENT)
+			//{
+			//	switch (event.window.event) 
+			//	{
+			//	case SDL_WINDOWEVENT_RESIZED:
+			//		//resizeWindow(event.window.data1, event.window.data2);
+			//		break;
+			//	default:
+			//		break;
+			//	}
+			//}
 		}
 		
 		//Example for stopping the particles, etc, could even be based on time passed

@@ -17,6 +17,8 @@ public:
 	void bindTexColor(int index, int textureUnit);
 	void unbindTexColor(int index, int textureUnit);
 
+	void reshape(unsigned windowWidth, unsigned windowHeight);
+
 private:
 	void compositeBloom();
 	void computeBlur(int bloomPasses);

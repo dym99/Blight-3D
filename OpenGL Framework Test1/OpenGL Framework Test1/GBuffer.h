@@ -16,6 +16,8 @@ public:
 	void bindEdge();
 	void unbindEdge();
 
+	void reshape(unsigned windowWidth, unsigned windowHeight);
+
 	virtual void drawBuffers() override;
 
 private:

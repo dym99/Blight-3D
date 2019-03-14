@@ -29,6 +29,7 @@ public:
 	void initGLEW();
 	void initSDL();
 
+	//void resizeWindow(int w, int h);
 
 	void update();
 	void draw();
@@ -73,6 +74,8 @@ private:
 	GBuffer *gBuffer;
 	PostBuffer *deferredComposite;
 	BloomBuffer *bloomBuffer;
+	BloomBuffer *bloomBuffer2;
+	BloomBuffer *bloomBuffer3;
 	FrameBuffer *edgeBuffer;
 	/*FrameBuffer *workBuffer1;
 	FrameBuffer *workBuffer2;
