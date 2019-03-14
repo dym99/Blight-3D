@@ -46,6 +46,16 @@ void PostBuffer::reshape(unsigned width, unsigned height)
 	}
 }
 
+void PostBuffer::bindColorTex(unsigned textureUnit)
+{
+	m_readBuffer->bindTex(textureUnit, 0);
+}
+
+void PostBuffer::unbindColorTex(unsigned textureUnit)
+{
+	m_readBuffer->unbindTex(textureUnit);
+}
+
 void PostBuffer::drawTo()
 {
 	m_writeBuffer->renderToFSQ();

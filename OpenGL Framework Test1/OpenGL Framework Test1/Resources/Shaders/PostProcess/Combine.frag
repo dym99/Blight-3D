@@ -9,8 +9,9 @@ out vec4 outColor;
 
 void main()
 {
-    vec4 sceneColor = texture(uSceneTex, TexCoords);
-    vec4 secondColor = vec4(texture(uSecondTex, TexCoords).r);
-    outColor = sceneColor * secondColor;
+	vec3 colorA = texture(uSceneTex, TexCoords).rgb;
+	vec3 colorB = texture(uSecondTex, TexCoords).rgb;
+
+	outColor.rgb = (1.0 - (1.0 - colorA) * (1.0 - colorB)).rgb;
 }
 

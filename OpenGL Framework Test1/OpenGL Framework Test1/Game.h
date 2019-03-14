@@ -73,6 +73,7 @@ private:
 	//Framebuffers
 	GBuffer *gBuffer;
 	PostBuffer *deferredComposite;
+	PostBuffer *compositeBuffer;
 	BloomBuffer *bloomBuffer;
 	BloomBuffer *bloomBuffer2;
 	BloomBuffer *bloomBuffer3;

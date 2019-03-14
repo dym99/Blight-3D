@@ -68,6 +68,7 @@ void Game::initGame()
 	//Initialise Framebuffers
 	gBuffer = new GBuffer(window_width, window_height);
 	deferredComposite = new PostBuffer;
+	compositeBuffer = new PostBuffer;
 	bloomBuffer = new BloomBuffer;
 	bloomBuffer2 = new BloomBuffer;
 	bloomBuffer3 = new BloomBuffer;
@@ -172,6 +173,7 @@ void Game::initGame()
 	//Frame Buffers
 #pragma region FrameBuffers
 	deferredComposite->init(window_width, window_height);
+	compositeBuffer->init(window_width, window_height);
 
 	bloomBuffer->init(window_width, window_height, 2.f);
 	bloomBuffer2->init(window_width, window_height, 4.f);
@@ -912,35 +914,42 @@ void Game::draw()
 	gBuffer->unbindTex(0);
 	ShaderManager::getPost(PASSTHROUGH_POST)->unbind();
 
-	bloomBuffer->applyBloom(0.01f, 15);
-
-	if (displayBloom)
-	{
-		bloomBuffer->drawBuffer(2);
-	}
+	bloomBuffer->applyBloom(0.01f, 20);
 
 	///Blooming more with different downscales
 	///Looks trashy though, need to talk to Dr. Hogue about the fullscreen post effects and see what he thinks about bloom lmao
 	///1/4th size
-	//ShaderManager::getPost(PASSTHROUGH_POST)->bind();
-	//bloomBuffer->bindTexColor(3, 0);
-	//bloomBuffer2->drawTo();
-	//bloomBuffer->unbindTexColor(3, 0);
-	//ShaderManager::getPost(PASSTHROUGH_POST)->unbind();
-	//
-	//bloomBuffer2->applyBloom(0.01f, 2);
-	//
+	ShaderManager::getPost(PASSTHROUGH_POST)->bind();
+	gBuffer->bindTex(0, 3);
+	bloomBuffer2->drawTo();
+	gBuffer->unbindTex(0);
+	ShaderManager::getPost(PASSTHROUGH_POST)->unbind();
+	
+	bloomBuffer2->applyBloom(0.01f, 20);
+
 	///1/8th size
-	//ShaderManager::getPost(PASSTHROUGH_POST)->bind();
-	//bloomBuffer2->bindTexColor(3, 0);
-	//bloomBuffer3->drawTo();
-	//bloomBuffer2->unbindTexColor(3, 0);
-	//ShaderManager::getPost(PASSTHROUGH_POST)->unbind();
-	//
-	//bloomBuffer3->applyBloom(0.01f, 1);
+	ShaderManager::getPost(PASSTHROUGH_POST)->bind();
+	gBuffer->bindTex(0, 3);
+	bloomBuffer3->drawTo();
+	gBuffer->unbindTex(0);
+	ShaderManager::getPost(PASSTHROUGH_POST)->unbind();
+	
+	bloomBuffer3->applyBloom(0.01f, 20);
+	
+	ShaderManager::getPost(COMBINE_POST)->bind();
+	bloomBuffer->bindTexColor(3, 0);
+	bloomBuffer2->bindTexColor(3, 1);
+	compositeBuffer->drawTo();
+	bloomBuffer2->unbindTexColor(3, 1);
+	bloomBuffer->unbindTexColor(3, 0);
+
+	bloomBuffer3->bindTexColor(3, 1);
+	compositeBuffer->draw();
+	bloomBuffer3->unbindTexColor(3, 1);
+	ShaderManager::getPost(COMBINE_POST)->unbind();
 
 	ShaderManager::getPost(EMISSIVE_POST)->bind();
-	bloomBuffer->bindTexColor(3, 1);
+	compositeBuffer->bindColorTex(1);
 	deferredComposite->draw();
 	gBuffer->unbindTex(1);
 	ShaderManager::getPost(EMISSIVE_POST)->unbind();
@@ -950,6 +959,7 @@ void Game::draw()
 	gBuffer->bindEdge();
 	FrameBuffer::drawFSQ();
 	gBuffer->unbindEdge();
+	ShaderManager::getPost(EDGEDETECTION_POST)->unbind();
 	edgeBuffer->unbind();
 	
 	//Example of how to use the new composite buffer
@@ -963,11 +973,11 @@ void Game::draw()
 	colorCorrection->unbind(30);
 	ShaderManager::getPost(COLORCORR_POST)->unbind();
 
-	ShaderManager::getPost(ADDEDGE_POST)->bind();
+	ShaderManager::getPost(COMBINEEDGE_POST)->bind();
 	edgeBuffer->bindTex(1, 0);				//Edge buffer
 	deferredComposite->drawToScreen();
 	Texture::unbind(1);
-	ShaderManager::getPost(ADDEDGE_POST)->bind();
+	ShaderManager::getPost(COMBINEEDGE_POST)->bind();
 
 	//Render the particle emitters
 	if (!displayBuffers)

@@ -59,6 +59,11 @@ void ShaderManager::loadShaders()
 
 	m_postShaders.push_back(new Shader(
 		"./Resources/Shaders/PassThrough.vert",
+		"./Resources/Shaders/PostProcess/Combine.frag"
+	));
+
+	m_postShaders.push_back(new Shader(
+		"./Resources/Shaders/PassThrough.vert",
 		"./Resources/Shaders/PostProcess/CombineEdge.frag"
 	));
 

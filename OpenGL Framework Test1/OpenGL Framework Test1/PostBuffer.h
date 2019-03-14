@@ -14,6 +14,9 @@ public:
 	void clear();
 	void reshape(unsigned width, unsigned height);
 
+	void bindColorTex(unsigned textureUnit);
+	void unbindColorTex(unsigned textureUnit);
+
 	void drawTo();
 
 	void draw();
