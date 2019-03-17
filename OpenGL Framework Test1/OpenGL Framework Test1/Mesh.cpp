@@ -160,35 +160,35 @@ bool Mesh::ProcessMesh(std::vector<float>& unPackedVertexData, std::vector<float
 
 void Mesh::Draw(Shader * shader)
 {
-	unsigned int diffuseNr = 0;
-	unsigned int normalNr = 0;
-	unsigned int specularNr = 0;
-	for (unsigned int i = 0; i < material.textures.size(); i++) {
-		//Sets the correct texture unit to active
-		glActiveTexture(GL_TEXTURE0 + i);
-
-		std::string name = material.textures[i]->getType();
-		if (name == "diffuseTex") {
-			diffuseNr++;
-		}
-		else if (name == "specularTex") {
-			specularNr++;
-		}
-		else if (name == "normalTex") {
-			normalNr++;
-		}
-
-		if (normalNr == 0) {
-			shader->sendUniform("hasNormMap", 0);
-		}
-		else {
-			shader->sendUniform("hasNormMap", 1);
-		}
-
-		shader->sendUniform(("material." + name).c_str(), i);
-		glBindTexture(GL_TEXTURE_2D, material.textures[i]->getID());
-	}
-	glActiveTexture(GL_TEXTURE0);
+	//unsigned int diffuseNr = 0;
+	//unsigned int normalNr = 0;
+	//unsigned int specularNr = 0;
+	//for (unsigned int i = 0; i < material.textures.size(); i++) {
+	//	//Sets the correct texture unit to active
+	//	glActiveTexture(GL_TEXTURE0 + i);
+	//
+	//	std::string name = material.textures[i]->getType();
+	//	if (name == "diffuseTex") {
+	//		diffuseNr++;
+	//	}
+	//	else if (name == "specularTex") {
+	//		specularNr++;
+	//	}
+	//	else if (name == "normalTex") {
+	//		normalNr++;
+	//	}
+	//
+	//	if (normalNr == 0) {
+	//		shader->sendUniform("hasNormMap", 0);
+	//	}
+	//	else {
+	//		shader->sendUniform("hasNormMap", 1);
+	//	}
+	//
+	//	shader->sendUniform(("material." + name).c_str(), i);
+	//	glBindTexture(GL_TEXTURE_2D, material.textures[i]->getID());
+	//}
+	//glActiveTexture(GL_TEXTURE0);
 
 	//draws mesh
 	glBindVertexArray(VAO);

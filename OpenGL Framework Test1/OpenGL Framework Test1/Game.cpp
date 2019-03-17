@@ -73,6 +73,7 @@ void Game::initGame()
 	bloomBuffer2 = new BloomBuffer;
 	bloomBuffer3 = new BloomBuffer;
 	edgeBuffer = new FrameBuffer(1);
+	lightingBuffer = new FrameBuffer(1);
 
 	uiImage = new Texture();
 	uiImage->load("./Resources/Textures/UIpost.png");
@@ -128,6 +129,13 @@ void Game::initGame()
 	m_altar->loadFromFile("SkullAltar.imdl", "./Resources/Objects/MainLevel/");
 	m_box = new Model();
 	m_box->LoadFromFile("./Resources/Objects/Box/", "cube");
+	m_sphere = new Model();
+	m_sphere->LoadFromFile("./Resources/Objects/Sphere/", "sphere");
+
+	m_lights.push_back(PointLight(m_sphere));
+	m_lights[0].init();
+	m_lights[0].position = glm::vec4(-44.633648, 0.500000, 5.672839, 0.0);
+	m_lights[0].color = glm::vec4(0.6, 0.3, 0.1, 1.0);
 
 	Texture *roomTex = new Texture("diffuseTex");
 	roomTex->load("./Resources/Objects/MainLevel/BlightLevelTexturesOne.png");
@@ -184,6 +192,16 @@ void Game::initGame()
 
 	if (!edgeBuffer->checkFBO()) {
 		std::cout << "Edge buffer failed to load.\n\n";
+		system("pause");
+		exit(0);
+	}
+
+	lightingBuffer->initDepthTexture(window_width, window_height);
+	lightingBuffer->initColorTexture(0, window_width, window_height, GL_RGBA8, GL_NEAREST, GL_CLAMP_TO_EDGE);
+	
+	if (!lightingBuffer->checkFBO())
+	{
+		std::cout << "Lighting buffer failed to load.\n\n";
 		system("pause");
 		exit(0);
 	}
@@ -772,9 +790,6 @@ void Game::initGame()
 		owo->localTransform.setPos(glm::vec3(4.f, 10.f, 0.f) * 2.f);
 		new P_PhysicsBody(owo, 1.0f, false, BOX, 1.f * 2.f, 56.f * 2.f, 54.f * 2.f, glm::vec3(0.f, 0.f, 0.f), 0.f, 0.f, true);
 	}
-	
-	//P_PhysicsBody::P_bodyCount.push_back(ravagerPhys);
-	//P_PhysicsBody::P_bodyCount.push_back(floor);
 
 	if (_DEBUG)
 		new P_PhysicsBody(new GameObject("World"), 1.f, false, BOX, 1.f, 500.f, 500.f, glm::vec3(0, 20.f, 0), 0, 0, true);
@@ -847,6 +862,8 @@ void Game::update()
 		m_activeScenes[i]->update();
 	}
 
+	m_lights[0].update(Time::deltaTime);
+
 	Shader::unbind();
 	Input::ResetKeys();
 }
@@ -857,6 +874,7 @@ void Game::draw()
 	glClearColor(0.f, 0.0f, 0.0f, 1.f);
 	deferredComposite->clear();
 	gBuffer->clear();
+	lightingBuffer->clear();
 	edgeBuffer->clear();
 
 	ShaderManager::update(*Camera::mainCamera);
@@ -882,16 +900,41 @@ void Game::draw()
 	{
 		ShaderManager::getPost(DEFERREDLIGHT_POST)->bind();
 		gBuffer->bindLighting();
-		toonRamp->bind(3);
 		deferredComposite->drawTo();
-		toonRamp->unbind(3);
 		gBuffer->unbindLighting();
 		ShaderManager::getPost(DEFERREDLIGHT_POST)->unbind();
-	}
+		
+		/*Failed idea*/
+		//ShaderManager::getPost(BASEAMBIENCE_SHADER)->bind();
+		//gBuffer->bindLighting();
+		//deferredComposite->drawTo();
+		//gBuffer->unbindLighting();
+		//ShaderManager::getPost(BASEAMBIENCE_SHADER)->unbind();
+		//
+		//
+		//lightingBuffer->bind();
+		//gBuffer->bindLighting();
+		//ShaderManager::getShader(POINT_SHADER)->bind();
+		//ShaderManager::getShader(POINT_SHADER)->sendUniform("uWindowWidth", window_width);
+		//ShaderManager::getShader(POINT_SHADER)->sendUniform("uWindowHeight", window_height);
+		//m_lights[0].bind();
+		//glDisable(GL_DEPTH_BUFFER);
+		//m_lights[0].draw(ShaderManager::getShader(POINT_SHADER));
+		//glEnable(GL_DEPTH_BUFFER);
+		//ShaderManager::getShader(POINT_SHADER)->unbind();
+		//gBuffer->bindLighting();
+		//lightingBuffer->unbind();
+		//
+		//ShaderManager::getPost(COMBINE_POST)->bind();
+		//lightingBuffer->bindTex(1, 0);
+		//deferredComposite->draw();
+		//lightingBuffer->unbindTex(1);
+		//ShaderManager::getPost(COMBINE_POST)->unbind();
+	}	
 	else
 	{
 		gBuffer->drawBuffers();
-
+	
 		glViewport(window_width / 2, 0, window_width / 2, window_height / 2);					///Bottom Right
 		ShaderManager::getPost(DEFERREDLIGHT_POST)->bind();
 		gBuffer->bindLighting();

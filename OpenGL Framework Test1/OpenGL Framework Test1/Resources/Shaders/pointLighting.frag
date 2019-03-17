@@ -12,7 +12,9 @@ layout (std140, binding = 2) uniform PointLight
 #define uLightQuadAttenuation uLightAttenuation.z
 #define uLightRadius uLightAttenuation.w
 
-uniform vec2 uPixelSize = vec2(1 / 1080.f, 1 / 720.f);
+uniform float uWindowWidth;
+uniform float uWindowHeight;	
+//vec2 uPixelSize = vec2(1 / uWindowWidth 1 / uWindowHeight);
 
 layout(binding = 0) uniform sampler2D uTexAlbedo;
 layout(binding = 1) uniform sampler2D uTexNormal;
@@ -26,7 +28,7 @@ out vec3 outColor;
 
 void main()
 {
-	vec2 texOffset = gl_FragCoord.xy * uPixelSize;
+	vec2 texOffset = gl_FragCoord.xy * vec2(1/1920.f, 1/1011.f);
 
 	vec4 position = texture(uTexPosition, texOffset);
 	position /= position.w;

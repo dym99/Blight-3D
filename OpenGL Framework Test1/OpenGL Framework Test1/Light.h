@@ -1,6 +1,7 @@
 #ifndef __LIGHT_H__
 #define __LIGHT_H__
 #include "UniformBuffer.h"
+#include "Model.h"
 
 
 class Light
@@ -13,6 +14,8 @@ public:
 	virtual void update(float dt)=0;
 
 	virtual void bind()=0;
+
+	virtual void draw(Shader* shader)=0;
 
 	glm::vec4 color;
 	glm::vec4 position;

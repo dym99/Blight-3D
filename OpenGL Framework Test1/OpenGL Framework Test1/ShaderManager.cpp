@@ -30,6 +30,11 @@ void ShaderManager::loadShaders()
 	));
 
 	m_shaders.push_back(new Shader(
+		"./Resources/Shaders/StaticGeometry.vert",
+		"./Resources/Shaders/baseAmbience.frag"
+	));
+
+	m_shaders.push_back(new Shader(
 		"./Resources/Shaders/MorphingMesh.vert",
 		"./Resources/Shaders/GBufferPass.frag"
 	));

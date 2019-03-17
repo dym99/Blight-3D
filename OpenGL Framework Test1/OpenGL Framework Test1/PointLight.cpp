@@ -4,6 +4,11 @@ PointLight::PointLight() : Light()
 {
 }
 
+PointLight::PointLight(Model * sphere) : Light()
+{
+	m_sphere = sphere;
+}
+
 PointLight::~PointLight()
 {
 }
@@ -16,12 +21,23 @@ void PointLight::init()
 void PointLight::update(float dt)
 {
 	calculateRadius();
+	m_sphere->GetTransform()->getPos() = position;
 	_UBO.sendData(&color, sizeof(glm::vec4) * 3, 0);
 }
 
 void PointLight::bind()
 {
 	_UBO.bind(2);
+}
+
+void PointLight::draw(Shader * shader)
+{
+	m_sphere->GetTransform()->setScale(glm::vec3(radius, radius, radius));
+
+	shader->update(*Camera::mainCamera);
+	shader->sendUniform("uModel", m_sphere->GetTransform()->getModel());
+
+	m_sphere->Draw(shader);
 }
 
 float PointLight::calculateRadius()

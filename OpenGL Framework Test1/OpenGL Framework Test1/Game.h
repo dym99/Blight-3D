@@ -6,6 +6,8 @@
 #include "Shader.h"
 #include "FrameBuffer.h"
 #include "GBuffer.h"
+#include "PointLight.h"
+#include "DirectionalLight.h"
 #include "PostBuffer.h"
 #include "BloomBuffer.h"
 #include "Display.h"
@@ -59,6 +61,7 @@ private:
 	IModel *m_altar;
 
 	Model *m_box;
+	Model *m_sphere;
 
 	AnimatedModel *m_ravagerIdle;
 
@@ -78,10 +81,11 @@ private:
 	BloomBuffer *bloomBuffer2;
 	BloomBuffer *bloomBuffer3;
 	FrameBuffer *edgeBuffer;
+	FrameBuffer *lightingBuffer;
 	/*FrameBuffer *workBuffer1;
 	FrameBuffer *workBuffer2;
 	FrameBuffer *workBuffer3;*/
-
+	
 	//Texture
 	Texture *uiImage;
 	Texture *toonRamp;
@@ -89,6 +93,8 @@ private:
 
 	std::vector<Scene>  m_scenes;
 	std::vector<Scene*> m_activeScenes;
+
+	std::vector<PointLight> m_lights;
 
 	P_PhysicsBody *ravagerPhys;
 	P_PhysicsBody *hitBox;
