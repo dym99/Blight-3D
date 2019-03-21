@@ -143,6 +143,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="AnimatedModel.cpp" />
+    <ClCompile Include="AttachBehaviour.cpp" />
     <ClCompile Include="AudioPlayer.cpp" />
     <ClCompile Include="Behaviour.cpp" />
     <ClCompile Include="BloomBuffer.cpp" />
@@ -191,6 +192,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="AnimatedModel.h" />
+    <ClInclude Include="AttachBehaviour.h" />
     <ClInclude Include="AudioPlayer.h" />
     <ClInclude Include="Behaviour.h" />
     <ClInclude Include="BloomBuffer.h" />

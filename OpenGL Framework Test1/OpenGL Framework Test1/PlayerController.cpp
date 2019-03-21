@@ -94,22 +94,28 @@ void PlayerController::update()
 	}
 	float mult = Input::GetKey(KeyCode::Shift);
 	float yRot = m_playerObject->getGameObject()->localTransform.getRot().y;
+	glm::vec3 force = glm::vec3(0,0,0);
 	if (Input::GetKey(KeyCode::W))
 	{
-		m_playerObject->P_addForce((15.f + (20.f * mult)) * glm::vec3(sin(yRot), 0, cos(yRot)));
+		force +=((15.f + (20.f * mult)) * glm::vec3(sin(yRot), 0, cos(yRot)));
 	}
 	if (Input::GetKey(KeyCode::S))
 	{
-		m_playerObject->P_addForce((-15.f - (20.f * mult)) * glm::vec3(sin(yRot), 0, cos(yRot)));
+		force += ((-15.f - (20.f * mult)) * glm::vec3(sin(yRot), 0, cos(yRot)));
 	}
 	if (Input::GetKey(KeyCode::A))
 	{
-		m_playerObject->P_addForce((15.f + (20.f * mult)) * glm::vec3(cos(yRot), 0, -sin(yRot)));
+		force += ((15.f + (20.f * mult)) * glm::vec3(cos(yRot), 0, -sin(yRot)));
 	}
 	if (Input::GetKey(KeyCode::D))
 	{
-		m_playerObject->P_addForce((-15.f - (20.f * mult)) * glm::vec3(cos(yRot), 0, -sin(yRot)));
+		force += ((-15.f - (20.f * mult)) * glm::vec3(cos(yRot), 0, -sin(yRot)));
 	}
+	if (glm::length(force) > 0.01f) {
+		force = glm::normalize(force);
+		m_playerObject->P_addForce(force*15.f);
+	}
+
 	if (touchGround)
 	{
 		if (Input::GetKey(KeyCode::Space)) {
@@ -119,7 +125,7 @@ void PlayerController::update()
 
 	m_prevLMouse = (GetKeyState(VK_LBUTTON) & 0x100);
 
-		std::cout << health << std::endl;
+		//std::cout << health << std::endl;
 
 }
 

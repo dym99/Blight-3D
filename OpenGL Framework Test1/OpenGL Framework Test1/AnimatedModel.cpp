@@ -324,7 +324,7 @@ void AnimatedModel::setEmissive(Texture * _tex)
 void AnimatedModel::update()
 {
 	//Update T-value
-	m_t += Time::deltaTime/m_frameTimes[m_cFrame];
+	m_t += m_animSpeed * Time::deltaTime/m_frameTimes[m_cFrame];
 
 	if (m_t >= 1.0f) {
 		//Properly set current frame indices.
@@ -352,6 +352,11 @@ void AnimatedModel::reset()
 	m_lFrame = 0;
 
 	m_t = 0.f;
+}
+
+void AnimatedModel::setAnimSpeed(float _speed)
+{
+	m_animSpeed = _speed;
 }
 
 void AnimatedModel::updateFrames()

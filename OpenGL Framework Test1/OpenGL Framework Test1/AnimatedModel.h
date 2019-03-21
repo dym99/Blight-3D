@@ -42,6 +42,8 @@ public:
 
 	void reset();
 
+	void setAnimSpeed(float _speed);
+
 private:
 
 	void updateFrames();
@@ -73,6 +75,8 @@ private:
 	std::vector<float> m_uvs;
 
 	std::vector<float> m_frameTimes;
+
+	float m_animSpeed;
 };
 
 #endif

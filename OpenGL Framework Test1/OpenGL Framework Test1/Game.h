@@ -59,7 +59,7 @@ private:
 
 	Model *m_box;
 
-	AnimatedModel *m_ravagerIdle;
+	AnimatedModel *m_logunWalk, *m_logunWalkSword;
 
 	Shader *m_shader;
 
@@ -86,11 +86,12 @@ private:
 	std::vector<Scene>  m_scenes;
 	std::vector<Scene*> m_activeScenes;
 
-	P_PhysicsBody *ravagerPhys;
+	P_PhysicsBody *playerPhys;
 	P_PhysicsBody *hitBox;
 	P_PhysicsBody *floor;
 
 	GameObject* player;
+	GameObject* playerModel;
 	GameObject* playerLoc;
 	GameObject* cameraPivot;
 
@@ -98,6 +99,8 @@ private:
 
 	static std::vector<Enemy*> enemies;
 	static std::vector<P_PhysicsBody*> enemyBodies;
+
+	float m_playerModelAngle;
 };
 
 #endif

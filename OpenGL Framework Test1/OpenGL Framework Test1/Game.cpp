@@ -5,6 +5,7 @@
 #include "ShaderManager.h"
 #include "MeshRenderBehaviour.h"
 #include "TestRotateBehaviour.h"
+#include "AttachBehaviour.h"
 #include "MouseLook.h"
 #include "CameraBehaviour.h"
 #include "AudioPlayer.h"
@@ -16,6 +17,9 @@
 #ifndef _DEBUG
 #define _DEBUG 0
 #endif
+
+
+#define RATIO_LOGUN_WALK (1 / 2.286346)
 
 std::vector<Enemy*> Game::enemies;
 std::vector<P_PhysicsBody*> Game::enemyBodies;
@@ -56,7 +60,6 @@ void Game::initGame()
 
 	///Initialise the display
 	m_display = new Display("Blight");
-
 	///Initialise GLEW
 	initGLEW();
 
@@ -130,15 +133,28 @@ void Game::initGame()
 	Texture *testEmissive = new Texture("emissiveTex");
 	testEmissive->load("./Resources/Objects/Box/face_emis.png");
 
-	m_ravagerIdle = new AnimatedModel();
-	m_ravagerIdle->loadFromFiles(6, "RavagerIdle", "Resources/Objects/Ravager/Anims/");
+	Texture *logunTex = new Texture("diffuseTex");
+	logunTex->load("./Resources/Objects/Logun/Albedo.png");
+	Texture *logunTexEmissive = new Texture("emissiveTex");
+	logunTexEmissive->load("./Resources/Objects/Logun/Emissive.png");
+	Texture *swordTex = new Texture("diffuseTex");
+	swordTex->load("./Resources/Objects/Logun/SwordAlbedo.png");
 
-	m_ravagerIdle->setAlbedo(ravagerAlbedo);
-	m_ravagerIdle->setEmissive(blankEmissive);
-	for (int i = 0; i < 6; ++i) {
-		m_ravagerIdle->setFrameTime(i, 0.8333f);
+
+	m_logunWalk = new AnimatedModel();
+	m_logunWalk->loadFromFiles(10, "LogunWalk", "./Resources/Objects/Logun/Anims/Walk/");
+	m_logunWalk->setAlbedo(logunTex);
+	m_logunWalk->setEmissive(logunTexEmissive);
+
+	m_logunWalkSword = new AnimatedModel();
+	m_logunWalkSword->loadFromFiles(10, "LogunWalkSword", "./Resources/Objects/Logun/Anims/Walk/");
+	m_logunWalkSword->setAlbedo(swordTex);
+	m_logunWalkSword->setEmissive(blankEmissive);
+
+	for (int i = 0; i < 10; ++i) {
+		m_logunWalk->setFrameTime(i, 0.08333f);
+		m_logunWalkSword->setFrameTime(i, 0.08333f);
 	}
-
 
 	m_brazier->setEmissive(blankEmissive);
 	m_ravager->setEmissive(blankEmissive);
@@ -182,8 +198,7 @@ void Game::initGame()
 
 	//Set up the test Scene
 
-	player = new GameObject("Ravager");
-	player->addBehaviour(new MeshRenderBehaviour(m_ravagerIdle, ShaderManager::getShader(GBUFFER_MORPH)));
+	player = new GameObject("Player");
 	//player->addBehaviour(new MeshRenderBehaviour(m_ravager, ShaderManager::getShader(GBUFFER_SHADER)));
 	if (_DEBUG)
 		player->localTransform.setPos(glm::vec3(0.f, 25.f, 0.f));
@@ -194,13 +209,20 @@ void Game::initGame()
 
 	auto cameraObject = new GameObject("Camera");
 
-	cameraObject->localTransform.setPos(glm::vec3(0, 0, 3.f));
+	cameraObject->localTransform.setPos(glm::vec3(0, 0, 6.f));
 
 	camera->setTransform(&cameraObject->worldTransform);
 
 	cameraPivot->addChild(cameraObject);
 	player->addChild(cameraPivot);
 	
+	
+
+	playerModel = new GameObject("Player Model");
+	playerModel->addBehaviour(new MeshRenderBehaviour(m_logunWalk, ShaderManager::getShader(GBUFFER_MORPH)));
+	playerModel->addBehaviour(new MeshRenderBehaviour(m_logunWalkSword, ShaderManager::getShader(GBUFFER_MORPH)));
+	player->addChild(playerModel);
+
 #pragma region braziers
 	auto brazier = new GameObject("brazier");
 	brazier->addBehaviour(new MeshRenderBehaviour(m_brazier, ShaderManager::getShader(GBUFFER_SHADER)));
@@ -478,6 +500,7 @@ void Game::initGame()
 
 	auto scene = new Scene("DemoScene");
 	scene->addChild(player);
+	//scene->addChild(playerModel);
 	scene->addChild(bottomRoom);
 	scene->addChild(grove);
 	scene->addChild(leftRoom);
@@ -596,12 +619,12 @@ void Game::initGame()
 	attackBox->localTransform.setScale(glm::vec3(0.2f, 0.2f, 1.f));
 	attackBox->addBehaviour(new MeshRenderBehaviour(m_box, ShaderManager::getShader(GBUFFER_SHADER)));
 
-	ravagerPhys = new P_PhysicsBody(player, 1.f, true, SPHERE, 0.5f, 0.f, 0.f, glm::vec3(0, 0.5f, 0), 0.0f, 1.0f, false, false, "Player");
+	playerPhys = new P_PhysicsBody(player, 1.f, true, SPHERE, 0.5f, 0.f, 0.f, glm::vec3(0, 0.5f, 0), 0.0f, 1.0f, false, false, "Player");
 	hitBox = new P_PhysicsBody(attackBox, 1.f, false, BOX, .2f, .2f, 2.f, VEC3ZERO, 0.f, 0.f, false, true, "Sword");
 
-	player->addBehaviour(new PlayerController(ravagerPhys, hitBox));
-	player->addChild(attackBox);
-	ravagerPhys->trackNames(true);
+	player->addBehaviour(new PlayerController(playerPhys, hitBox));
+	playerModel->addChild(attackBox);
+	playerPhys->trackNames(true);
 
 	//World Physics Bodies
 	{
@@ -770,6 +793,8 @@ void Game::initGame()
 	if (_DEBUG)
 		new P_PhysicsBody(new GameObject("World"), 1.f, false, BOX, 1.f, 500.f, 500.f, glm::vec3(0, 20.f, 0), 0, 0, true);
 
+	m_playerModelAngle = 0.f;
+
 
 #pragma region Level Physics Bodies
 
@@ -783,6 +808,7 @@ void Game::initGame()
 	AudioPlayer::playTrack("Ambiance");
 	AudioPlayer::setVolume("Ambiance", 0.1f);
 
+	m_display->setFullscreen(SDL_WINDOW_FULLSCREEN);
 	m_activeScenes.push_back(scene);
 }
 
@@ -790,13 +816,23 @@ void Game::update()
 {
 	Time::update();
 
-	m_ravagerIdle->update();
+	m_logunWalk->update();
+	m_logunWalkSword->update();
 
+	//If actually moving, update player model angle
+	if (glm::length(playerPhys->P_velocity) > 0.02) {
+		m_playerModelAngle = atan2f(-playerPhys->P_velocity.z, playerPhys->P_velocity.x);
+	}
+
+	//Apply player model angle as a local rotation
+	glm::vec3 forward = glm::vec3(0, 0, 1);
+	forward = glm::rotate(-player->localTransform.getRot().y, glm::vec3(0, 1, 0)) * glm::vec4(forward, 1.0);
+	playerModel->localTransform.setRot(glm::vec3(0, atan2f(forward.z, -forward.x) + m_playerModelAngle, 0));
 
 	//Remove this when done testing. Or use as a jump for testing purposes.
-	if (Input::GetKeyDown(KeyCode::Space)) {
-		ravagerPhys->P_velocity.y = 4.f;
-	}
+	/*if (Input::GetKeyDown(KeyCode::Space)) {
+		playerPhys->P_velocity.y = 4.f;
+	}*/
 
 	///SUPER SKETCHY KILL BUTTON
 	if (Input::GetKeyDown(KeyCode::K))
@@ -960,7 +996,7 @@ void Game::GUI()
 {
 	UI::Start(WINDOW_WIDTH, WINDOW_HEIGHT);
 
-	ImGui::SliderFloat3("Ravager Position", &ravagerPhys->getGameObject()->localTransform.getPos()[0], -5.f, 5.f);
+	ImGui::SliderFloat3("Ravager Position", &playerPhys->getGameObject()->localTransform.getPos()[0], -5.f, 5.f);
 
 
 	UI::End();
@@ -1035,6 +1071,9 @@ int Game::run() {
 		//ShaderManager::getShader(PHONG_SHADER)->SendUniform("light.position", glm::vec4(lights[0]->GetTransform()->GetPos(), 1.0f));
 		Shader::unbind();
 
+		m_logunWalk->setAnimSpeed((glm::length(playerPhys->P_velocity) + 0.0001f)*RATIO_LOGUN_WALK);
+		m_logunWalkSword->setAnimSpeed((glm::length(playerPhys->P_velocity)+0.0001f)*RATIO_LOGUN_WALK);
+
 		update();
 
 		m_display->clear(0.f, 0.0f, 0.0f, 1.f);
@@ -1087,7 +1126,7 @@ void Game::initGLEW() {
 
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
-	glEnable(GL_MULTISAMPLE);
+	//glEnable(GL_MULTISAMPLE);
 }
 
 void Game::initSDL() {
