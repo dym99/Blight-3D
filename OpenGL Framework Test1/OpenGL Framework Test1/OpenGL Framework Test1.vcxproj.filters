@@ -48,6 +48,7 @@
     <ClCompile Include="Utils.cpp" />
     <ClCompile Include="BloomBuffer.cpp" />
     <ClCompile Include="AttachBehaviour.cpp" />
+    <ClCompile Include="Graph.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="AnimatedModel.h" />
@@ -99,5 +100,6 @@
     <ClInclude Include="Utils.h" />
     <ClInclude Include="BloomBuffer.h" />
     <ClInclude Include="AttachBehaviour.h" />
+    <ClInclude Include="Graph.h" />
   </ItemGroup>
 </Project>

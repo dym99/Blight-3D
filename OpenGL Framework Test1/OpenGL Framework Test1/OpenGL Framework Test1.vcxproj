@@ -156,6 +156,7 @@
     <ClCompile Include="Game.cpp" />
     <ClCompile Include="GameObject.cpp" />
     <ClCompile Include="GBuffer.cpp" />
+    <ClCompile Include="Graph.cpp" />
     <ClCompile Include="IModel.cpp" />
     <ClCompile Include="include\imgui\imgui.cpp" />
     <ClCompile Include="include\imgui\imgui_demo.cpp" />
@@ -201,6 +202,7 @@
     <ClInclude Include="DirectionalLight.h" />
     <ClInclude Include="Enemy.h" />
     <ClInclude Include="GBuffer.h" />
+    <ClInclude Include="Graph.h" />
     <ClInclude Include="IModel.h" />
     <ClInclude Include="include\imgui\imgui.h" />
     <ClInclude Include="include\imgui\imgui_impl.h" />

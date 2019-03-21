@@ -17,6 +17,7 @@
 #include "Enemy.h"
 #include "LUT.h"
 #include "AnimatedModel.h"
+#include "Graph.h"
 
 
 class Game {
@@ -38,6 +39,8 @@ public:
 
 	void spawnEnemy(EnemyType _type, glm::vec3 _location);
 	static void killEnemy(Enemy* _toKill);
+
+	Node* getClosestToLogun();
 
 private:
 	Display *m_display;
@@ -62,7 +65,10 @@ private:
 	AnimatedModel *m_logunWalk, *m_logunWalkSword;
 
 	Shader *m_shader;
+	
+	Graph* m_AIGraph;
 
+	Node* closestToLogun;
 
 	bool displayBuffers = false;
 	bool displayBloom = false;

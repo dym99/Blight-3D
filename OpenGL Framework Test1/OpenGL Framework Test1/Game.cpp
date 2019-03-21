@@ -636,9 +636,9 @@ void Game::initGame()
 		new P_PhysicsBody(owo, 1.0f, false, BOX, 5.f * 2.f, 13.f * 2.f, 1.f * 2.f, glm::vec3(0.f, 0.f, 0.f), 0.f, 0.f, true);
 		owo = new GameObject("World"); 
 		owo->localTransform.setPos(glm::vec3(20.25f, 2.f, -9.f) * 2.f);
-		new P_PhysicsBody(owo, 1.0f, false, BOX, 5.f, 23.5f, 1.f, glm::vec3(0.f, 0.f, 0.f), 0.f, 0.f, true);
+		new P_PhysicsBody(owo, 1.0f, false, BOX, 5.f * 2.f, 23.5f * 2.f, 1.f * 2.f, glm::vec3(0.f, 0.f, 0.f), 0.f, 0.f, true);
 		owo = new GameObject("World"); 
-		owo->localTransform.setPos(glm::vec3(-15.75f, 2.f, -9.f));
+		owo->localTransform.setPos(glm::vec3(-15.75f, 2.f, -9.f) * 2.f);
 		new P_PhysicsBody(owo, 1.0f, false, BOX, 5.f * 2.f, 16.5f * 2.f, 1.f * 2.f, glm::vec3(0.f, 0.f, 0.f), 0.f, 0.f, true);
 		owo = new GameObject("World"); 
 		owo->localTransform.setPos(glm::vec3(-12.f, 2.f, -14.75f) * 2.f);
@@ -801,6 +801,24 @@ void Game::initGame()
 
 #pragma endregion
 
+	//for (P_PhysicsBody* b : P_PhysicsBody::P_bodyCount)
+	//{
+	//	GameObject* physWireframe = new GameObject(b->getGameObject()->getName());
+	//	scene->addChild(b->getGameObject());
+	//	b->getGameObject()->addChild(physWireframe);
+	//	float _w = b->getCollider()->getWidth() / 2;
+	//	float _h = b->getCollider()->getHeight() / 2;
+	//	float _d = b->getCollider()->getDepth() / 2;
+	//	if (_w <= 0)
+	//		_w = 0.5f;
+	//	if (_h <= 0)
+	//		_h = 0.5f;
+	//	if (_d <= 0)
+	//		_d = 0.5f;
+	//	physWireframe->localTransform.setScale(glm::vec3(_w, _h, _d));
+	//	physWireframe->addBehaviour(new MeshRenderBehaviour(m_wireframeCube, ShaderManager::getShader(GBUFFER_SHADER)));
+	//}
+
 
 	//Load audio track for ambiance
 	AudioPlayer::loadAudio(*new AudioTrack("Ambiance", FMOD_3D, AudioType::EFFECT, { 0.f, 0.f, 0.f }, { 0.f, 0.f, 0.f }, true, 0.1f, 5000.f), "Ambiance");
@@ -810,6 +828,36 @@ void Game::initGame()
 
 	m_display->setFullscreen(SDL_WINDOW_FULLSCREEN);
 	m_activeScenes.push_back(scene);
+
+	//Create node graph for AI to pathfind on
+	m_AIGraph = new Graph();
+
+	m_AIGraph->createNode(glm::vec3(30, 0.4f, 0)); //Main Entrance - 0
+	m_AIGraph->createNode(glm::vec3(19, 0.4f, 0)); //Courtyard - 1
+	m_AIGraph->createNode(glm::vec3(36, 0.4f, 0)); //Long Hall Entrance - 2
+	m_AIGraph->createNode(glm::vec3(46, 0.4f, 0)); //Long Hall End - 3
+	m_AIGraph->createNode(glm::vec3(36, 0.4f, 7.5f)); //R Front Room Hall Door - 4
+	m_AIGraph->createNode(glm::vec3(30, 0.4f, 7.5f)); //R Front Room Entrance Door - 5
+	m_AIGraph->createNode(glm::vec3(46, 0.4f, 10)); //R Back Room - 6
+	m_AIGraph->createNode(glm::vec3(59, 0.4f, 10)); //R Back Hall - 7
+	m_AIGraph->createNode(glm::vec3(59, 0.4f, -10)); //L Back Hall - 8
+	m_AIGraph->createNode(glm::vec3(46, 0.4f, -10)); //L Back Room - 9 
+	m_AIGraph->createNode(glm::vec3(36, 0.4f, -7.5f)); //L Front Room Hall Door - 10
+	m_AIGraph->createNode(glm::vec3(30, 0.4f, -7.5f)); //L Front Room Entrance Door - 11
+
+	m_AIGraph->createEdge(m_AIGraph->nodes[0], m_AIGraph->nodes[1]);
+	m_AIGraph->createEdge(m_AIGraph->nodes[0], m_AIGraph->nodes[5]);
+	m_AIGraph->createEdge(m_AIGraph->nodes[0], m_AIGraph->nodes[11]);
+	m_AIGraph->createEdge(m_AIGraph->nodes[10], m_AIGraph->nodes[11]);
+	m_AIGraph->createEdge(m_AIGraph->nodes[10], m_AIGraph->nodes[2]);
+	m_AIGraph->createEdge(m_AIGraph->nodes[4], m_AIGraph->nodes[2]);
+	m_AIGraph->createEdge(m_AIGraph->nodes[4], m_AIGraph->nodes[5]);
+	m_AIGraph->createEdge(m_AIGraph->nodes[3], m_AIGraph->nodes[2]);
+	m_AIGraph->createEdge(m_AIGraph->nodes[3], m_AIGraph->nodes[9]);
+	m_AIGraph->createEdge(m_AIGraph->nodes[3], m_AIGraph->nodes[6]);
+	m_AIGraph->createEdge(m_AIGraph->nodes[8], m_AIGraph->nodes[9]);
+	m_AIGraph->createEdge(m_AIGraph->nodes[8], m_AIGraph->nodes[7]);
+	m_AIGraph->createEdge(m_AIGraph->nodes[7], m_AIGraph->nodes[6]);
 }
 
 void Game::update()
@@ -833,7 +881,8 @@ void Game::update()
 	/*if (Input::GetKeyDown(KeyCode::Space)) {
 		playerPhys->P_velocity.y = 4.f;
 	}*/
-
+	
+	
 	///SUPER SKETCHY KILL BUTTON
 	if (Input::GetKeyDown(KeyCode::K))
 	{
@@ -850,7 +899,7 @@ void Game::update()
 
 	if (Input::GetKeyPress(KeyCode::G))
 	{
-		spawnEnemy(RAVAGER, VEC3ZERO + glm::vec3(0, 2, 0));
+		spawnEnemy(RAVAGER, VEC3ZERO + glm::vec3(0, 0.5, 0));
 	}
 
 	if (Input::GetKeyPress(KeyCode::F1)) {
@@ -1024,7 +1073,7 @@ void Game::spawnEnemy(EnemyType _type, glm::vec3 _location)
 
 	P_PhysicsBody* enemyBody = new P_PhysicsBody(enemy, 10.f, true, SPHERE, 0.5f, 0.f, 0.f, VEC3ZERO, 0.f, 1.f, false, false, "Enemy");
 	enemyBodies.push_back(enemyBody);
-	enemy->addBehaviour(new TempEnemy(enemyBody, enemy, player));
+	enemy->addBehaviour(new TempEnemy(enemyBody, enemy, player, m_AIGraph, *closestToLogun, this));
 	enemyBody->trackNames(true);
 }
 
@@ -1061,6 +1110,26 @@ void Game::killEnemy(Enemy* _toKill)
 	}
 	else
 		std::cout << "ERROR: Enemy not found!" << std::endl;
+}
+
+Node * Game::getClosestToLogun()
+{
+	//Find the node closest to Logun
+	if (m_AIGraph->nodes.size() > 0)
+	{
+
+		Node* closest = m_AIGraph->nodes[0];
+		for (int i = 0; i < m_AIGraph->nodes.size(); i++) {
+			glm::vec3 distPos = m_AIGraph->nodes[i]->pos - player->localTransform.getPos();
+			glm::vec3 distPos2 = closest->pos - player->localTransform.getPos();
+			float _dist = glm::dot(distPos, distPos);
+			float _dist2 = glm::dot(distPos2, distPos2);
+			if (_dist < _dist2)
+				closest = m_AIGraph->nodes[i];
+		}
+		return closest;
+	}
+	return nullptr;
 }
 
 int Game::run() {
