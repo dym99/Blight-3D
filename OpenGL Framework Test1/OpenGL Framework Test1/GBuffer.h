@@ -4,6 +4,17 @@
 
 #include "FrameBuffer.h"
 
+enum BufferType {
+	ALBEDO,
+	NORMAL,
+	FRAGPOSITION,
+	EMISSIVES,
+	METALNESS,
+	ROUGHNESS,
+
+	NUM_BUFFERS
+};
+
 class GBuffer : public FrameBuffer 
 {
 public:
@@ -16,7 +27,9 @@ public:
 	void bindEdge();
 	void unbindEdge();
 
-	virtual void drawBuffers() override;
+	void reshape(unsigned windowWidth, unsigned windowHeight);
+
+	void drawBuffers(BufferType topLeft, BufferType topRight, BufferType bottomLeft);
 
 private:
 	float windowWidth, windowHeight;

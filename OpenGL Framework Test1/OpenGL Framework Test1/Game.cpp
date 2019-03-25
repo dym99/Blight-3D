@@ -18,6 +18,8 @@
 #define _DEBUG 0
 #endif
 
+float window_width = 1920.f;
+float window_height = 1011.f;
 
 #define RATIO_LOGUN_WALK (1 / 2.286346)
 
@@ -59,14 +61,14 @@ void Game::initGame()
 	initSDL();
 
 	///Initialise the display
-	m_display = new Display("Blight");
+	m_display = new Display("Blight", window_width, window_height);
 	///Initialise GLEW
 	initGLEW();
 
 	UI::InitImGUI();
 
 	//Initialise Framebuffers
-	gBuffer = new GBuffer(WINDOW_WIDTH, WINDOW_HEIGHT);
+	gBuffer = new GBuffer(window_width, window_height);
 	deferredComposite = new PostBuffer;
 	bloomBuffer = new BloomBuffer;
 	edgeBuffer = new FrameBuffer(1);
@@ -139,17 +141,31 @@ void Game::initGame()
 	logunTexEmissive->load("./Resources/Objects/Logun/Emissive.png");
 	Texture *swordTex = new Texture("diffuseTex");
 	swordTex->load("./Resources/Objects/Logun/SwordAlbedo.png");
+	Texture *swordMetalTex = new Texture("metalTex");
+	swordMetalTex->load("./Resources/Objects/Logun/SwordMetal.png");
 
+	Texture *noMetalTex = new Texture("metalTex");
+	noMetalTex->load("./Resources/Textures/noMetalTex.png");
+	Texture *allMetalTex = new Texture("metalTex");
+	allMetalTex->load("./Resources/Textures/allMetalTex.png");
+	Texture *smoothTex = new Texture("roughTex");
+	smoothTex->load("./Resources/Textures/noMetalTex.png");
+	Texture *roughTex = new Texture("roughTex");
+	roughTex->load("./Resources/Textures/allMetalTex.png");
 
 	m_logunWalk = new AnimatedModel();
 	m_logunWalk->loadFromFiles(10, "LogunWalk", "./Resources/Objects/Logun/Anims/Walk/");
 	m_logunWalk->setAlbedo(logunTex);
 	m_logunWalk->setEmissive(logunTexEmissive);
+	m_logunWalk->setMetalness(noMetalTex);
+	m_logunWalk->setRoughness(smoothTex);
 
 	m_logunWalkSword = new AnimatedModel();
 	m_logunWalkSword->loadFromFiles(10, "LogunWalkSword", "./Resources/Objects/Logun/Anims/Walk/");
 	m_logunWalkSword->setAlbedo(swordTex);
 	m_logunWalkSword->setEmissive(blankEmissive);
+	m_logunWalkSword->setMetalness(swordMetalTex);
+	m_logunWalkSword->setRoughness(smoothTex);
 
 	for (int i = 0; i < 10; ++i) {
 		m_logunWalk->setFrameTime(i, 0.08333f);
@@ -182,12 +198,12 @@ void Game::initGame()
 
 	//Frame Buffers
 #pragma region FrameBuffers
-	deferredComposite->init(WINDOW_WIDTH, WINDOW_HEIGHT);
+	deferredComposite->init(window_width, window_height);
 
-	bloomBuffer->init(WINDOW_WIDTH, WINDOW_HEIGHT, 2.f);
+	bloomBuffer->init(window_width, window_height, 2.f);
 
-	edgeBuffer->initDepthTexture(WINDOW_WIDTH, WINDOW_HEIGHT);
-	edgeBuffer->initColorTexture(0, WINDOW_WIDTH, WINDOW_HEIGHT, GL_RGBA8, GL_NEAREST, GL_CLAMP_TO_EDGE);
+	edgeBuffer->initDepthTexture(window_width, window_height);
+	edgeBuffer->initColorTexture(0, window_width, window_height, GL_RGBA8, GL_NEAREST, GL_CLAMP_TO_EDGE);
 
 	if (!edgeBuffer->checkFBO()) {
 		std::cout << "Edge buffer failed to load.\n\n";
@@ -826,7 +842,7 @@ void Game::initGame()
 	AudioPlayer::playTrack("Ambiance");
 	AudioPlayer::setVolume("Ambiance", 0.1f);
 
-	m_display->setFullscreen(SDL_WINDOW_FULLSCREEN);
+	//m_display->setFullscreen(SDL_WINDOW_FULLSCREEN);
 	m_activeScenes.push_back(scene);
 
 	//Create node graph for AI to pathfind on
@@ -939,7 +955,7 @@ void Game::draw()
 
 	//Camera 1
 	{
-		glViewport(0, 0, WINDOW_WIDTH, WINDOW_HEIGHT);
+		glViewport(0, 0, window_width, window_height);
 		gBuffer->bind();
 
 		for (unsigned int i = 0; i < m_activeScenes.size(); ++i) {
@@ -966,9 +982,9 @@ void Game::draw()
 	}
 	else
 	{
-		gBuffer->drawBuffers();
+		gBuffer->drawBuffers(METALNESS, EMISSIVES, NORMAL);
 
-		glViewport(WINDOW_WIDTH / 2, 0, WINDOW_WIDTH / 2, WINDOW_HEIGHT / 2);					///Bottom Right
+		glViewport(window_width / 2, 0, window_width / 2, window_height / 2);					///Bottom Right
 		ShaderManager::getPost(DEFERREDLIGHT_POST)->bind();
 		gBuffer->bindLighting();
 		FrameBuffer::drawFSQ();
@@ -1030,7 +1046,7 @@ void Game::draw()
 	//Render the particle emitters
 	if (!displayBuffers)
 	{
-		gBuffer->copyTo(GL_NONE, GL_DEPTH_BUFFER_BIT, WINDOW_WIDTH, WINDOW_HEIGHT);
+		gBuffer->copyTo(GL_NONE, GL_DEPTH_BUFFER_BIT, window_width, window_height);
 		ShaderManager::getGeom(BILLBOARD_GEOM)->bind();
 		ShaderManager::getGeom(BILLBOARD_GEOM)->sendUniform("uTex", 0);
 		for (unsigned int i = 0; i < NUM_PARTICLES; i++)
@@ -1043,7 +1059,7 @@ void Game::draw()
 
 void Game::GUI()
 {
-	UI::Start(WINDOW_WIDTH, WINDOW_HEIGHT);
+	UI::Start(window_width, window_height);
 
 	ImGui::SliderFloat3("Ravager Position", &playerPhys->getGameObject()->localTransform.getPos()[0], -5.f, 5.f);
 
