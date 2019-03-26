@@ -139,6 +139,10 @@ void Game::initGame()
 	logunTex->load("./Resources/Objects/Logun/Albedo.png");
 	Texture *logunTexEmissive = new Texture("emissiveTex");
 	logunTexEmissive->load("./Resources/Objects/Logun/Emissive.png");
+	Texture *logunMetal = new Texture("metalTex");
+	logunMetal->load("./Resources/Objects/Logun/Metal.png");
+	Texture *logunRough = new Texture("roughTex");
+	logunRough->load("./Resources/Objects/Logun/Roughness.png");
 	Texture *swordTex = new Texture("diffuseTex");
 	swordTex->load("./Resources/Objects/Logun/SwordAlbedo.png");
 	Texture *swordMetalTex = new Texture("metalTex");
@@ -157,8 +161,8 @@ void Game::initGame()
 	m_logunWalk->loadFromFiles(10, "LogunWalk", "./Resources/Objects/Logun/Anims/Walk/");
 	m_logunWalk->setAlbedo(logunTex);
 	m_logunWalk->setEmissive(logunTexEmissive);
-	m_logunWalk->setMetalness(noMetalTex);
-	m_logunWalk->setRoughness(smoothTex);
+	m_logunWalk->setMetalness(logunMetal);
+	m_logunWalk->setRoughness(logunRough);
 
 	m_logunWalkSword = new AnimatedModel();
 	m_logunWalkSword->loadFromFiles(10, "LogunWalkSword", "./Resources/Objects/Logun/Anims/Walk/");
@@ -982,7 +986,7 @@ void Game::draw()
 	}
 	else
 	{
-		gBuffer->drawBuffers(METALNESS, EMISSIVES, NORMAL);
+		gBuffer->drawBuffers(METALNESS, ROUGHNESS, NORMAL);
 
 		glViewport(window_width / 2, 0, window_width / 2, window_height / 2);					///Bottom Right
 		ShaderManager::getPost(DEFERREDLIGHT_POST)->bind();
