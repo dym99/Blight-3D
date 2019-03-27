@@ -10,12 +10,13 @@
 class Display
 {
 public:
-	Display(const std::string& title);
+	Display(const std::string& title, int windowWidth, int windowHeight, bool resizable=false);
 	virtual ~Display();
 
 	void clear(float, float, float, float);
 	void flip();
 
+	void setWindowResizable(bool);
 	void setFullscreen(Uint32);
 	Uint32 getFullscreen();
 	void close();

@@ -147,8 +147,6 @@ void FrameBuffer::unload()
 		glDeleteTextures(1, &depthAttachment);
 		depthAttachment = GL_NONE;
 	}
-
-	numColorAttachments = 0;
 }
 
 void FrameBuffer::clear()

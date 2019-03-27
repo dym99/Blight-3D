@@ -2,11 +2,11 @@
 #include "Utilities.h"
 
 
-Display::Display(const std::string& title)
+Display::Display(const std::string& title, int windowWidth, int windowHeight, bool resizable)
 {
 	m_open = true;
 	//Create the window as a gl context
-	m_window = SDL_CreateWindow(title.c_str(), SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, WINDOW_WIDTH, WINDOW_HEIGHT, SDL_WINDOW_OPENGL);
+	m_window = SDL_CreateWindow(title.c_str(), SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, windowWidth, windowHeight, SDL_WINDOW_OPENGL);
 
 	//Check to make sure window is created properly
 	if (m_window == NULL) {
@@ -18,6 +18,8 @@ Display::Display(const std::string& title)
 		//Create context
 		m_context = SDL_GL_CreateContext(m_window);
 
+		setWindowResizable(resizable);
+
 		//Check to make sure gl context is created properly
 		if (m_context == NULL) {
 #ifdef _DEBUG
@@ -28,11 +30,15 @@ Display::Display(const std::string& title)
 	}
 }
 
-
 Display::~Display()
 {
 	SDL_GL_DeleteContext(m_context);
 	SDL_DestroyWindow(m_window);
+}
+
+void Display::setWindowResizable(bool resizable)
+{
+	SDL_SetWindowResizable(m_window, SDL_bool(resizable));
 }
 
 void Display::setFullscreen(Uint32 flags) {

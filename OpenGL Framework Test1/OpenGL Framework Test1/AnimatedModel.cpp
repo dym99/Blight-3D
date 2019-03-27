@@ -301,13 +301,17 @@ void AnimatedModel::draw(Shader * shader)
 	shader->sendUniform("uT", m_t);
 	//Draw the mesh
 	m_albedo->bind(0);			//Albedo
-	m_albedo->bind(1);
+								//Normals
 	m_emissive->bind(2);		//Emissives
+	m_metalness->bind(3);		//Metalness
+	m_roughness->bind(4);		//Roughness
 	glBindVertexArray(m_VAO);
 	glDrawArrays(GL_TRIANGLES, 0, m_numVertices * 3);
 	glBindVertexArray(0);
+	Texture::unbind(4);
+	Texture::unbind(3);
 	Texture::unbind(2);
-	Texture::unbind(1);
+	//Texture::unbind(1);
 	Texture::unbind(0);
 }
 
@@ -319,6 +323,16 @@ void AnimatedModel::setAlbedo(Texture * _tex)
 void AnimatedModel::setEmissive(Texture * _tex)
 {
 	m_emissive = _tex;
+}
+
+void AnimatedModel::setMetalness(Texture * _tex)
+{
+	m_metalness = _tex;
+}
+
+void AnimatedModel::setRoughness(Texture * _tex)
+{
+	m_roughness = _tex;
 }
 
 void AnimatedModel::update()
