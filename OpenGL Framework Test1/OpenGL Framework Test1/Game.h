@@ -100,6 +100,8 @@ private:
 	GameObject* playerModel;
 	GameObject* playerLoc;
 	GameObject* cameraPivot;
+	GameObject* deadLogun;
+	GameObject* healthShower;
 
 	bool guiEnabled = false;
 
@@ -107,6 +109,8 @@ private:
 	static std::vector<P_PhysicsBody*> enemyBodies;
 
 	float m_playerModelAngle;
+
+	static int m_score;
 };
 
 #endif

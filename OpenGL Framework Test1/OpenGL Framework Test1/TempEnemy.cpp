@@ -3,8 +3,9 @@
 #include "GameObject.h"
 #include "Game.h"
 #include "Enemy.h"
+#include "Input.h"
 
-#define CLOSEST_RAD 1.2f
+#define CLOSEST_RAD 1.15f
 
 TempEnemy::TempEnemy(P_PhysicsBody * _body, Enemy * _theEnemy, GameObject* _thePlayer, Graph* _theGraph, Node& _closest, Game* _game)
 {
@@ -30,7 +31,7 @@ void TempEnemy::update()
 	{
 		if (name == "Sword")
 		{
-			health -= 0.05f;
+			health -= 0.10f;
 		}
 	}
 
@@ -54,6 +55,8 @@ void TempEnemy::update()
 		//Logun has moved to a new node.
 		m_targetNode = m_theGraph->getNodeById(closestToL->id);
 		m_startNode = findClosestNode();
+		if (m_startNode == m_recentNode)
+			m_startNode = m_path.front();
 		calculatePath();
 
 		prevClosestID = closestToL->id;
@@ -71,13 +74,25 @@ void TempEnemy::update()
 	if (m_startNode == m_targetNode || m_path.size() == 0)
 	{
 		//Target Logun
-		glm::vec3 vectorPT = (m_thePlayer->localTransform.getPos() - m_bodyObject->getPos());
-		float vectorL = sqrt((vectorPT.x * vectorPT.x) + (vectorPT.y * vectorPT.y) + (vectorPT.z * vectorPT.z));
-		if (vectorL > CLOSEST_RAD)
+		bool touchGround = false;
+		for (std::string _name : m_bodyObject->getTriggeredNames())
+			if (_name == "Floor")
+				touchGround = true;
+
+		if (Input::GetKeyDown(KeyCode::F) || rand() % 100 < 1 && touchGround)
 		{
-			glm::vec3 tingy = (glm::normalize(vectorPT)) * glm::vec3(100.f, 0.f, 100.f) - glm::vec3(0, 5, 0);
-			m_bodyObject->P_addForce(tingy);
-			//std::cout << tingy.x << ", " << tingy.y << ", " << tingy.z << std::endl;
+			leap(m_thePlayer->localTransform.getPos(), 250.f, 10.f);
+		}
+		else
+		{
+			glm::vec3 vectorPT = (m_thePlayer->localTransform.getPos() - m_bodyObject->getPos());
+			float vectorL = sqrt((vectorPT.x * vectorPT.x) + (vectorPT.y * vectorPT.y) + (vectorPT.z * vectorPT.z));
+			if (vectorL > CLOSEST_RAD)
+			{
+				glm::vec3 tingy = ((vectorPT) / vectorL) * glm::vec3(100.f, 0.f, 100.f) - glm::vec3(0, 100, 0);
+				m_bodyObject->P_addForce(tingy);
+				//std::cout << tingy.x << ", " << tingy.y << ", " << tingy.z << std::endl;
+			}
 		}
 	}
 	else
@@ -95,6 +110,7 @@ void TempEnemy::update()
 
 			if (dist - m_bodyObject->getCollider()->getHeight() <= 0)
 			{
+				m_recentNode = m_path.front();
 				m_path.pop();
 			}
 		}
@@ -143,6 +159,12 @@ void TempEnemy::setStartNode(int _id)
 void TempEnemy::calculatePath()
 {
 	m_path = m_theGraph->aStar(m_startNode, m_targetNode);
+}
+
+void TempEnemy::leap(glm::vec3 _at, float _speed, float _height)
+{
+	glm::vec3 leapDir = glm::normalize(_at - m_bodyObject->getPos()) + glm::vec3(0, _height, 0);
+	m_bodyObject->P_addForce(leapDir * _speed);
 }
 
 Node * TempEnemy::findClosestNode()

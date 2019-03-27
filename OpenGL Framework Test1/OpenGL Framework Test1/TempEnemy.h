@@ -28,6 +28,8 @@ public:
 
 	void calculatePath();
 
+	void leap(glm::vec3 _at, float _speed, float _height = 1.f);
+
 	Node* findClosestNode();
 private:
 	//How many times in a row has the player attacked?
@@ -43,6 +45,7 @@ private:
 
 	Node* m_targetNode;
 	Node* m_startNode;
+	Node* m_recentNode;
 	Node* closestToLogun;
 	Node* closestToL;
 	int prevClosestID = -1;

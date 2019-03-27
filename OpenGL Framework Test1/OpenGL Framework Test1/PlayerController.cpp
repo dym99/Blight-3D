@@ -2,12 +2,16 @@
 #include "Input.h"
 #include "P_PhysicsBody.h"
 #include "Utils.h"
+#include <algorithm>
 
 //Length in seconds each attack lasts
 #define SWORD_DUR 0.3f
 
 //How much time must pass to reset the combo
 #define COMBO_LAG 0.3f
+
+#define SPEED 25.f
+#define RUN_MOD 300.f
 
 
 #define DT Time::deltaTime
@@ -89,31 +93,34 @@ void PlayerController::update()
 	bool touchGround = false;
 	for (std::string _name : m_playerObject->getTriggeredNames())
 	{
-		if (_name == "Floor")
+		if(_name == "Floor")
 			touchGround = true;
+
+		if (_name == "Enemy")
+			health -= 10.f * Time::deltaTime;
 	}
 	float mult = Input::GetKey(KeyCode::Shift);
 	float yRot = m_playerObject->getGameObject()->localTransform.getRot().y;
 	glm::vec3 force = glm::vec3(0,0,0);
 	if (Input::GetKey(KeyCode::W))
 	{
-		force +=((15.f + (20.f * mult)) * glm::vec3(sin(yRot), 0, cos(yRot)));
+		force +=((SPEED + (RUN_MOD * mult)) * glm::vec3(sin(yRot), 0, cos(yRot)));
 	}
 	if (Input::GetKey(KeyCode::S))
 	{
-		force += ((-15.f - (20.f * mult)) * glm::vec3(sin(yRot), 0, cos(yRot)));
+		force += ((-SPEED - (RUN_MOD * mult)) * glm::vec3(sin(yRot), 0, cos(yRot)));
 	}
 	if (Input::GetKey(KeyCode::A))
 	{
-		force += ((15.f + (20.f * mult)) * glm::vec3(cos(yRot), 0, -sin(yRot)));
+		force += ((SPEED + (RUN_MOD * mult)) * glm::vec3(cos(yRot), 0, -sin(yRot)));
 	}
 	if (Input::GetKey(KeyCode::D))
 	{
-		force += ((-15.f - (20.f * mult)) * glm::vec3(cos(yRot), 0, -sin(yRot)));
+		force += ((-SPEED - (RUN_MOD * mult)) * glm::vec3(cos(yRot), 0, -sin(yRot)));
 	}
 	if (glm::length(force) > 0.01f) {
 		force = glm::normalize(force);
-		m_playerObject->P_addForce(force*15.f);
+		m_playerObject->P_addForce(force * SPEED);
 	}
 
 	if (touchGround)
