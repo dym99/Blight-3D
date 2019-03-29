@@ -65,6 +65,8 @@ public:
 
 	//Specify Emissive texture
 	void setEmissive(Texture* _tex);
+	void setMetal(Texture* _tex);
+	void setRough(Texture* _tex);
 
 private:
 	//Vertex attributes
@@ -76,6 +78,8 @@ private:
 
 	Texture* m_albedo;
 	Texture* m_emissive;
+	Texture* m_metalness;
+	Texture* m_roughness;
 
 	const char* m_path;
 	const char* m_name;

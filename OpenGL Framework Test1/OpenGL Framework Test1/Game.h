@@ -51,14 +51,12 @@ private:
 	IModel *m_testArea;
 	IModel *m_brazier;
 	IModel *m_bottomRoom;
-	IModel *m_grove;
-	IModel *m_grove2;
-	IModel *m_leftRoom;
-	IModel *m_rightRoom;
 	IModel *m_topRoom1;
 	IModel *m_topRoom2;
 	IModel *m_tree;
 	IModel *m_altar;
+
+	IModel *m_level;
 
 	Model *m_box;
 

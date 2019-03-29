@@ -333,12 +333,22 @@ void IModel::draw(Shader * shader) {
 	m_albedo->bind(0);			//Albedo
 	m_albedo->bind(1);			//Specular
 	m_emissive->bind(2);		//Emissive
+	if (m_metalness != nullptr)
+	{
+		m_metalness->bind(3);	//Metalness
+	}
+	if (m_roughness != nullptr)
+	{
+		m_roughness->bind(4);	//Roughness
+	}
 	glBindVertexArray(m_VAO);
 	glDrawArrays(GL_TRIANGLES, 0, m_numVertices * 3);
 	glBindVertexArray(0);
 	Texture::unbind(0);
 	Texture::unbind(1);
 	Texture::unbind(2);
+	Texture::unbind(3);
+	Texture::unbind(4);
 }
 
 void IModel::setAlbedo(Texture * _tex)
@@ -349,6 +359,16 @@ void IModel::setAlbedo(Texture * _tex)
 void IModel::setEmissive(Texture * _tex)
 {
 	m_emissive = _tex;
+}
+
+void IModel::setMetal(Texture * _tex)
+{
+	m_metalness = _tex;
+}
+
+void IModel::setRough(Texture * _tex)
+{
+	m_roughness = _tex;
 }
 
 

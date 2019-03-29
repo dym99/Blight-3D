@@ -112,29 +112,28 @@ void Game::initGame()
 
 	m_bottomRoom = new IModel();
 	m_bottomRoom->loadFromFile("MapBottom.imdl", "./Resources/Objects/MainLevel/");
-	m_grove = new IModel();
-	m_grove->loadFromFile("MarshFinal.imdl", "./Resources/Objects/MainLevel/");
-	m_leftRoom = new IModel();
-	m_leftRoom->loadFromFile("MapLeft.imdl", "./Resources/Objects/MainLevel/");
-	m_rightRoom = new IModel();
-	m_rightRoom->loadFromFile("MapRight.imdl", "./Resources/Objects/MainLevel/");
 	m_topRoom1 = new IModel();
 	m_topRoom1->loadFromFile("MapTop2.imdl", "./Resources/Objects/MainLevel/");
 	m_topRoom2 = new IModel();
 	m_topRoom2->loadFromFile("MapTop1.imdl", "./Resources/Objects/MainLevel/");
-	m_tree = new IModel();
-	m_tree->loadFromFile("Tree.imdl", "./Resources/Objects/MainLevel/");
 	m_altar = new IModel();
 	m_altar->loadFromFile("SkullAltar.imdl", "./Resources/Objects/MainLevel/");
 	m_box = new Model();
 	m_box->LoadFromFile("./Resources/Objects/Box/", "cube");
 
+	m_level = new IModel();
+	m_level->loadFromFile("BlightMap.imdl", "./Resources/Objects/MainLevel/");
+
 	Texture *roomTex = new Texture("diffuseTex");
-	roomTex->load("./Resources/Objects/MainLevel/BlightLevelTexturesOne.png");
-	Texture *blankEmissive = new Texture("emissiveTex");
-	blankEmissive->load("./Resources/Objects/MainLevel/BlightLevelTexturesEmissive.png");
-	Texture *testEmissive = new Texture("emissiveTex");
-	testEmissive->load("./Resources/Objects/Box/face_emis.png");
+	roomTex->load("./Resources/Objects/MainLevel/albedo.png");
+	Texture *roomOldTex = new Texture("diffuseTex");
+	roomOldTex->load("./Resources/Objects/MainLevel/oldAlbedo.png");
+	Texture *roomEmissive = new Texture("emissiveTex");
+	roomEmissive->load("./Resources/Objects/MainLevel/emissive.png");
+	Texture *roomMetal = new Texture("metalTex");
+	roomMetal->load("./Resources/Objects/MainLevel/metalness.png");
+	Texture *roomRough = new Texture("roughTex");
+	roomRough->load("./Resources/Objects/MainLevel/roughness.png");
 
 	Texture *logunTex = new Texture("diffuseTex");
 	logunTex->load("./Resources/Objects/Logun/Albedo.png");
@@ -148,6 +147,8 @@ void Game::initGame()
 	swordTex->load("./Resources/Objects/Logun/SwordAlbedo.png");
 	Texture *swordMetalTex = new Texture("metalTex");
 	swordMetalTex->load("./Resources/Objects/Logun/SwordMetal.png");
+	Texture *swordRoughTex = new Texture("roughTex");
+	swordRoughTex->load("./Resources/Objects/Logun/SwordRoughness.png");
 
 	Texture *noMetalTex = new Texture("metalTex");
 	noMetalTex->load("./Resources/Textures/noMetalTex.png");
@@ -157,6 +158,10 @@ void Game::initGame()
 	smoothTex->load("./Resources/Textures/noMetalTex.png");
 	Texture *roughTex = new Texture("roughTex");
 	roughTex->load("./Resources/Textures/allMetalTex.png");
+	Texture *blankEmissive = new Texture("emissiveTex");
+	blankEmissive->load("./Resources/Textures/noEmissive.png");
+	Texture *testEmissive = new Texture("emissiveTex");
+	testEmissive->load("./Resources/Objects/Box/face_emis.png");
 
 	m_logunWalk = new AnimatedModel();
 	m_logunWalk->loadFromFiles(10, "LogunWalk", "./Resources/Objects/Logun/Anims/Walk/");
@@ -170,7 +175,7 @@ void Game::initGame()
 	m_logunWalkSword->setAlbedo(swordTex);
 	m_logunWalkSword->setEmissive(blankEmissive);
 	m_logunWalkSword->setMetalness(swordMetalTex);
-	m_logunWalkSword->setRoughness(smoothTex);
+	m_logunWalkSword->setRoughness(swordRoughTex);
 
 	for (int i = 0; i < 10; ++i) {
 		m_logunWalk->setFrameTime(i, 0.08333f);
@@ -179,22 +184,19 @@ void Game::initGame()
 
 	m_brazier->setEmissive(blankEmissive);
 	m_ravager->setEmissive(blankEmissive);
-	m_bottomRoom->setAlbedo(roomTex);
+	m_bottomRoom->setAlbedo(roomOldTex);
 	m_bottomRoom->setEmissive(blankEmissive);
-	m_grove->setAlbedo(roomTex);
-	m_grove->setEmissive(blankEmissive);
-	m_leftRoom->setAlbedo(roomTex);
-	m_leftRoom->setEmissive(blankEmissive);
-	m_rightRoom->setAlbedo(roomTex);
-	m_rightRoom->setEmissive(blankEmissive);
-	m_topRoom1->setAlbedo(roomTex);
+	m_topRoom1->setAlbedo(roomOldTex);
 	m_topRoom1->setEmissive(blankEmissive);
-	m_topRoom2->setAlbedo(roomTex);
+	m_topRoom2->setAlbedo(roomOldTex);
 	m_topRoom2->setEmissive(blankEmissive);
-	m_tree->setAlbedo(roomTex);
-	m_tree->setEmissive(testEmissive);
-	m_altar->setAlbedo(roomTex);
+	m_altar->setAlbedo(roomOldTex);
 	m_altar->setEmissive(blankEmissive);
+
+	m_level->setAlbedo(roomTex);
+	m_level->setEmissive(roomEmissive);
+	m_level->setMetal(roomMetal);
+	m_level->setRough(roomRough);
 
 	
 	ShaderManager::loadShaders();
@@ -222,7 +224,7 @@ void Game::initGame()
 	player = new GameObject("Player");
 	//player->addBehaviour(new MeshRenderBehaviour(m_ravager, ShaderManager::getShader(GBUFFER_SHADER)));
 	if (_DEBUG)
-		//player->localTransform.setPos(glm::vec3(0.f, 25.f, 0.f));
+		player->localTransform.setPos(glm::vec3(0.f, 25.f, 0.f));
 
 	cameraPivot = new GameObject("CameraPivot");
 	cameraPivot->localTransform.setPos(glm::vec3(0.f,1.f,0.f));
@@ -491,27 +493,8 @@ void Game::initGame()
 #pragma endregion
 
 
-#pragma region trees
-	auto tree1 = new GameObject("Tree1");
-	tree1->addBehaviour(new MeshRenderBehaviour(m_tree, ShaderManager::getShader(GBUFFER_SHADER)));
-	tree1->localTransform.setPos(glm::vec3(10.846286, 0.500000, -9.084585));
-
-	auto tree2 = new GameObject("Tree2");
-	tree2->addBehaviour(new MeshRenderBehaviour(m_tree, ShaderManager::getShader(GBUFFER_SHADER)));
-	tree2->localTransform.setPos(glm::vec3(12.069606, 0.500000, 6.998760));
-#pragma endregion
-
 	auto bottomRoom = new GameObject("BottomRoom");
 	bottomRoom->addBehaviour(new MeshRenderBehaviour(m_bottomRoom, ShaderManager::getShader(GBUFFER_SHADER)));
-
-	auto grove = new GameObject("Grove");
-	grove->addBehaviour(new MeshRenderBehaviour(m_grove, ShaderManager::getShader(GBUFFER_SHADER)));
-
-	auto leftRoom = new GameObject("LeftRoom");
-	leftRoom->addBehaviour(new MeshRenderBehaviour(m_leftRoom, ShaderManager::getShader(GBUFFER_SHADER)));
-
-	auto rightRoom = new GameObject("RightRoom");
-	rightRoom->addBehaviour(new MeshRenderBehaviour(m_rightRoom, ShaderManager::getShader(GBUFFER_SHADER)));
 
 	auto topRoom1 = new GameObject("TopRoom1");
 	topRoom1->addBehaviour(new MeshRenderBehaviour(m_topRoom1, ShaderManager::getShader(GBUFFER_SHADER)));
@@ -519,9 +502,8 @@ void Game::initGame()
 	auto topRoom2 = new GameObject("TopRoom2");
 	topRoom2->addBehaviour(new MeshRenderBehaviour(m_topRoom2, ShaderManager::getShader(GBUFFER_SHADER)));
 
-	auto altar = new GameObject("Altar");
-	altar->addBehaviour(new MeshRenderBehaviour(m_altar, ShaderManager::getShader(GBUFFER_SHADER)));
-
+	auto mainLevel = new GameObject("level");
+	mainLevel->addBehaviour(new MeshRenderBehaviour(m_level, ShaderManager::getShader(GBUFFER_SHADER)));
 	
 	deadLogun = new GameObject("Position of Logun's Corpse");
 
@@ -529,12 +511,10 @@ void Game::initGame()
 	scene->addChild(player);
 	scene->addChild(deadLogun);
 	//scene->addChild(playerModel);
-	scene->addChild(bottomRoom);
-	scene->addChild(grove);
-	scene->addChild(leftRoom);
-	scene->addChild(rightRoom);
-	scene->addChild(topRoom1);
-	scene->addChild(topRoom2);
+	//scene->addChild(bottomRoom);
+	//scene->addChild(topRoom1);
+	//scene->addChild(topRoom2);
+	scene->addChild(mainLevel);
 	//scene->addChild(altar);
 
 	{
@@ -633,11 +613,6 @@ void Game::initGame()
 		scene->addChild(brazier47);
 		//new P_PhysicsBody(&brazier47->localTransform, 1.0f, false, BOX, 1.f, 1.f, 1.f, glm::vec3(0.f, 0.f, 1.f), 0.f, 0.f, true);
 		scene->addChild(brazier48);
-	}
-
-	{
-		scene->addChild(tree1);
-		scene->addChild(tree2);
 	}
 
 	Camera::mainCameraTransform = &(cameraObject->worldTransform);
@@ -1011,7 +986,7 @@ void Game::draw()
 	}
 	else
 	{
-		gBuffer->drawBuffers(METALNESS, ROUGHNESS, NORMAL);
+		gBuffer->drawBuffers(METALNESS, ROUGHNESS, EMISSIVES);
 
 		glViewport(window_width / 2, 0, window_width / 2, window_height / 2);					///Bottom Right
 		ShaderManager::getPost(DEFERREDLIGHT_POST)->bind();
