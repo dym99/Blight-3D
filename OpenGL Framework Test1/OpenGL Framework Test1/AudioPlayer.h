@@ -96,6 +96,10 @@ struct AudioTrack {
 	RollOffType rollType;
 };
 
+FMOD_VECTOR convertVector(glm::vec3 vector);
+
+glm::vec3 convertVector(FMOD_VECTOR vector);
+
 class AudioPlayer abstract
 {
 public:

@@ -352,3 +352,13 @@ bool AudioPlayer::errorCheck(FMOD_RESULT result)
 {
 	return (result != FMOD_OK);
 }
+
+FMOD_VECTOR convertVector(glm::vec3 vector)
+{
+	return { vector.x, vector.y, vector.z };
+}
+
+glm::vec3 convertVector(FMOD_VECTOR vector)
+{
+	return glm::vec3(vector.x, vector.y, vector.z);
+}

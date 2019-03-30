@@ -847,6 +847,7 @@ void Game::initGame()
 	//Load audio track for ambiance
 	AudioPlayer::loadAudio(*new AudioTrack("Ambiance", FMOD_3D, AudioType::EFFECT, { 0.f, 0.f, 0.f }, { 0.f, 0.f, 0.f }, true, 0.1f, 5000.f), "Ambiance");
 	//Play ambiance
+	AudioPlayer::prepareTrack("Ambiance");
 	AudioPlayer::playTrack("Ambiance");
 	AudioPlayer::setVolume("Ambiance", 0.1f);
 
@@ -976,13 +977,20 @@ void Game::update()
 		displayBloom = !displayBloom;
 	}
 
+	if (Input::GetKeyDown(KeyCode::F3)) {
+		greyScaleEnabled = !greyScaleEnabled;
+	}
+
 	if (Input::GetKeyDown(KeyCode::F4)) {
-		guiEnabled = !guiEnabled;
+		sepiaEnabled = !sepiaEnabled;
 	}
 
 	ParticleManager::update(Time::deltaTime);
 
 	AudioPlayer::update(Time::deltaTime);
+	//How to update listener position
+	//AudioPlayer::setListenerPosition(convertVector(Logun position), convertVector(logun speed), convertVector(cameraForward), glm::vec3(0.f, 1.f, 0.f));
+	//AudioPlayer::searchTrack("Ambiance")->position = logun position;
 
 	for (unsigned int i = 0; i < m_activeScenes.size(); ++i) {
 		m_activeScenes[i]->update();
@@ -1059,14 +1067,12 @@ void Game::draw()
 
 	if (displayBloom)
 	{
-		bloomBuffer->drawBuffer(2);
+		ShaderManager::getPost(EMISSIVE_POST)->bind();
+		bloomBuffer->bindTexColor(3, 1);
+		deferredComposite->draw();
+		gBuffer->unbindTex(1);
+		ShaderManager::getPost(EMISSIVE_POST)->unbind();
 	}
-
-	ShaderManager::getPost(EMISSIVE_POST)->bind();
-	bloomBuffer->bindTexColor(3, 1);
-	deferredComposite->draw();
-	gBuffer->unbindTex(1);
-	ShaderManager::getPost(EMISSIVE_POST)->unbind();
 
 	edgeBuffer->bind();
 	ShaderManager::getPost(EDGEDETECTION_POST)->bind();
@@ -1079,6 +1085,20 @@ void Game::draw()
 	//ShaderManager::getPost(GREYSCALE_POST)->bind();
 	//deferredComposite->draw();
 	//ShaderManager::getPost(GREYSCALE_POST)->unbind();
+
+	if (greyScaleEnabled)
+	{
+		ShaderManager::getPost(GREYSCALE_POST)->bind();
+		deferredComposite->draw();
+		ShaderManager::getPost(GREYSCALE_POST)->unbind();
+	}
+
+	if (sepiaEnabled)
+	{
+		ShaderManager::getPost(SEPIA_POST)->bind();
+		deferredComposite->draw();
+		ShaderManager::getPost(SEPIA_POST)->unbind();
+	}
 
 	ShaderManager::getPost(COLORCORR_POST)->bind();
 	colorCorrection->bind(30);
@@ -1093,17 +1113,17 @@ void Game::draw()
 	ShaderManager::getPost(ADDEDGE_POST)->bind();
 
 	//Render the particle emitters
-	if (!displayBuffers)
-	{
-		gBuffer->copyTo(GL_NONE, GL_DEPTH_BUFFER_BIT, window_width, window_height);
-		ShaderManager::getGeom(BILLBOARD_GEOM)->bind();
-		ShaderManager::getGeom(BILLBOARD_GEOM)->sendUniform("uTex", 0);
-		for (unsigned int i = 0; i < NUM_PARTICLES; i++)
-		{
-			ShaderManager::getGeom(BILLBOARD_GEOM)->sendUniform("uModel", ParticleManager::getParticle(i)->transform.getModel());
-			ParticleManager::render(i);
-		}
-	}
+	//if (!displayBuffers)
+	//{
+	//	gBuffer->copyTo(GL_NONE, GL_DEPTH_BUFFER_BIT, window_width, window_height);
+	//	ShaderManager::getGeom(BILLBOARD_GEOM)->bind();
+	//	ShaderManager::getGeom(BILLBOARD_GEOM)->sendUniform("uTex", 0);
+	//	for (unsigned int i = 0; i < NUM_PARTICLES; i++)
+	//	{
+	//		ShaderManager::getGeom(BILLBOARD_GEOM)->sendUniform("uModel", ParticleManager::getParticle(i)->transform.getModel());
+	//		ParticleManager::render(i);
+	//	}
+	//}
 }
 
 void Game::GUI()

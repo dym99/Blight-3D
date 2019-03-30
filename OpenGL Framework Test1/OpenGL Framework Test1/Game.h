@@ -74,7 +74,7 @@ private:
 	Node* closestToLogun;
 
 	bool displayBuffers = false;
-	bool displayBloom = false;
+	bool displayBloom = true;
 
 	///////////////////////
 
@@ -107,6 +107,9 @@ private:
 	GameObject* healthShower;
 
 	bool guiEnabled = false;
+
+	bool greyScaleEnabled = false;
+	bool sepiaEnabled = false;
 
 	static std::vector<Enemy*> enemies;
 	static std::vector<P_PhysicsBody*> enemyBodies;
