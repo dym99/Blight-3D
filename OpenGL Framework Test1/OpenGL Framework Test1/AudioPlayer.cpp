@@ -20,7 +20,7 @@ bool AudioPlayer::init(int maxChannels, FMOD_INITFLAGS flags, void * extraDriver
 	system->getVersion(&version);
 
 	//error check
-	if (version < FMOD_VERSION) 
+	if (version < FMOD_VERSION)
 	{
 		printf("FMOD lib version %u doesn't match header version %u", version, (unsigned int)FMOD_VERSION);
 		return false;
@@ -41,46 +41,56 @@ bool AudioPlayer::set3DSettings(float dopplerScale, float rollOffScale)
 	return true;
 }
 
+bool AudioPlayer::setMinMaxSettings(std::string fileName, float minDist, float maxDist)
+{
+	if (searchTrack(fileName) == nullptr)
+	{
+		printf("This AudioTrack isn't currently loaded");
+		return false;
+	}
+
+	result = tracksLoaded[fileName]->sound->set3DMinMaxDistance(minDist * DISTANCEFACTOR, maxDist * DISTANCEFACTOR);
+	if (errorCheck(result))
+	{
+		printf("Error while setting the min max settings for the audio");
+		return false;
+	}
+	return true;
+}
+
+void AudioPlayer::setListenerPosition(FMOD_VECTOR& position, FMOD_VECTOR& velocity, FMOD_VECTOR& forward, FMOD_VECTOR& up)
+{
+	result = system->set3DListenerAttributes(0, &position, &velocity, &forward, &up);
+	if (errorCheck(result))
+	{
+		printf("Error while setting listener attributes");
+	}
+}
+
 bool AudioPlayer::loadAudio(AudioTrack & audio, std::string fileName)
 {
 	result = system->createSound(audio.fileName.c_str(), audio.dimension, 0, &audio.sound);
 	if (errorCheck(result))
 	{
-		printf("Error while creaating sound at %s", audio.fileName);
+		printf("Error while creaating sound at %s", audio.fileName.c_str());
 		return false;
 	}
 
 	result = audio.sound->set3DMinMaxDistance(audio.minDist * DISTANCEFACTOR, audio.maxDist * DISTANCEFACTOR);
 	if (errorCheck(result))
 	{
-		printf("Error while setting the min max distance at %s", audio.fileName);
+		printf("Error while setting the min max distance at %s", audio.fileName.c_str());
 		return false;
 	}
 
 	result = audio.sound->setMode(audio.doesLoop ? FMOD_LOOP_NORMAL : FMOD_LOOP_OFF);
 	if (errorCheck(result))
 	{
-		printf("Error while setting the audio loop mode at %s", audio.fileName);
+		printf("Error while setting the audio loop mode at %s", audio.fileName.c_str());
 		return false;
 	}
 
 	tracksLoaded.insert(std::make_pair(fileName, &audio));
-
-	AudioTrack* track = tracksLoaded[fileName];
-
-	result = system->playSound(track->sound, 0, track->paused, &track->channel);
-	if (errorCheck(result))
-	{
-		printf("Error playing the sound for audio track at %s", tracksLoaded[fileName]->fileName);
-		return false;
-	}
-
-	result = track->channel->set3DAttributes(&track->position, &track->velocity);
-	if (errorCheck(result))
-	{
-		printf("Error setting the 3D attributes for audio track at %s", tracksLoaded[fileName]->fileName);
-		return false;
-	}
 
 	return true;
 }
@@ -96,7 +106,7 @@ bool AudioPlayer::unloadAudio(std::string fileName)
 	result = tracksLoaded[fileName]->sound->release();
 	if (errorCheck(result))
 	{
-		printf("Error while unloading the audio track at %s", tracksLoaded[fileName]->fileName);
+		printf("Error while unloading the audio track at %s", tracksLoaded[fileName]->fileName.c_str());
 		return false;
 	}
 
@@ -110,7 +120,7 @@ bool AudioPlayer::unloadAudio(std::string fileName)
 	return true;
 }
 
-bool AudioPlayer::panAudio(std::string fileName, Degrees panning)
+bool AudioPlayer::panAudio(std::string fileName, Degrees _panning, FMOD_VECTOR point)
 {
 	if (searchTrack(fileName) == nullptr)
 	{
@@ -118,7 +128,35 @@ bool AudioPlayer::panAudio(std::string fileName, Degrees panning)
 		return false;
 	}
 
+	AudioTrack* track = searchTrack(fileName);
+	track->panning += _panning;
+
+	glm::mat4 rotationXMat = glm::rotate(glm::radians(0.f), glm::vec3(1.f, 0.f, 0.f));
+	glm::mat4 rotationYMat = glm::rotate(glm::radians(_panning), glm::vec3(0.f, 1.f, 0.f));
+	glm::mat4 rotationZMat = glm::rotate(glm::radians(0.f), glm::vec3(0.f, 0.f, 1.f));
+
+	glm::mat4 rotationMat = rotationZMat * rotationYMat * rotationXMat;
+
+	glm::vec3 temp = glm::vec3(track->position.x - point.x, track->position.y - point.y, track->position.z - point.z);
+	glm::vec4 temp2 = rotationMat * glm::vec4(temp, 1.f);
+
+	track->position = { temp2.x + point.x, temp2.y + point.y , temp2.z + point.z};
+	
 	return true;
+}
+
+bool AudioPlayer::setRolloff(std::string fileName, RollOffType _type)
+{
+	switch (_type) {
+	case LINEAR:
+		tracksLoaded[fileName]->channel->setMode(FMOD_3D_LINEARROLLOFF);
+		break;
+	case LOGARITHMIC:
+		tracksLoaded[fileName]->channel->setMode(FMOD_3D_INVERSEROLLOFF);
+		break;
+	}
+
+	return false;
 }
 
 bool AudioPlayer::setVolume(std::string fileName, float volume)
@@ -132,9 +170,71 @@ bool AudioPlayer::setVolume(std::string fileName, float volume)
 	result = tracksLoaded[fileName]->channel->setVolume(volume);
 	if (errorCheck(result))
 	{
-		printf("Error changing the volume for audio track at %s", tracksLoaded[fileName]->fileName);
+		printf("Error changing the volume for audio track at %s", tracksLoaded[fileName]->fileName.c_str());
+		return false;
 	}
 	
+	return true;
+}
+
+bool AudioPlayer::prepareTrack(std::string fileName)
+{
+	if (searchTrack(fileName) == nullptr)
+	{
+		printf("This AudioTrack isn't currently loaded");
+		return false;
+	}
+
+	AudioTrack* track = tracksLoaded[fileName];
+
+	if (!track->prepared)
+	{
+		result = system->playSound(track->sound, 0, track->paused, &track->channel);
+		if (errorCheck(result))
+		{
+			printf("Error playing the sound for audio track at %s", tracksLoaded[fileName]->fileName.c_str());
+			return false;
+		}
+
+		result = track->channel->set3DAttributes(&track->position, &track->velocity);
+		if (errorCheck(result))
+		{
+			printf("Error setting the 3D attributes for audio track at %s", tracksLoaded[fileName]->fileName.c_str());
+			return false;
+		}
+
+		track->prepared = true;
+	}
+
+	return true;
+}
+
+bool AudioPlayer::prepareTrack(std::string original, std::string copy)
+{
+	if (searchTrack(original) == nullptr)
+	{
+		printf("This AudioTrack isn't currently loaded");
+		return false;
+	}
+
+	AudioTrack* track = new AudioTrack(*tracksLoaded[original]);
+	
+	result = system->playSound(track->sound, 0, track->paused, &track->channel);
+	if (errorCheck(result))
+	{
+		printf("Error copying the sound for audio track at %s", track->fileName.c_str());
+		return false;
+	}
+
+	result = track->channel->set3DAttributes(&track->position, &track->velocity);
+	if (errorCheck(result))
+	{
+		printf("Error setting the 3D attributes for audio Track at %s", track->fileName.c_str());
+		return false;
+	}
+
+	tracksLoaded.insert(std::make_pair(copy, track));
+
 	return true;
 }
 
@@ -147,14 +247,35 @@ bool AudioPlayer::playTrack(std::string fileName)
 	}
 
 	result = tracksLoaded[fileName]->channel->setPaused(false);
-	if (errorCheck(result))
-	{
-		printf("Error unpausing the audio track at %s", tracksLoaded[fileName]->fileName);
-		return false;
-	}
 	tracksLoaded[fileName]->paused = false;
 
 	return true;
+}
+
+void AudioPlayer::playTrack(AudioTrack* audio, float volume)
+{
+	result = system->createSound(audio->fileName.c_str(), audio->dimension, 0, &audio->sound);
+
+	result = audio->sound->set3DMinMaxDistance(audio->minDist * DISTANCEFACTOR, audio->maxDist * DISTANCEFACTOR);
+
+	result = audio->sound->setMode(false ? FMOD_LOOP_NORMAL : FMOD_LOOP_OFF);
+
+	result = audio->channel->setVolume(volume);
+
+	result = system->playSound(audio->sound, 0, false, &audio->channel);
+
+	result = audio->channel->set3DAttributes(&audio->position, &audio->velocity);
+	
+	delete audio;
+	audio = nullptr;
+}
+
+void AudioPlayer::removeTrack(std::string fileName)
+{
+	if (searchTrack(fileName) != nullptr)
+	{
+		tracksLoaded.erase(fileName);
+	}
 }
 
 bool AudioPlayer::pauseTrack(std::string fileName)
@@ -168,7 +289,7 @@ bool AudioPlayer::pauseTrack(std::string fileName)
 	result = tracksLoaded[fileName]->channel->setPaused(true);
 	if (errorCheck(result))
 	{
-		printf("Error unpausing the audio track at %s", tracksLoaded[fileName]->fileName);
+		printf("Error unpausing the audio track at %s", tracksLoaded[fileName]->fileName.c_str());
 		return false;
 	}
 	tracksLoaded[fileName]->paused = true;
@@ -183,11 +304,6 @@ bool AudioPlayer::update(float deltaTime)
 		AudioTrack* track = pair.second;
 
 		result = track->channel->set3DAttributes(&track->position, &track->velocity);
-		if (errorCheck(result))
-		{
-			printf("Error updating the 3D attributes");
-			return false;
-		}
 	}
 
 	system->update();
@@ -209,6 +325,12 @@ bool AudioPlayer::close()
 	{
 		printf("Error while releasing the system");
 		return false;
+	}
+
+	for (auto pair : tracksLoaded)
+	{
+		delete pair.second;
+		pair.second = nullptr;
 	}
 
 	return true;
