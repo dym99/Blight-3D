@@ -110,17 +110,11 @@ void Game::initGame()
 	brazierAlbedo->load("./Resources/Objects/Brazier/BrazierBasic.png");
 	m_brazier->setAlbedo(brazierAlbedo);
 
-	m_bottomRoom = new IModel();
-	m_bottomRoom->loadFromFile("MapBottom.imdl", "./Resources/Objects/MainLevel/");
-	m_topRoom1 = new IModel();
-	m_topRoom1->loadFromFile("MapTop2.imdl", "./Resources/Objects/MainLevel/");
-	m_topRoom2 = new IModel();
-	m_topRoom2->loadFromFile("MapTop1.imdl", "./Resources/Objects/MainLevel/");
-	m_altar = new IModel();
-	m_altar->loadFromFile("SkullAltar.imdl", "./Resources/Objects/MainLevel/");
 	m_box = new Model();
 	m_box->LoadFromFile("./Resources/Objects/Box/", "cube");
-
+	
+	m_acid = new IModel();
+	m_acid->loadFromFile("AcidWater.imdl", "./Resources/Objects/MainLevel/");
 	m_level = new IModel();
 	m_level->loadFromFile("BlightMap.imdl", "./Resources/Objects/MainLevel/");
 
@@ -202,14 +196,8 @@ void Game::initGame()
 	
 	m_brazier->setEmissive(blankEmissive);
 	m_ravager->setEmissive(blankEmissive);
-	m_bottomRoom->setAlbedo(roomOldTex);
-	m_bottomRoom->setEmissive(blankEmissive);
-	m_topRoom1->setAlbedo(roomOldTex);
-	m_topRoom1->setEmissive(blankEmissive);
-	m_topRoom2->setAlbedo(roomOldTex);
-	m_topRoom2->setEmissive(blankEmissive);
-	m_altar->setAlbedo(roomOldTex);
-	m_altar->setEmissive(blankEmissive);
+	m_acid->setAlbedo(roomTex);
+	m_acid->setEmissive(blankEmissive);
 
 	m_level->setAlbedo(roomTex);
 	m_level->setEmissive(roomEmissive);
@@ -514,17 +502,11 @@ void Game::initGame()
 #pragma endregion
 
 
-	auto bottomRoom = new GameObject("BottomRoom");
-	bottomRoom->addBehaviour(new MeshRenderBehaviour(m_bottomRoom, ShaderManager::getShader(GBUFFER_SHADER)));
-
-	auto topRoom1 = new GameObject("TopRoom1");
-	topRoom1->addBehaviour(new MeshRenderBehaviour(m_topRoom1, ShaderManager::getShader(GBUFFER_SHADER)));
-
-	auto topRoom2 = new GameObject("TopRoom2");
-	topRoom2->addBehaviour(new MeshRenderBehaviour(m_topRoom2, ShaderManager::getShader(GBUFFER_SHADER)));
-
 	auto mainLevel = new GameObject("level");
 	mainLevel->addBehaviour(new MeshRenderBehaviour(m_level, ShaderManager::getShader(GBUFFER_SHADER)));
+
+	auto acidPlane = new GameObject("acid");
+	acidPlane->addBehaviour(new MeshRenderBehaviour(m_acid, ShaderManager::getShader(GBUFFER_WATER)));
 	
 	deadLogun = new GameObject("Position of Logun's Corpse");
 
@@ -532,11 +514,8 @@ void Game::initGame()
 	scene->addChild(player);
 	scene->addChild(deadLogun);
 	//scene->addChild(playerModel);
-	//scene->addChild(bottomRoom);
-	//scene->addChild(topRoom1);
-	//scene->addChild(topRoom2);
 	scene->addChild(mainLevel);
-	//scene->addChild(altar);
+	scene->addChild(acidPlane);
 
 	{
 		scene->addChild(brazier);

@@ -50,13 +50,9 @@ private:
 	IModel *m_ravager;
 	IModel *m_testArea;
 	IModel *m_brazier;
-	IModel *m_bottomRoom;
-	IModel *m_topRoom1;
-	IModel *m_topRoom2;
-	IModel *m_tree;
-	IModel *m_altar;
 
 	IModel *m_level;
+	IModel *m_acid;
 
 	Model *m_box;
 
