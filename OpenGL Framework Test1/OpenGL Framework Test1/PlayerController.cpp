@@ -5,10 +5,10 @@
 #include <algorithm>
 
 //Length in seconds each attack lasts
-#define SWORD_DUR 0.3f
+#define SWORD_DUR 0.86f
 
 //How much time must pass to reset the combo
-#define COMBO_LAG 0.3f
+#define COMBO_LAG 0.9f
 
 #define SPEED 25.f
 #define RUN_MOD 300.f
@@ -83,7 +83,8 @@ void PlayerController::update()
 			float _X = (1 + (-2 * left)) * (((1 - completePercent) * 2 - 1) / 2);
 			float _Y = -0.6f * (1 - completePercent) + 1;
 
-			m_swordHitbox->getGameObject()->localTransform.setPos((glm::vec3(_X, _Y, 0.5f)));
+			m_swordHitbox->getGameObject()->localTransform.setPos(glm::rotate(m_playerRotation, glm::vec3(0,1,0))*(glm::vec4(_X, _Y, 0.5f, 1.0f)));
+			m_swordHitbox->getGameObject()->localTransform.setRot(glm::vec3(0,m_playerRotation,0));
 			break;
 		}
 	}
@@ -102,23 +103,27 @@ void PlayerController::update()
 	float mult = Input::GetKey(KeyCode::Shift);
 	float yRot = m_playerObject->getGameObject()->localTransform.getRot().y;
 	glm::vec3 force = glm::vec3(0,0,0);
-	if (Input::GetKey(KeyCode::W))
-	{
-		force +=((SPEED + (RUN_MOD * mult)) * glm::vec3(sin(yRot), 0, cos(yRot)));
-	}
-	if (Input::GetKey(KeyCode::S))
-	{
-		force += ((-SPEED - (RUN_MOD * mult)) * glm::vec3(sin(yRot), 0, cos(yRot)));
-	}
-	if (Input::GetKey(KeyCode::A))
-	{
-		force += ((SPEED + (RUN_MOD * mult)) * glm::vec3(cos(yRot), 0, -sin(yRot)));
-	}
-	if (Input::GetKey(KeyCode::D))
-	{
-		force += ((-SPEED - (RUN_MOD * mult)) * glm::vec3(cos(yRot), 0, -sin(yRot)));
+	m_walking = false;
+	if (m_theState != SWORD) {
+		if (Input::GetKey(KeyCode::W))
+		{
+			force += ((SPEED + (RUN_MOD * mult)) * glm::vec3(sin(yRot), 0, cos(yRot)));
+		}
+		if (Input::GetKey(KeyCode::S))
+		{
+			force += ((-SPEED - (RUN_MOD * mult)) * glm::vec3(sin(yRot), 0, cos(yRot)));
+		}
+		if (Input::GetKey(KeyCode::A))
+		{
+			force += ((SPEED + (RUN_MOD * mult)) * glm::vec3(cos(yRot), 0, -sin(yRot)));
+		}
+		if (Input::GetKey(KeyCode::D))
+		{
+			force += ((-SPEED - (RUN_MOD * mult)) * glm::vec3(cos(yRot), 0, -sin(yRot)));
+		}
 	}
 	if (glm::length(force) > 0.01f) {
+		m_walking = true;
 		force = glm::normalize(force);
 		m_playerObject->P_addForce(force * SPEED);
 	}

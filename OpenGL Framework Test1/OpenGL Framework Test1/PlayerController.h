@@ -25,13 +25,21 @@ public:
 	void renderTransparent() override;
 	void renderGUI() override;
 	float health = MAX_HEALTH;
+
+	inline PlayerState getState() { return m_theState; }
+	inline bool isWalking() { return m_walking; }
+
+	inline void setPlayerRotation(float _rot) { m_playerRotation = _rot; }
 private:
 
 	//How many times in a row has the player attacked?
 	int m_comboNumber = 0;
 
+	float m_playerRotation = 0.f;
+
 	//Is the player currently mid-attack?
 	bool m_attacking = false;
+	bool m_walking = false;
 	
 	//How much time is left in the current action?
 	float m_attackTimer = 0.0f;

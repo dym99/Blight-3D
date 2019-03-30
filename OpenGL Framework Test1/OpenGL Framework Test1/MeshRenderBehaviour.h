@@ -19,6 +19,8 @@ public:
 	void renderTransparent() override;
 	void renderGUI() override;
 
+	void swapAnim(AnimatedModel *_new);
+
 private:
 	Model* m_model;
 	IModel* m_iModel;

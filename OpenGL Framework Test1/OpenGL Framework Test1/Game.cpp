@@ -177,11 +177,29 @@ void Game::initGame()
 	m_logunWalkSword->setMetalness(swordMetalTex);
 	m_logunWalkSword->setRoughness(swordRoughTex);
 
+	m_logunSwingA = new AnimatedModel();
+	m_logunSwingA->loadFromFiles(16, "LogunSlashA", "./Resources/Objects/Logun/Anims/SlashA/");
+	m_logunSwingA->setAlbedo(logunTex);
+	m_logunSwingA->setEmissive(logunTexEmissive);
+	m_logunSwingA->setMetalness(logunMetal);
+	m_logunSwingA->setRoughness(logunRough);
+
+	m_logunSwingASword = new AnimatedModel();
+	m_logunSwingASword->loadFromFiles(16, "LogunSlashASword", "./Resources/Objects/Logun/Anims/SlashA/");
+	m_logunSwingASword->setAlbedo(swordTex);
+	m_logunSwingASword->setEmissive(blankEmissive);
+	m_logunSwingASword->setMetalness(swordMetalTex);
+	m_logunSwingASword->setRoughness(swordRoughTex);
+
 	for (int i = 0; i < 10; ++i) {
 		m_logunWalk->setFrameTime(i, 0.08333f);
 		m_logunWalkSword->setFrameTime(i, 0.08333f);
 	}
-
+	for (int i = 0; i < 16; ++i) {
+		m_logunSwingA->setFrameTime(i, 0.08333f);
+		m_logunSwingASword->setFrameTime(i, 0.08333f);
+	}
+	
 	m_brazier->setEmissive(blankEmissive);
 	m_ravager->setEmissive(blankEmissive);
 	m_bottomRoom->setAlbedo(roomOldTex);
@@ -246,8 +264,11 @@ void Game::initGame()
 	
 
 	playerModel = new GameObject("Player Model");
-	playerModel->addBehaviour(new MeshRenderBehaviour(m_logunWalk, ShaderManager::getShader(GBUFFER_MORPH)));
-	playerModel->addBehaviour(new MeshRenderBehaviour(m_logunWalkSword, ShaderManager::getShader(GBUFFER_MORPH)));
+	m_logunRenderer = new MeshRenderBehaviour(m_logunWalk, ShaderManager::getShader(GBUFFER_MORPH));
+	m_swordRenderer = new MeshRenderBehaviour(m_logunWalkSword, ShaderManager::getShader(GBUFFER_MORPH));
+
+	playerModel->addBehaviour(m_logunRenderer);
+	playerModel->addBehaviour(m_swordRenderer);
 	player->addChild(playerModel);
 
 #pragma region braziers
@@ -863,25 +884,17 @@ void Game::initGame()
 	m_AIGraph->createEdge(m_AIGraph->nodes[7], m_AIGraph->nodes[6]);
 
 	m_score = 0;
+
+	m_logunSwingA->setAnimSpeed(1.5f);
+	m_logunSwingASword->setAnimSpeed(1.5f);
 }
 
 void Game::update()
 {
-	std::cout << m_score << std::endl;
+	//std::cout << m_score << std::endl;
 	Time::update();
 
-	m_logunWalk->update();
-	m_logunWalkSword->update();
-
-	//If actually moving, update player model angle
-	if (glm::length(playerPhys->P_velocity) > 0.02) {
-		m_playerModelAngle = atan2f(-playerPhys->P_velocity.z, playerPhys->P_velocity.x);
-	}
-
-	//Apply player model angle as a local rotation
-	glm::vec3 forward = glm::vec3(0, 0, 1);
-	forward = glm::rotate(-player->localTransform.getRot().y, glm::vec3(0, 1, 0)) * glm::vec4(forward, 1.0);
-	playerModel->localTransform.setRot(glm::vec3(0, atan2f(forward.z, -forward.x) + m_playerModelAngle, 0));
+	
 	
 	//Kill the player
 	if (player != nullptr)
@@ -890,8 +903,40 @@ void Game::update()
 		{
 			std::vector<Behaviour*> behav = *player->getBehaviours();
 			PlayerController* pc = (PlayerController*)behav[0];
+
+			//If actually moving, update player model angle
+			if (pc->isWalking()) {
+				m_playerModelAngle = atan2f(-playerPhys->P_velocity.z, playerPhys->P_velocity.x);
+			}
+
+
+
+			//Apply player model angle as a local rotation
+			glm::vec3 forward = glm::vec3(0, 0, 1);
+			forward = glm::rotate(-player->localTransform.getRot().y, glm::vec3(0, 1, 0)) * glm::vec4(forward, 1.0);
+
+			playerModel->localTransform.setRot(glm::vec3(0, atan2f(forward.z, -forward.x) + m_playerModelAngle, 0));
+
+			pc->setPlayerRotation(atan2f(forward.z, -forward.x) + m_playerModelAngle);
+
+			if (pc->getState()==SWORD) {
+				if (!m_logunAttacking) {
+					m_logunAttacking = true;
+					m_logunRenderer->swapAnim(m_logunSwingA);
+					m_swordRenderer->swapAnim(m_logunSwingASword);
+				}
+			}
+			if (pc->getState() != SWORD) {
+				if (m_logunAttacking) {
+					m_logunAttacking = false;
+					m_logunRenderer->swapAnim(m_logunWalk);
+					m_swordRenderer->swapAnim(m_logunWalkSword);
+				}
+			}
+
 			if (pc->health < 0)
 			{
+				
 				deadLogun->localTransform.setPos(player->localTransform.getPos());
 				deadLogun->addChild(cameraPivot);
 				cameraPivot->getBehaviours()->clear();

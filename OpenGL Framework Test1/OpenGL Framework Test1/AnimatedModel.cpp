@@ -44,6 +44,7 @@ AnimatedModel::AnimatedModel(const AnimatedModel &_other)
 	for (unsigned int i = 0; i < NUM_VBO; ++i) {
 		m_VBO[i] = _other.m_VBO[i];
 	}
+
 }
 
 AnimatedModel::~AnimatedModel()
@@ -57,6 +58,9 @@ AnimatedModel::~AnimatedModel()
 void AnimatedModel::loadFromFiles(int _frameCount, const std::string & _name, const std::string & _path)
 {
 
+	m_animSpeed = 1.0f;
+	m_name = _name.c_str();
+	m_path = _path.c_str();
 	for (int i = 0; i < _frameCount; ++i) {
 		std::string filename = _path + _name + std::to_string(i) + ".imdl";
 
@@ -339,7 +343,7 @@ void AnimatedModel::update()
 {
 	//Update T-value
 	m_t += m_animSpeed * Time::deltaTime/m_frameTimes[m_cFrame];
-
+	printf("T-Val: %s: %f\n", m_name, m_t);
 	if (m_t >= 1.0f) {
 		//Properly set current frame indices.
 		while (m_t >= 1.0f) {
@@ -366,6 +370,7 @@ void AnimatedModel::reset()
 	m_lFrame = 0;
 
 	m_t = 0.f;
+	updateFrames();
 }
 
 void AnimatedModel::setAnimSpeed(float _speed)

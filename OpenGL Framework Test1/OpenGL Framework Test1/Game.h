@@ -17,8 +17,8 @@
 #include "Enemy.h"
 #include "LUT.h"
 #include "AnimatedModel.h"
+#include "MeshRenderBehaviour.h"
 #include "Graph.h"
-
 
 class Game {
 public:
@@ -61,6 +61,11 @@ private:
 	Model *m_box;
 
 	AnimatedModel *m_logunWalk, *m_logunWalkSword;
+	AnimatedModel *m_logunSwingA, *m_logunSwingASword;
+
+	MeshRenderBehaviour *m_logunRenderer, *m_swordRenderer;
+
+	bool m_logunAttacking = false;
 
 	Shader *m_shader;
 	

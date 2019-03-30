@@ -63,7 +63,8 @@ void MeshRenderBehaviour::start()
 
 void MeshRenderBehaviour::update()
 {
-	//Intentionally empty
+	if (m_animated)
+		m_aModel->update();
 }
 
 void MeshRenderBehaviour::render()
@@ -102,4 +103,10 @@ void MeshRenderBehaviour::renderTransparent()
 void MeshRenderBehaviour::renderGUI()
 {
 	//Intentionally empty
+}
+
+void MeshRenderBehaviour::swapAnim(AnimatedModel * _new)
+{
+	m_aModel = _new;
+	m_aModel->reset();
 }
