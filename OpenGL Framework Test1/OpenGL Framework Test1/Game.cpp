@@ -1055,7 +1055,7 @@ void Game::draw()
 	gBuffer->unbindTex(0);
 	ShaderManager::getPost(PASSTHROUGH_POST)->unbind();
 
-	bloomBuffer->applyBloom(0.01f, 20);
+	bloomBuffer->applyBloom(0.01f, 5);
 
 	if (displayBloom)
 	{
