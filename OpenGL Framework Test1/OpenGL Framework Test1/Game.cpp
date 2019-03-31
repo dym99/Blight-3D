@@ -902,6 +902,13 @@ void Game::update()
 			if (pc->getState()==SWORD) {
 				if (!m_logunAttacking) {
 					m_logunAttacking = true;
+					GameObject* temp = m_activeScenes[0]->getChildren()->at(0);
+					glm::vec3 worldPos = glm::vec3(temp->getParent()->worldTransform * glm::vec4(temp->localTransform.getPos(), 1.0f));
+					glm::vec3 zeroVel = glm::vec3(0.f);
+					//Sword schwing sound
+					AudioPlayer::playTrack(new AudioTrack("LogunSlash1", FMOD_3D, AudioType::EFFECT, convertVector(worldPos), convertVector(zeroVel), false, 1.f, 10000.f), 0.05f);
+					//LogunGrunt
+					AudioPlayer::playTrack(new AudioTrack("LogunSwing1", FMOD_3D, AudioType::EFFECT, convertVector(worldPos), convertVector(zeroVel), false, 1.f, 10000.f), 0.5f);
 					m_logunRenderer->swapAnim(m_logunSwingA);
 					m_swordRenderer->swapAnim(m_logunSwingASword);
 				}
@@ -968,8 +975,17 @@ void Game::update()
 
 	AudioPlayer::update(Time::deltaTime);
 	//How to update listener position
-	//AudioPlayer::setListenerPosition(convertVector(Logun position), convertVector(logun speed), convertVector(cameraForward), glm::vec3(0.f, 1.f, 0.f));
-	//AudioPlayer::searchTrack("Ambiance")->position = logun position;
+
+	GameObject* temp = m_activeScenes[0]->getChildren()->at(0);
+	glm::vec3 worldPos = glm::vec3(temp->getParent()->worldTransform * glm::vec4(temp->localTransform.getPos(), 1.0f));
+	glm::vec3 zeroVel = glm::vec3(0.f);
+	FMOD_VECTOR logunPos = { worldPos.x, worldPos.y, worldPos.z };
+	FMOD_VECTOR fmodVel = { zeroVel.x, zeroVel.y, zeroVel.z };
+	glm::vec3 tempFor = Camera::mainCamera->GetForward();
+	FMOD_VECTOR camFor = { tempFor.x, tempFor.y, tempFor.z };
+	FMOD_VECTOR camUp = { 0.f, 1.f, 0.f };
+	AudioPlayer::setListenerPosition(logunPos, fmodVel, camFor, camUp);
+	AudioPlayer::searchTrack("Ambiance")->position = logunPos;
 
 	for (unsigned int i = 0; i < m_activeScenes.size(); ++i) {
 		m_activeScenes[i]->update();
