@@ -26,6 +26,7 @@ float window_height = 1011.f;
 std::vector<Enemy*> Game::enemies;
 std::vector<P_PhysicsBody*> Game::enemyBodies;
 int Game::m_score;
+int Game::m_wave;
 
 Game::Game()
 {
@@ -244,6 +245,8 @@ void Game::initGame()
 	//player->addBehaviour(new MeshRenderBehaviour(m_ravager, ShaderManager::getShader(GBUFFER_SHADER)));
 	if (_DEBUG)
 		player->localTransform.setPos(glm::vec3(0.f, 25.f, 0.f));
+	else
+		player->localTransform.setPos(glm::vec3(15.f, 0.f, 0.f));
 
 	cameraPivot = new GameObject("CameraPivot");
 	cameraPivot->localTransform.setPos(glm::vec3(0.f,1.f,0.f));
@@ -877,6 +880,7 @@ void Game::initGame()
 	m_AIGraph->createEdge(m_AIGraph->nodes[7], m_AIGraph->nodes[6]);
 
 	m_score = 0;
+	m_wave = 0;
 
 	m_logunSwingA->setAnimSpeed(1.5f);
 	m_logunSwingASword->setAnimSpeed(1.5f);
@@ -966,6 +970,13 @@ void Game::update()
 	if (Input::GetKeyDown(KeyCode::Divide))
 	{
 		exit(0);
+	}
+
+	if (enemies.size() <= 0)
+	{
+		++m_wave;
+		for (int i = 0; i < m_wave + 3; ++i)
+			spawnEnemy(RAVAGER, VEC3ZERO + glm::vec3(rand() % 4, 0.5, rand() % 4));
 	}
 
 	if (Input::GetKeyPress(KeyCode::G))

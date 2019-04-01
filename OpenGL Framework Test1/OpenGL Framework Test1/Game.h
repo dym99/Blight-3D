@@ -115,6 +115,7 @@ private:
 	float m_playerModelAngle;
 
 	static int m_score;
+	static int m_wave;
 };
 
 #endif
