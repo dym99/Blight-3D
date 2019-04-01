@@ -963,7 +963,7 @@ void Game::update()
 	}
 
 
-	if (Input::GetKeyDown(KeyCode::Escape))
+	if (Input::GetKeyDown(KeyCode::Divide))
 	{
 		exit(0);
 	}
