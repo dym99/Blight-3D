@@ -74,7 +74,7 @@ void main()
     //flowed uv coordinates, for two separate offset phases
     vec3 texOffsetWeight = flowUV(TexCoords, direction, jump, uTile, uFlowOffset, disTime, false);
     vec3 texOffsetWeight2 = flowUV(TexCoords, direction, jump, uTile, uFlowOffset,disTime, true);
-    
+
     //Blending two flowing waves
     vec3 color1 = texture(uAlbedoTex, texOffsetWeight.xy).rgb * texOffsetWeight.z;
     vec3 color2 = texture(uAlbedoTex, texOffsetWeight2.xy).rgb * texOffsetWeight2.z;
@@ -82,6 +82,10 @@ void main()
     //Blends the two flows together to remove the black waves
     outColors.rgb = (color1 + color2).rgb;
     outColors.a = 1.0;
+
+    //For normals
+    vec2 texOffset = TexCoords;
+    vec2 texOffset2 = TexCoords + vec2(0.5, 0.5);
 
     //Pack normals
     //in -> [-1, 1]
@@ -96,9 +100,10 @@ void main()
     //                                     tangent.y, bitangent.y, normal.y,
     //                                     tangent.z, bitangent.z, normal.z);
 
-    vec3 normMap = texture(uNormalTex, TexCoords).rgb * 2.0 - 1.0;
+    vec3 normMap = texture(uNormalTex, texOffset + vec2(sin(uTime), cos(uTime)) / 15.f).rgb * 2.0 - 1.0;
+    vec3 normMap2 = texture(uNormalTex, texOffset2 + vec2(sin(uTime), cos(uTime)) / 15.f).rgb * 2.0 - 1.0;
    // normMap = normMap * tangentSpaceToWorldSpace;
-    outNormals = normalize(normMap) * 0.5 + 0.5;
+    outNormals = normalize(normMap + normMap2) * 0.5 + 0.5;
 
     //View space positions
     outPositions = fragPosition;
