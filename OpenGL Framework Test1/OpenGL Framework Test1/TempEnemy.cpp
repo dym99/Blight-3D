@@ -1,5 +1,6 @@
 #include "TempEnemy.h"
 #include "P_PhysicsBody.h"
+#include "AudioPlayer.h"
 #include "GameObject.h"
 #include "Game.h"
 #include "Enemy.h"
@@ -31,6 +32,11 @@ void TempEnemy::update()
 	{
 		if (name == "Sword")
 		{
+			GameObject* temp = m_theEnemy;
+			glm::vec3 worldPos = glm::vec3(temp->getParent()->worldTransform * glm::vec4(temp->localTransform.getPos(), 1.0f));
+			glm::vec3 zeroVel = glm::vec3(0.f);
+			AudioPlayer::playTrack(new AudioTrack("RavagerHurt1", FMOD_3D, AudioType::EFFECT, convertVector(worldPos), convertVector(zeroVel), false, 1.f, 10000.f), 0.2f);
+
 			health -= 0.10f;
 		}
 	}

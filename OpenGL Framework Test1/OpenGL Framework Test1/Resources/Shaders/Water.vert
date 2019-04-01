@@ -23,7 +23,7 @@ void main()
 	float height = texture(uWaveTex, texCoord + (vec2(0.5f, 0.5f) * (uTime * 0.25))).r;
 	height = height;
 	vec3 tempPos = position;
-	tempPos.y += height;
+	tempPos.y += height + 0.15f;
 	normal0 = mat3(uModel) * normal;
 	fragPosition = (uModel * vec4(tempPos, 1.0)).rgb;
 	gl_Position = uProj * uView * uModel * vec4(tempPos, 1.0);

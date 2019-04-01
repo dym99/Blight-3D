@@ -937,7 +937,11 @@ void Game::update()
 
 			if (pc->health < 0)
 			{
-				
+				GameObject* temp = m_activeScenes[0]->getChildren()->at(0);
+				glm::vec3 worldPos = glm::vec3(temp->getParent()->worldTransform * glm::vec4(temp->localTransform.getPos(), 1.0f));
+				glm::vec3 zeroVel = glm::vec3(0.f);
+				AudioPlayer::playTrack(new AudioTrack("LogunDeath", FMOD_3D, AudioType::EFFECT, convertVector(worldPos), convertVector(zeroVel), false, 1.f, 10000.f), 0.5f);
+
 				deadLogun->localTransform.setPos(player->localTransform.getPos());
 				deadLogun->addChild(cameraPivot);
 				cameraPivot->getBehaviours()->clear();
@@ -966,7 +970,7 @@ void Game::update()
 
 	if (Input::GetKeyPress(KeyCode::G))
 	{
-		//spawnEnemy(RAVAGER, VEC3ZERO + glm::vec3(0, 0.5, 0));
+		spawnEnemy(RAVAGER, VEC3ZERO + glm::vec3(0, 0.5, 0));
 	}
 
 	if (Input::GetKeyPress(KeyCode::F1)) {
@@ -1076,7 +1080,7 @@ void Game::draw()
 	gBuffer->unbindTex(0);
 	ShaderManager::getPost(PASSTHROUGH_POST)->unbind();
 
-	bloomBuffer->applyBloom(0.01f, 5);
+	bloomBuffer->applyBloom(0.01f, 10);
 
 	if (displayBloom)
 	{
@@ -1191,6 +1195,14 @@ void Game::killEnemy(Enemy* _toKill)
 	if (proceed)
 	{
 		delete enemyBodies[i];
+		
+		//Enemy death sound
+		GameObject* temp = enemies[i];
+		glm::vec3 worldPos = glm::vec3(temp->getParent()->worldTransform * glm::vec4(temp->localTransform.getPos(), 1.0f));
+		glm::vec3 zeroVel = glm::vec3(0.f);
+		AudioPlayer::playTrack(new AudioTrack("RavagerDeath1", FMOD_3D, AudioType::EFFECT, convertVector(worldPos), convertVector(zeroVel), false, 1.f, 10000.f), 0.5f);
+		//enemy death sound end
+
 		enemyBodies.erase(enemyBodies.begin() + i);
 		enemies[i]->getParent()->removeChild(enemies[i]);
 		//GameObject* parent = enemies[0]->getParent();

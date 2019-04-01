@@ -47,7 +47,7 @@ void Texture::createTexture(int w, int h, GLenum target, GLenum filtering, GLenu
 
 bool Texture::load(const std::string & file)
 {
-	m_texture = SOIL_load_OGL_texture(file.c_str(), SOIL_LOAD_AUTO, SOIL_CREATE_NEW_ID, SOIL_FLAG_MIPMAPS | SOIL_FLAG_INVERT_Y | SOIL_FLAG_COMPRESS_TO_DXT);
+	m_texture = SOIL_load_OGL_texture(file.c_str(), SOIL_LOAD_AUTO, SOIL_CREATE_NEW_ID, SOIL_FLAG_MIPMAPS | SOIL_FLAG_INVERT_Y);
 
 	if (m_texture == 0) {
 		std::cout << "Texture failed to load.\n" << file << '\n' << SOIL_last_result() << '\n';
