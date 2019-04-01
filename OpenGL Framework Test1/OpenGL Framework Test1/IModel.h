@@ -37,6 +37,31 @@ enum TexTypes {
 
 #pragma endregion
 
+class Weight {
+public:
+	Weight() {
+		m_group = 0;
+		m_weight = 0.f;
+	}
+	unsigned int m_group;
+	float m_weight;
+};
+
+class Vertex {
+public:
+	Vertex() {
+		m_pos = glm::vec3();
+		m_weights = std::vector<Weight>();
+	}
+	Vertex(const glm::vec3& _pos, const std::vector<Weight>& _weights) {
+		m_pos = _pos;
+		m_weights = _weights;
+	}
+
+	glm::vec3 m_pos;
+	std::vector<Weight> m_weights;
+};
+
 //Simple IMDL Loader
 //
 // Skipped Tangent/Bitangent stuff for now
@@ -65,10 +90,17 @@ public:
 
 	//Specify Emissive texture
 	void setEmissive(Texture* _tex);
+	void setHeight(Texture* _tex);
+	void setNormal(Texture* _tex);
+	void setDirection(Texture* _tex);
 	void setMetal(Texture* _tex);
 	void setRough(Texture* _tex);
 
 private:
+	std::vector<glm::vec4> dataTangent;
+	std::vector<glm::vec4> dataBitangent;
+
+	void calculateTangents(std::vector<Vertex>* dataVertex, std::vector<glm::vec2>* dataTexture);
 	//Vertex attributes
 	GLuint m_VAO;
 	GLuint m_VBO[NUM_VBO];
@@ -78,6 +110,9 @@ private:
 
 	Texture* m_albedo;
 	Texture* m_emissive;
+	Texture* m_height;
+	Texture* m_normal;
+	Texture* m_direction;
 	Texture* m_metalness;
 	Texture* m_roughness;
 

@@ -45,6 +45,8 @@ public:
 private:
 	Display *m_display;
 
+	float totalGameTime = 0.f;
+
 	//TODO: Replace resources here with resource loader class
 
 	IModel *m_ravager;

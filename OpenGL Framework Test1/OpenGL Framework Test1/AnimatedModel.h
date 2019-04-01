@@ -29,6 +29,7 @@ public:
 	//Right now, you have to specify.
 	void setAlbedo(Texture* _tex);
 	void setEmissive(Texture* _tex);
+	void setNormal(Texture* _tex);
 	void setMetalness(Texture* _tex);
 	void setRoughness(Texture* _tex);
 
@@ -59,6 +60,7 @@ private:
 
 	Texture* m_albedo;
 	Texture* m_emissive;
+	Texture* m_normal;
 	Texture* m_metalness;
 	Texture* m_roughness;
 

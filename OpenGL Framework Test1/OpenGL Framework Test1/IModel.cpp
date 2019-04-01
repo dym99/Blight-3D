@@ -13,31 +13,6 @@
 #include <algorithm>
 #include <glm/glm.hpp>
 
-class Weight {
-public:
-	Weight() {
-		m_group = 0;
-		m_weight = 0.f;
-	}
-	unsigned int m_group;
-	float m_weight;
-};
-
-class Vertex {
-public:
-	Vertex() {
-		m_pos = glm::vec3();
-		m_weights = std::vector<Weight>();
-	}
-	Vertex(const glm::vec3& _pos, const std::vector<Weight>& _weights) {
-		m_pos = _pos;
-		m_weights = _weights;
-	}
-
-	glm::vec3 m_pos;
-	std::vector<Weight> m_weights;
-};
-
 class IndexPair {
 public:
 	IndexPair() {
@@ -208,10 +183,13 @@ void IModel::loadFromFile(const std::string& _name, const std::string& _path) {
 			std::cout << indexPairs.size() << std::endl;
 			//Unpack data
 
+			//calculateTangents(&vertices, &uvs);
+
 			std::vector<float> unpackedPos;
 			std::vector<float> unpackedUV;
 			std::vector<float> unpackedNorm;
-
+			std::vector<float> unpackedTangent;
+			std::vector<float> unpackedBitangent;
 			std::vector<int> unpackedGroups;
 			std::vector<float> unpackedWeights;
 
@@ -225,6 +203,12 @@ void IModel::loadFromFile(const std::string& _name, const std::string& _path) {
 				unpackedNorm.push_back(norms[indexPairs[i].norm].x);
 				unpackedNorm.push_back(norms[indexPairs[i].norm].y);
 				unpackedNorm.push_back(norms[indexPairs[i].norm].z);
+				//unpackedTangent.push_back(dataTangent[indexPairs[i].vert].x);
+				//unpackedTangent.push_back(dataTangent[indexPairs[i].vert].y);
+				//unpackedTangent.push_back(dataTangent[indexPairs[i].vert].z);
+				//unpackedBitangent.push_back(dataBitangent[indexPairs[i].vert].x);
+				//unpackedBitangent.push_back(dataBitangent[indexPairs[i].vert].y);
+				//unpackedBitangent.push_back(dataBitangent[indexPairs[i].vert].z);
 
 				if (vertices[indexPairs[i].vert].m_weights.size() > 4) {
 					//Too many groups for the engine (for now)
@@ -252,6 +236,7 @@ void IModel::loadFromFile(const std::string& _name, const std::string& _path) {
 			//TODO: TANGENT/BITANGENT
 
 
+
 			//Get unpacked vertex count
 			m_numVertices = static_cast<unsigned int>(unpackedPos.size());
 
@@ -268,8 +253,8 @@ void IModel::loadFromFile(const std::string& _name, const std::string& _path) {
 			glEnableVertexAttribArray(VBO_POS);	//Vertices
 			glEnableVertexAttribArray(VBO_TEX);	//UVs
 			glEnableVertexAttribArray(VBO_NORM);	//Normals
-			//glEnableVertexAttribArray(3);	//Tangents
-			//glEnableVertexAttribArray(4);	//Bitangents
+			//glEnableVertexAttribArray(VBO_NORM_TANGENT);	//Tangents
+			//glEnableVertexAttribArray(VBO_NORM_BITANGENT);	//Bitangents
 			glEnableVertexAttribArray(VBO_GROUPS);	//Groups
 			glEnableVertexAttribArray(VBO_WEIGHTS);	//Weights
 
@@ -289,13 +274,13 @@ void IModel::loadFromFile(const std::string& _name, const std::string& _path) {
 			glVertexAttribPointer((GLuint)VBO_NORM, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 3, BUFFER_OFFSET(0));
 
 			////Send the tangent data to OpenGL
-			//glBindBuffer(GL_ARRAY_BUFFER, VBO_Tangents);
-			//glBufferData(GL_ARRAY_BUFFER, sizeof(float) * unPackedTangentData.size(), &unPackedTangentData[0], GL_STATIC_DRAW);
+			//glBindBuffer(GL_ARRAY_BUFFER, m_VBO[VBO_NORM_TANGENT]);
+			//glBufferData(GL_ARRAY_BUFFER, sizeof(float) * unpackedTangent.size(), &unpackedTangent[0], GL_STATIC_DRAW);
 			//glVertexAttribPointer((GLuint)3, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 3, BUFFER_OFFSET(0));
 			//
 			////Send the bitangent data to OpenGL
-			//glBindBuffer(GL_ARRAY_BUFFER, VBO_Bitangents);
-			//glBufferData(GL_ARRAY_BUFFER, sizeof(float) * unPackedBitangentData.size(), &unPackedBitangentData[0], GL_STATIC_DRAW);
+			//glBindBuffer(GL_ARRAY_BUFFER, m_VBO[VBO_NORM_BITANGENT]);
+			//glBufferData(GL_ARRAY_BUFFER, sizeof(float) * unpackedBitangent.size(), &unpackedBitangent[0], GL_STATIC_DRAW);
 			//glVertexAttribPointer((GLuint)4, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 3, BUFFER_OFFSET(0));
 
 			//Send the group data to OpenGL
@@ -331,7 +316,15 @@ void IModel::draw(Shader * shader) {
 
 	//Draw the mesh
 	m_albedo->bind(0);			//Albedo
-	m_albedo->bind(1);			//Specular
+	if (m_normal != nullptr)
+	{
+		shader->sendUniform("noNormMap", 0);
+		m_normal->bind(1);		//Normal
+	}
+	else
+	{
+		shader->sendUniform("noNormMap", 1);
+	}
 	m_emissive->bind(2);		//Emissive
 	if (m_metalness != nullptr)
 	{
@@ -341,6 +334,15 @@ void IModel::draw(Shader * shader) {
 	{
 		m_roughness->bind(4);	//Roughness
 	}
+	if (m_height != nullptr)
+	{
+		m_height->bind(5);		//Height
+	}
+	if (m_direction != nullptr)
+	{
+		m_direction->bind(6);	//Direction map
+	}
+
 	glBindVertexArray(m_VAO);
 	glDrawArrays(GL_TRIANGLES, 0, m_numVertices * 3);
 	glBindVertexArray(0);
@@ -349,6 +351,8 @@ void IModel::draw(Shader * shader) {
 	Texture::unbind(2);
 	Texture::unbind(3);
 	Texture::unbind(4);
+	Texture::unbind(5);
+	Texture::unbind(6);
 }
 
 void IModel::setAlbedo(Texture * _tex)
@@ -361,6 +365,21 @@ void IModel::setEmissive(Texture * _tex)
 	m_emissive = _tex;
 }
 
+void IModel::setHeight(Texture * _tex)
+{
+	m_height = _tex;
+}
+
+void IModel::setNormal(Texture * _tex)
+{
+	m_normal = _tex;
+}
+
+void IModel::setDirection(Texture * _tex)
+{
+	m_direction = _tex;
+}
+
 void IModel::setMetal(Texture * _tex)
 {
 	m_metalness = _tex;
@@ -369,6 +388,39 @@ void IModel::setMetal(Texture * _tex)
 void IModel::setRough(Texture * _tex)
 {
 	m_roughness = _tex;
+}
+
+void IModel::calculateTangents(std::vector<Vertex>* dataVertex, std::vector<glm::vec2>* dataTexture)
+{
+	dataTangent.resize(dataVertex->size());
+	dataBitangent.resize(dataVertex->size());
+
+	for (size_t i = 0; i < dataVertex->size(); i += 3)
+	{
+		glm::vec3 vertex0 = dataVertex->at(i + 0).m_pos;
+		glm::vec3 vertex1 = dataVertex->at(i + 1).m_pos;
+		glm::vec3 vertex2 = dataVertex->at(i + 2).m_pos;
+
+		glm::vec2 uv0 = dataTexture->at(i + 0);
+		glm::vec2 uv1 = dataTexture->at(i + 1);
+		glm::vec2 uv2 = dataTexture->at(i + 2);
+
+		glm::vec3 deltaPos1 = vertex1 - vertex0;
+		glm::vec3 deltaPos2 = vertex2 - vertex0;
+
+		glm::vec2 deltaUV1 = uv1 - uv0;
+		glm::vec2 deltaUV2 = uv2 - uv0;
+
+		float f = 1.0f / (deltaUV1.x * deltaUV2.y - deltaUV1.y * deltaUV2.x);
+		glm::vec3 tangent = (deltaPos1 * deltaUV2.y - deltaPos2 * deltaUV1.y)*f;
+		glm::vec3 bitangent = (deltaPos2 * deltaUV1.x - deltaPos1 * deltaUV2.x)*f;
+
+		for (int tangentLoop = 0; tangentLoop < 3; ++tangentLoop)
+		{
+			dataTangent[i + tangentLoop] = glm::vec4(tangent, 1.0f);
+			dataBitangent[i + tangentLoop] = glm::vec4(bitangent, 1.0f);
+		}
+	}
 }
 
 

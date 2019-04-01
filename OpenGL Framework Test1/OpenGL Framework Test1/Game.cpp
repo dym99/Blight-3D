@@ -144,6 +144,15 @@ void Game::initGame()
 	Texture *swordRoughTex = new Texture("roughTex");
 	swordRoughTex->load("./Resources/Objects/Logun/SwordRoughness.png");
 
+	Texture *acidWaterTex = new Texture("albedoTex");
+	acidWaterTex->load("./Resources/Objects/MainLevel/Acid.png");
+	Texture *acidNormTex = new Texture("normalTex");
+	acidNormTex->load("./Resources/Objects/MainLevel/AcidNorm.png");
+	Texture *acidHeightTex = new Texture("heightTex");
+	acidHeightTex->load("./Resources/Objects/MainLevel/AcidHeight.png");
+	Texture *acidDirectionTex = new Texture("directTex");
+	acidDirectionTex->load("./Resources/Objects/MainLevel/testDir.png");
+
 	Texture *noMetalTex = new Texture("metalTex");
 	noMetalTex->load("./Resources/Textures/noMetalTex.png");
 	Texture *allMetalTex = new Texture("metalTex");
@@ -196,8 +205,12 @@ void Game::initGame()
 	
 	m_brazier->setEmissive(blankEmissive);
 	m_ravager->setEmissive(blankEmissive);
-	m_acid->setAlbedo(roomTex);
+	m_acid->setAlbedo(acidWaterTex);
 	m_acid->setEmissive(blankEmissive);
+	m_acid->setNormal(acidNormTex);
+	m_acid->setHeight(acidHeightTex);
+	m_acid->setDirection(acidDirectionTex);
+
 
 	m_level->setAlbedo(roomTex);
 	m_level->setEmissive(roomEmissive);
@@ -874,7 +887,8 @@ void Game::update()
 	//std::cout << m_score << std::endl;
 	Time::update();
 
-	
+	//static float totalGameTime = 0.f;
+	totalGameTime += Time::deltaTime;
 	
 	//Kill the player
 	if (player != nullptr)
@@ -952,7 +966,7 @@ void Game::update()
 
 	if (Input::GetKeyPress(KeyCode::G))
 	{
-		spawnEnemy(RAVAGER, VEC3ZERO + glm::vec3(0, 0.5, 0));
+		//spawnEnemy(RAVAGER, VEC3ZERO + glm::vec3(0, 0.5, 0));
 	}
 
 	if (Input::GetKeyPress(KeyCode::F1)) {
@@ -990,6 +1004,10 @@ void Game::update()
 	for (unsigned int i = 0; i < m_activeScenes.size(); ++i) {
 		m_activeScenes[i]->update();
 	}
+
+	ShaderManager::getShader(GBUFFER_WATER)->bind();
+	ShaderManager::getShader(GBUFFER_WATER)->sendUniform("uTime", totalGameTime);
+	ShaderManager::getShader(GBUFFER_WATER)->unbind();
 
 	Shader::unbind();
 	Input::ResetKeys();
@@ -1034,7 +1052,7 @@ void Game::draw()
 	}
 	else
 	{
-		gBuffer->drawBuffers(METALNESS, ROUGHNESS, EMISSIVES);
+		gBuffer->drawBuffers(NORMAL, ALBEDO, EMISSIVES);
 
 		glViewport(window_width / 2, 0, window_width / 2, window_height / 2);					///Bottom Right
 		ShaderManager::getPost(DEFERREDLIGHT_POST)->bind();

@@ -305,7 +305,15 @@ void AnimatedModel::draw(Shader * shader)
 	shader->sendUniform("uT", m_t);
 	//Draw the mesh
 	m_albedo->bind(0);			//Albedo
-								//Normals
+	if (m_normal != nullptr)
+	{
+		m_normal->bind(1);		//Normals
+		shader->sendUniform("noNormMap", 0);
+	}
+	else
+	{
+		shader->sendUniform("noNormMap", 1);
+	}
 	m_emissive->bind(2);		//Emissives
 	m_metalness->bind(3);		//Metalness
 	m_roughness->bind(4);		//Roughness
@@ -327,6 +335,11 @@ void AnimatedModel::setAlbedo(Texture * _tex)
 void AnimatedModel::setEmissive(Texture * _tex)
 {
 	m_emissive = _tex;
+}
+
+void AnimatedModel::setNormal(Texture * _tex)
+{
+	m_normal = _tex;
 }
 
 void AnimatedModel::setMetalness(Texture * _tex)
