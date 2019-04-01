@@ -49,4 +49,6 @@ private:
 	Node* closestToLogun;
 	Node* closestToL;
 	int prevClosestID = -1;
+
+	bool m_startHit = false;
 };
