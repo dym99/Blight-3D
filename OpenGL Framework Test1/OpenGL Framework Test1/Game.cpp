@@ -18,6 +18,9 @@
 #define _DEBUG 0
 #endif
 
+#define ded = false
+#define aliv = true
+
 float window_width = 1920.f;
 float window_height = 1011.f;
 
@@ -27,6 +30,8 @@ std::vector<Enemy*> Game::enemies;
 std::vector<P_PhysicsBody*> Game::enemyBodies;
 int Game::m_score;
 int Game::m_wave;
+
+bool logunAlive = true;
 
 Game::Game()
 {
@@ -77,9 +82,14 @@ void Game::initGame()
 
 	uiImage = new Texture();
 	uiImage->load("./Resources/Textures/UIpost.png");
+	uiMask = new Texture();
+	uiMask->load("./Resources/Textures/UImask.png");
 	toonRamp = new Texture();
 	toonRamp->load("./Resources/Textures/ToonRamp.png");
 	colorCorrection = new LUT3D("Blight_Lut.cube");
+
+	texMiniMap = new Texture();
+	texMiniMap->load("./Resources/Textures/miniMap.png");
 
 	//Initializes the screen quad
 	FrameBuffer::initFSQ();
@@ -246,7 +256,7 @@ void Game::initGame()
 	if (_DEBUG)
 		player->localTransform.setPos(glm::vec3(0.f, 25.f, 0.f));
 	else
-		player->localTransform.setPos(glm::vec3(15.f, 0.f, 0.f));
+		player->localTransform.setPos(glm::vec3(-40.f, 0.f, 0.f));
 
 	cameraPivot = new GameObject("CameraPivot");
 	cameraPivot->localTransform.setPos(glm::vec3(0.f,1.f,0.f));
@@ -260,7 +270,7 @@ void Game::initGame()
 
 	healthShower = new GameObject("HealthShower");
 	healthShower->localTransform.setPos(glm::vec3(0.f,2.f,0.f));
-	healthShower->addBehaviour(new MeshRenderBehaviour(m_box, ShaderManager::getShader(GBUFFER_SHADER)));
+	//healthShower->addBehaviour(new MeshRenderBehaviour(m_box, ShaderManager::getShader(GBUFFER_SHADER)));
 
 	cameraPivot->addChild(cameraObject);
 	player->addChild(cameraPivot);
@@ -636,7 +646,7 @@ void Game::initGame()
 	auto attackBox = new GameObject("AttackBox");
 	attackBox->localTransform.setPos(glm::vec3(0.f, 0.f, 0.3f));
 	attackBox->localTransform.setScale(glm::vec3(0.2f, 0.2f, 1.f));
-	attackBox->addBehaviour(new MeshRenderBehaviour(m_box, ShaderManager::getShader(GBUFFER_SHADER)));
+	//attackBox->addBehaviour(new MeshRenderBehaviour(m_box, ShaderManager::getShader(GBUFFER_SHADER)));
 
 	playerPhys = new P_PhysicsBody(player, 1.f, true, SPHERE, 0.5f, 0.f, 0.f, glm::vec3(0, 0.5f, 0), 0.0f, 1.0f, false, false, "Player");
 	hitBox = new P_PhysicsBody(attackBox, 1.f, false, BOX, .2f, .2f, 2.f, VEC3ZERO, 0.f, 0.f, false, true, "Sword");
@@ -841,10 +851,13 @@ void Game::initGame()
 
 	//Load audio track for ambiance
 	AudioPlayer::loadAudio(*new AudioTrack("Ambiance", FMOD_3D, AudioType::EFFECT, { 0.f, 0.f, 0.f }, { 0.f, 0.f, 0.f }, true, 0.1f, 5000.f), "Ambiance");
+	AudioPlayer::loadAudio(*new AudioTrack("bones", FMOD_3D, AudioType::EFFECT, { 0.f, 0.f, 0.f }, { 0.f, 0.f, 0.f }, true, 0.1f, 5000.f), "Walking");
 	//Play ambiance
 	AudioPlayer::prepareTrack("Ambiance");
+	AudioPlayer::prepareTrack("Walking");
 	AudioPlayer::playTrack("Ambiance");
 	AudioPlayer::setVolume("Ambiance", 0.1f);
+	AudioPlayer::setVolume("Walking", 0.1f);
 
 	//m_display->setFullscreen(SDL_WINDOW_FULLSCREEN);
 	m_activeScenes.push_back(scene);
@@ -907,7 +920,10 @@ void Game::update()
 				m_playerModelAngle = atan2f(-playerPhys->P_velocity.z, playerPhys->P_velocity.x);
 			}
 
-
+			if (Input::GetKeyDown(KeyCode::Multiply))
+			{
+				pc->health = -0.1f;
+			}
 
 			//Apply player model angle as a local rotation
 			glm::vec3 forward = glm::vec3(0, 0, 1);
@@ -941,24 +957,32 @@ void Game::update()
 
 			if (pc->health < 0)
 			{
+				logunAlive ded;
+
 				GameObject* temp = m_activeScenes[0]->getChildren()->at(0);
 				glm::vec3 worldPos = glm::vec3(temp->getParent()->worldTransform * glm::vec4(temp->localTransform.getPos(), 1.0f));
 				glm::vec3 zeroVel = glm::vec3(0.f);
 				AudioPlayer::playTrack(new AudioTrack("LogunDeath", FMOD_3D, AudioType::EFFECT, convertVector(worldPos), convertVector(zeroVel), false, 1.f, 10000.f), 0.5f);
 
-				deadLogun->localTransform.setPos(player->localTransform.getPos());
-				deadLogun->addChild(cameraPivot);
-				cameraPivot->getBehaviours()->clear();
-				cameraPivot->addBehaviour(new MouseLook(deadLogun));
+				//deadLogun->localTransform.setPos(player->localTransform.getPos());
+				//deadLogun->addChild(cameraPivot);
+				//cameraPivot->getBehaviours()->clear();
+				//cameraPivot->addBehaviour(new MouseLook(deadLogun));
 
-				player->getParent()->removeChild(player);
-				//for(P_PhysicsBody p : P_PhysicsBody::P_bodyCount)
-				playerPhys->setGameObject(deadLogun);
+				//player->getParent()->removeChild(player);
+				////for(P_PhysicsBody p : P_PhysicsBody::P_bodyCount)
+				//playerPhys->setGameObject(deadLogun);
 
-				delete player;
+				//delete player;
 			}
 			else
 			{
+
+				ShaderManager::getPost(UI_POST)->bind();
+				ShaderManager::getPost(UI_POST)->sendUniform("uHealth", pc->health);
+				ShaderManager::getPost(UI_POST)->sendUniform("uHealth2", pc->healthYellow);
+				ShaderManager::getPost(UI_POST)->unbind();
+
 				healthShower->localTransform.setScale(glm::vec3(0.2, pc->health / 200, 0.2));
 				healthShower->localTransform.setPos(glm::vec3(0, 2.f + (pc->health / 200 / 2), 0));
 				P_PhysicsBody::P_physicsUpdate(Time::deltaTime);
@@ -974,6 +998,11 @@ void Game::update()
 
 	if (enemies.size() <= 0)
 	{
+		GameObject* temp = m_activeScenes[0]->getChildren()->at(0);
+		glm::vec3 worldPos = glm::vec3(temp->getParent()->worldTransform * glm::vec4(temp->localTransform.getPos(), 1.0f));
+		glm::vec3 zeroVel = glm::vec3(0.f);
+		AudioPlayer::playTrack(new AudioTrack("dialoguetest3", FMOD_3D, AudioType::EFFECT, convertVector(worldPos), convertVector(zeroVel), false, 1.f, 10000.f), 0.5f);
+
 		++m_wave;
 		for (int i = 0; i < m_wave + 3; ++i)
 			spawnEnemy(RAVAGER, VEC3ZERO + glm::vec3(rand() % 4, 0.5, rand() % 4));
@@ -1015,6 +1044,7 @@ void Game::update()
 	FMOD_VECTOR camUp = { 0.f, 1.f, 0.f };
 	AudioPlayer::setListenerPosition(logunPos, fmodVel, camFor, camUp);
 	AudioPlayer::searchTrack("Ambiance")->position = logunPos;
+	AudioPlayer::searchTrack("Walking")->position = logunPos;
 
 	for (unsigned int i = 0; i < m_activeScenes.size(); ++i) {
 		m_activeScenes[i]->update();
@@ -1023,6 +1053,10 @@ void Game::update()
 	ShaderManager::getShader(GBUFFER_WATER)->bind();
 	ShaderManager::getShader(GBUFFER_WATER)->sendUniform("uTime", totalGameTime);
 	ShaderManager::getShader(GBUFFER_WATER)->unbind();
+
+	ShaderManager::getPost(UI_POST)->bind();
+	ShaderManager::getPost(UI_POST)->sendUniform("uTime", Time::deltaTime);
+	ShaderManager::getPost(UI_POST)->unbind();
 
 	Shader::unbind();
 	Input::ResetKeys();
@@ -1136,7 +1170,7 @@ void Game::draw()
 
 	ShaderManager::getPost(ADDEDGE_POST)->bind();
 	edgeBuffer->bindTex(1, 0);				//Edge buffer
-	deferredComposite->drawToScreen();
+	deferredComposite->draw();
 	Texture::unbind(1);
 	ShaderManager::getPost(ADDEDGE_POST)->bind();
 
@@ -1152,6 +1186,15 @@ void Game::draw()
 	//		ParticleManager::render(i);
 	//	}
 	//}
+
+	ShaderManager::getPost(UI_POST)->bind();
+	uiImage->bind(1);
+	uiMask->bind(2);
+	deferredComposite->drawToScreen();
+	uiMask->unbind(2);
+	uiImage->unbind(1);
+	ShaderManager::getPost(UI_POST)->unbind();
+
 }
 
 void Game::GUI()
@@ -1256,8 +1299,6 @@ Node * Game::getClosestToLogun()
 
 int Game::run() {
 	while (m_display->isOpen()) {
-
-
 		ShaderManager::getShader(PHONG_SHADER)->bind();
 		//ShaderManager::getShader(PHONG_SHADER)->SendUniform("light.position", glm::vec4(lights[0]->GetTransform()->GetPos(), 1.0f));
 		Shader::unbind();
@@ -1288,6 +1329,28 @@ int Game::run() {
 		if (Input::GetKeyPress(KeyCode::F5))
 		{
 			ShaderManager::reloadShaders();
+		}
+		if (!logunAlive)
+		{
+			if (Input::GetKeyDown(KeyCode::Enter))
+			{
+				logunAlive aliv;
+
+				while (enemies.size() > 0)
+				{
+					for (int i = 0; i < enemies.size(); ++i)
+					{
+						killEnemy(enemies[i]);
+					}
+				}
+				m_score = 0;
+				m_wave = 0;
+				
+				std::vector<Behaviour*> behav = *player->getBehaviours();
+				PlayerController* pc = (PlayerController*)behav[0];
+				pc->health = MAX_HEALTH;
+				player->localTransform.setPos(glm::vec3(-40.f, 0.f, 0.f));
+			}
 		}
 	}
 

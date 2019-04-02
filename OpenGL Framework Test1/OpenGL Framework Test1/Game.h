@@ -87,7 +87,9 @@ private:
 
 	//Texture
 	Texture *uiImage;
+	Texture *uiMask;
 	Texture *toonRamp;
+	Texture *texMiniMap;
 	LUT3D *colorCorrection;
 
 	std::vector<Scene>  m_scenes;

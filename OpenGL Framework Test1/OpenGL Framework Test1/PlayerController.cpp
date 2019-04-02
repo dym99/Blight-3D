@@ -2,6 +2,7 @@
 #include "Input.h"
 #include "P_PhysicsBody.h"
 #include "Utils.h"
+#include "AudioPlayer.h"
 #include <algorithm>
 
 //Length in seconds each attack lasts
@@ -89,6 +90,11 @@ void PlayerController::update()
 		}
 	}
 
+	
+	tVal += Time::deltaTime;
+	if (tVal >= 1.f)
+		tVal = 1.f;
+	healthYellow = Lerp<float>(healthLerp, health, tVal);
 
 	//Allow player to move and jump, when touching the ground
 	bool touchGround = false;
@@ -98,7 +104,34 @@ void PlayerController::update()
 			touchGround = true;
 
 		if (_name == "Enemy")
+		{
+			tVal = 0.f;
 			health -= 10.f * Time::deltaTime;
+			healthLerp = healthYellow;
+			healthLerp -= 5.f * Time::deltaTime;
+
+			if (m_hurtDelay <= 0)
+			{
+				//Play the hurted noise please
+				m_hurtDelay = 3.f;
+
+				GameObject* temp = m_playerObject->getGameObject();
+				glm::vec3 worldPos = glm::vec3(temp->getParent()->worldTransform * glm::vec4(temp->localTransform.getPos(), 1.0f));
+				glm::vec3 zeroVel = glm::vec3(0.f);
+				AudioPlayer::playTrack(new AudioTrack("LogunGetHit1", FMOD_3D, AudioType::EFFECT, convertVector(worldPos), convertVector(zeroVel), false, 1.f, 10000.f), 0.5f);
+			}
+			else
+				m_hurtDelay -= Time::deltaTime;
+		}	
+	}
+
+	if (m_walking == true)
+	{
+		AudioPlayer::playTrack("Walking");
+	}
+	else
+	{
+		AudioPlayer::pauseTrack("Walking");
 	}
 	float mult = Input::GetKey(KeyCode::Shift);
 	float yRot = m_playerObject->getGameObject()->localTransform.getRot().y;
@@ -128,12 +161,12 @@ void PlayerController::update()
 		m_playerObject->P_addForce(force * SPEED);
 	}
 
-	if (touchGround)
-	{
-		if (Input::GetKey(KeyCode::Space)) {
-			m_playerObject->P_addForce(glm::vec3(0, 10 / Time::deltaTime, 0));
-		}
-	}
+	//if (touchGround)
+	//{
+	//	if (Input::GetKey(KeyCode::Space)) {
+	//		m_playerObject->P_addForce(glm::vec3(0, 10 / Time::deltaTime, 0));
+	//	}
+	//}
 
 	m_prevLMouse = (GetKeyState(VK_LBUTTON) & 0x100);
 

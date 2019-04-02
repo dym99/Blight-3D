@@ -25,6 +25,9 @@ public:
 	void renderTransparent() override;
 	void renderGUI() override;
 	float health = MAX_HEALTH;
+	float healthLerp = MAX_HEALTH;
+	float healthYellow = MAX_HEALTH;
+	float tVal = 0.f;
 
 	inline PlayerState getState() { return m_theState; }
 	inline bool isWalking() { return m_walking; }
@@ -55,4 +58,7 @@ private:
 
 	//Button state
 	bool m_prevLMouse;
+
+	//stupid variable to make stuff more bad :)
+	float m_hurtDelay = 0.f;
 };
