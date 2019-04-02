@@ -92,6 +92,7 @@ private:
 	Texture *uiMask;
 	Texture *toonRamp;
 	Texture *texMiniMap;
+	Texture *endGame;
 	LUT3D *colorCorrection;
 
 	std::vector<Scene>  m_scenes;

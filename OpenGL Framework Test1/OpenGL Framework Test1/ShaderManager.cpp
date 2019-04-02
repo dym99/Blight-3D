@@ -122,6 +122,11 @@ void ShaderManager::loadShaders()
 		"./Resources/Shaders/PostProcess/EmissivePost.frag"
 	));
 
+	m_postShaders.push_back(new Shader(
+		"./Resources/Shaders/PassThrough.vert",
+		"./Resources/Shaders/PostProcess/EndGame.frag"
+	));
+
 	//Bloom components
 	m_bloomComponents.push_back(new Shader(
 		"./Resources/Shaders/PassThrough.vert",

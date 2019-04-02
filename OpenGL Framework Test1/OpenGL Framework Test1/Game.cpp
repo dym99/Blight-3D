@@ -86,6 +86,8 @@ void Game::initGame()
 	uiMask->load("./Resources/Textures/UImask.png");
 	toonRamp = new Texture();
 	toonRamp->load("./Resources/Textures/ToonRamp.png");
+	endGame = new Texture();
+	endGame->load("./Resources/Textures/BlightEndGame.jpg");
 	colorCorrection = new LUT3D("Blight_Lut.cube");
 
 	texMiniMap = new Texture();
@@ -971,13 +973,15 @@ void Game::update()
 
 			if (pc->health < 0)
 			{
+				if (logunAlive)
+				{
+					GameObject* temp = m_activeScenes[0]->getChildren()->at(0);
+					glm::vec3 worldPos = glm::vec3(temp->getParent()->worldTransform * glm::vec4(temp->localTransform.getPos(), 1.0f));
+					glm::vec3 zeroVel = glm::vec3(0.f);
+					AudioPlayer::playTrack(new AudioTrack("LogunDeath", FMOD_3D, AudioType::EFFECT, convertVector(worldPos), convertVector(zeroVel), false, 1.f, 10000.f), 0.5f);
+				}
+
 				logunAlive ded;
-
-				GameObject* temp = m_activeScenes[0]->getChildren()->at(0);
-				glm::vec3 worldPos = glm::vec3(temp->getParent()->worldTransform * glm::vec4(temp->localTransform.getPos(), 1.0f));
-				glm::vec3 zeroVel = glm::vec3(0.f);
-				AudioPlayer::playTrack(new AudioTrack("LogunDeath", FMOD_3D, AudioType::EFFECT, convertVector(worldPos), convertVector(zeroVel), false, 1.f, 10000.f), 0.5f);
-
 				//deadLogun->localTransform.setPos(player->localTransform.getPos());
 				//deadLogun->addChild(cameraPivot);
 				//cameraPivot->getBehaviours()->clear();
@@ -1202,13 +1206,24 @@ void Game::draw()
 	//	}
 	//}
 
-	ShaderManager::getPost(UI_POST)->bind();
-	uiImage->bind(1);
-	uiMask->bind(2);
-	deferredComposite->drawToScreen();
-	uiMask->unbind(2);
-	uiImage->unbind(1);
-	ShaderManager::getPost(UI_POST)->unbind();
+	if (logunAlive)
+	{
+		ShaderManager::getPost(UI_POST)->bind();
+		uiImage->bind(1);
+		uiMask->bind(2);
+		deferredComposite->drawToScreen();
+		uiMask->unbind(2);
+		uiImage->unbind(1);
+		ShaderManager::getPost(UI_POST)->unbind();
+	}
+	else
+	{
+		ShaderManager::getPost(THANOS_POST)->bind();
+		endGame->bind(1);
+		deferredComposite->drawToScreen();
+		endGame->unbind(1);
+		ShaderManager::getPost(THANOS_POST)->unbind();
+	}
 
 }
 

@@ -8,7 +8,6 @@ uniform float uHealth;
 uniform float uHealth2;
 uniform float uScore;
 uniform int uWave;
-uniform float ;
 
 layout(binding = 0) uniform sampler2D uTex;
 layout(binding = 1) uniform sampler2D uiTex;
