@@ -112,6 +112,8 @@ void Game::initGame()
 
 	Texture *ravagerAlbedo = new Texture("diffuseTex");
 	ravagerAlbedo->load("./Resources/Objects/Ravager/albedo.png");
+	Texture *ravagerEmissive = new Texture("emissiveTex");
+	ravagerEmissive->load("./Resources/Objects/Ravager/emissive.png");
 	m_ravager->setAlbedo(ravagerAlbedo);
 
 	m_brazier = new IModel();
@@ -205,9 +207,17 @@ void Game::initGame()
 	m_logunSwingASword->setMetalness(swordMetalTex);
 	m_logunSwingASword->setRoughness(swordRoughTex);
 
+	m_ravagerWalk = new AnimatedModel();
+	m_ravagerWalk->loadFromFiles(10, "RavagerWalk", "./Resources/Objects/Ravager/Anims/Walk/");
+	m_ravagerWalk->setAlbedo(ravagerAlbedo);
+	m_ravagerWalk->setEmissive(ravagerEmissive);
+	m_ravagerWalk->setMetalness(blankEmissive);
+	m_ravagerWalk->setRoughness(blankEmissive);
+
 	for (int i = 0; i < 10; ++i) {
 		m_logunWalk->setFrameTime(i, 0.08333f);
 		m_logunWalkSword->setFrameTime(i, 0.08333f);
+		m_ravagerWalk->setFrameTime(i, 0.3333f);
 	}
 	for (int i = 0; i < 16; ++i) {
 		m_logunSwingA->setFrameTime(i, 0.08333f);
@@ -916,7 +926,7 @@ void Game::update()
 			PlayerController* pc = (PlayerController*)behav[0];
 
 			//If actually moving, update player model angle
-			if (pc->isWalking()) {
+			if (pc->isWalking() && glm::length(playerPhys->P_velocity)>0.4f) {
 				m_playerModelAngle = atan2f(-playerPhys->P_velocity.z, playerPhys->P_velocity.x);
 			}
 
@@ -1214,7 +1224,7 @@ void Game::spawnEnemy(EnemyType _type, glm::vec3 _location)
 	switch (_type)
 	{
 	case RAVAGER:
-		enemy->addBehaviour(new MeshRenderBehaviour(m_ravager, ShaderManager::getShader(GBUFFER_SHADER)));
+		enemy->addBehaviour(new MeshRenderBehaviour(m_ravagerWalk, ShaderManager::getShader(GBUFFER_MORPH)));
 		break;
 	case LESSER_GHOUL:
 	case GREATER_GHOUL:
@@ -1307,7 +1317,6 @@ int Game::run() {
 		m_logunWalkSword->setAnimSpeed((glm::length(playerPhys->P_velocity)+0.0001f)*RATIO_LOGUN_WALK);
 
 		update();
-
 		m_display->clear(0.f, 0.0f, 0.0f, 1.f);
 
 		draw();

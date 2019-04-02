@@ -356,7 +356,6 @@ void AnimatedModel::update()
 {
 	//Update T-value
 	m_t += m_animSpeed * Time::deltaTime/m_frameTimes[m_cFrame];
-	printf("T-Val: %s: %f\n", m_name, m_t);
 	if (m_t >= 1.0f) {
 		//Properly set current frame indices.
 		while (m_t >= 1.0f) {

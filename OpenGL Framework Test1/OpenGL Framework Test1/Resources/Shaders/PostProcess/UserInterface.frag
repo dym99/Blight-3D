@@ -29,10 +29,10 @@ void main()
 	healthColor = (healthYellowColor == vec3(0.f, 1.f, 0.f)) ? 
 				(healthColor == vec3(1.f, 0.f, 0.f)) ? vec3(1.f, 0.f, 0.f) : vec3(1.f, 1.f, 0.f) 
 				: 
-				vec3(0.f, 0.f, 0.f);
+				vec3(0.3f, 0.3f, 0.3f);
 
 	float alpha = texture(uiMask, TexCoords).r;
-	float modifier = (healthColor == vec3(0.f, 0.f, 0.f)) ? 0.f : 1.f;
+	float modifier = (healthColor == vec3(3.f, 3.f, 3.f)) ? 0.f : 0.5f;
 
 	FragColor.rgb = mix(source.rgb, healthColor.rgb, alpha * modifier);
 	

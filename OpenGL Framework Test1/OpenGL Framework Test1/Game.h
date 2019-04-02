@@ -61,6 +61,8 @@ private:
 	AnimatedModel *m_logunWalk, *m_logunWalkSword;
 	AnimatedModel *m_logunSwingA, *m_logunSwingASword;
 
+	AnimatedModel *m_ravagerWalk;
+
 	MeshRenderBehaviour *m_logunRenderer, *m_swordRenderer;
 
 	bool m_logunAttacking = false;

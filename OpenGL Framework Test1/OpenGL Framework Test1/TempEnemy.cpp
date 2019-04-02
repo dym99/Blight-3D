@@ -25,7 +25,7 @@ void TempEnemy::start()
 
 void TempEnemy::update()
 {
-
+	m_parentObject->localTransform.setRot(glm::vec3(0,atan2f(m_bodyObject->P_velocity.x, m_bodyObject->P_velocity.z),0));
 
 	bool hitSword = false;
 	for (std::string name : m_bodyObject->getTriggeredNames())
@@ -73,7 +73,7 @@ void TempEnemy::update()
 		prevClosestID = closestToL->id;
 	}
 
-	std::cout << closestToL->id << " " << prevClosestID << std::endl;
+	//std::cout << closestToL->id << " " << prevClosestID << std::endl;
 
 	//if (m_startNode == NULL)
 	//{
