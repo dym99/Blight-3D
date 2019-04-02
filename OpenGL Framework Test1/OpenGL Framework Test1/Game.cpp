@@ -862,12 +862,16 @@ void Game::initGame()
 	//Load audio track for ambiance
 	AudioPlayer::loadAudio(*new AudioTrack("Ambiance", FMOD_3D, AudioType::EFFECT, { 0.f, 0.f, 0.f }, { 0.f, 0.f, 0.f }, true, 0.1f, 5000.f), "Ambiance");
 	AudioPlayer::loadAudio(*new AudioTrack("bones", FMOD_3D, AudioType::EFFECT, { 0.f, 0.f, 0.f }, { 0.f, 0.f, 0.f }, true, 0.1f, 5000.f), "Walking");
+	AudioPlayer::loadAudio(*new AudioTrack("Blight2", FMOD_3D, AudioType::EFFECT, { 0.f, 0.f, 0.f }, { 0.f, 0.f, 0.f }, true, 0.1f, 5000.f), "Soundtrack");
 	//Play ambiance
 	AudioPlayer::prepareTrack("Ambiance");
+	AudioPlayer::prepareTrack("Soundtrack");
 	AudioPlayer::prepareTrack("Walking");
+	AudioPlayer::playTrack("Soundtrack");
 	AudioPlayer::playTrack("Ambiance");
 	AudioPlayer::setVolume("Ambiance", 0.1f);
 	AudioPlayer::setVolume("Walking", 0.1f);
+	//AudioPlayer::setVolume("Soundtrack", 0.5f);
 
 	//m_display->setFullscreen(SDL_WINDOW_FULLSCREEN);
 	m_activeScenes.push_back(scene);
@@ -1055,6 +1059,7 @@ void Game::update()
 	AudioPlayer::setListenerPosition(logunPos, fmodVel, camFor, camUp);
 	AudioPlayer::searchTrack("Ambiance")->position = logunPos;
 	AudioPlayer::searchTrack("Walking")->position = logunPos;
+	AudioPlayer::searchTrack("Soundtrack")->position = logunPos;
 
 	for (unsigned int i = 0; i < m_activeScenes.size(); ++i) {
 		m_activeScenes[i]->update();
